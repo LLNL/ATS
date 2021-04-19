@@ -4,7 +4,7 @@
 
 Clone this repository, and all the submodules:
 
-    git clone --recursive https://github.com/llnl/ats
+    git clone --recursive  git@github.com:LLNL/ATS.git
 
 ## License
 
