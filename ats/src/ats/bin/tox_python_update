@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+####################################################################
+#  TOX WORKFLOW - UPDATE PYTHON EXECUTABLE PATH                    #
+#                                                                  #
+#  When tox creates a virtualenv in the ".tox" directory the ATS   #
+#  executables reference a static path to the virtualenv's python  #
+#  binary. For example, "#!/my/path/.tox/<venv>/bin/python"        #
+#  Moving this virtualenv to a different path does not change the  #
+#  static path in these files, even though the binary has moved.   #
+#                                                                  #
+#  This script updates the static paths in ATS' executable files.  #
+#  The user should provide a path where the python executable can  #
+#  be found. Assuming some "../bin/python" is found, this path     #
+#  replaces the tox default path set during virtualenv creation.   #
+####################################################################
+
+declare -r FIRST_LINE='^.*$'
+declare -r PREFIX='#!'
+
+if [[ -z "$1" ]]; then
+    echo "MISSING PATH ERROR: "
+    exit 1
+fi
+
+PYTHON_PATH=$(find $1 -type f -executable -path '*/python' -print | xargs realpath)
+if [[ ! -x "$PYTHON_PATH" ]]; then
+    echo "BAD PATH ERROR: path '$1' does not contain 'python' executable."
+    exit 1
+fi
+
+ATS_PYTHON_PATH=${PREFIX}${PYTHON_PATH}
+echo "Updating ATS executable files to reference '$ATS_PYTHON_PATH' ..."
+
+# Find non-binary executable files in $1 - determined by mime type.
+EXEC_FILES=$(find $1 -type f -executable -exec file -i '{}' \; \
+	     | tr --delete ':' \
+	     | awk '$3 !~ /binary/ {print $1}')
+echo -e "Files being updated: ${EXEC_FILES[*]}\n"
+sed -i "1s|$FIRST_LINE|$ATS_PYTHON_PATH|" ${EXEC_FILES[@]}
+
+echo "Listed files above now use: '$ATS_PYTHON_PATH'"
+echo "Done."
+

@@ -1,0 +1,7 @@
+#!/usr/apps/ats/7.0.0/bin/python
+import sys
+import ats
+
+result = ats.manager.main()
+sys.exit(result)
+

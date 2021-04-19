@@ -1,0 +1,320 @@
+#!/usr/apps/ats/7.0.0/bin/python
+import optparse
+import os
+import re
+import socket
+import sys
+
+d_debug= 1
+
+#---------------------------------------------------------------------------
+
+def runThisCommand(cmd):
+    import subprocess
+    print "Running: ", cmd
+    aProcess= subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    for line in aProcess.stdout:
+        print "", line,
+    aProcess.wait()
+    
+    if (d_debug==1):
+        print "return code= ", aProcess.returncode
+    returnCode= aProcess.returncode
+
+    return returnCode
+
+
+#---------------------------------------------------------------------------
+def getNumberOfProcessorsPerNode(useNode=None):
+    # Assume all nodes on this machine has the same number of processors
+
+    if os.environ.has_key('SYS_TYPE'):
+        SYS_TYPE= os.environ['SYS_TYPE']
+    else:
+        SYS_TYPE= ''
+    try:
+        import subprocess
+        stdout_value = '0'
+        catCmd= 'lsdev -C -c processor | wc -l'
+
+        if SYS_TYPE.startswith('aix'):
+
+            cmd = 'scontrol show node | head -2 '
+
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            stdout_value = proc.communicate()[0]
+        
+            cmdVal= repr(stdout_value)
+            
+            # Expect value to be similar to this format
+            #
+            # ["'NodeName", 'alc36 State', 'ALLOCATED CPUs', '2 AllocCPUs', '2 RealMemory', '3300 TmpDisk',"0\\n'"]
+            #
+            # grab cpu information
+         
+            allVals = cmdVal.split()
+            
+            numCPU= '0'
+            for val in allVals:
+                if val.startswith('CPUTot'):
+                    numCPU= val.split('=')[-1]
+                    break
+           
+            return  int(numCPU)
+
+        else: #if SYS_TYPE.startswith('linux'):
+            catCmd= 'cat /proc/cpuinfo | grep processor | wc -l'
+        
+        # grab cpu information
+        if useNode==None:
+            cmdToUse= catCmd 
+        else:
+            sshCmd= 'ssh ' + useNode + ' '
+            cmdToUse= sshCmd + '"' + catCmd + '"'
+        
+        proc= subprocess.Popen(cmdToUse, shell=True, stdout=subprocess.PIPE,)
+        stdout_value = proc.communicate()[0]
+        numCpu = stdout_value.split()[0]   # another way of getting CPUs
+        return  int(numCpu)
+    except KeyboardInterrupt:
+        raise
+    except:
+        print "Unexpected error in getNumberOfProcsPerNode:", sys.exc_info()
+        return 0
+
+#---------------------------------------------------------------------------
+def createMsubFile(inCommand, inBank="axcode", inPartition="pbatch", inNumMinutes=200, inNumNodes=4, inFilename=''):
+
+    if (inFilename==''):
+        import random
+        inFilename= "tmpAts" +  str(random.random()) + ".job"
+    
+    FILE= open(inFilename, "w")
+
+    msubOutputFilename= inFilename + ".out"
+
+    thisNode= socket.gethostname()
+
+    FILE.write("#!/bin/csh" + '\n')
+    FILE.write("\n")
+    FILE.write("#MSUB -N " + inFilename + '\n')
+    FILE.write("#MSUB -j oe "+ '\n')                       # directs all err output to stdout ")
+    FILE.write("#MSUB -o " + msubOutputFilename + '\n')
+    FILE.write("#MSUB -q " +  inPartition+ '\n')
+    FILE.write("#MSUB -l nodes=" +  str(inNumNodes)+ ":ppn=" + str(getNumberOfProcessorsPerNode()) + '\n')
+    FILE.write("#MSUB -l ttc=" +  str(getNumberOfProcessorsPerNode()*inNumNodes)+ '\n')
+    FILE.write("#MSUB -l walltime=" + str(inNumMinutes)+ '\n')
+    FILE.write("#MSUB -V                         # exports all environment var "+ '\n')
+
+    if (inBank is not None):
+        FILE.write("#MSUB -A " + inBank + "                        #bank to use "+ '\n')
+
+    FILE.write(""+ '\n')
+    FILE.write("setenv " + "SYS_TYPE " + os.environ['SYS_TYPE'] + '\n')
+    FILE.write(""+ '\n')
+    FILE.write("date"+ '\n')
+    FILE.write("cd " + os.getcwd() + " ; " + inCommand+ '\n')
+
+    FILE.write("date"+ '\n')
+
+
+    FILE.close()
+    return inFilename
+
+#---------------------------------------------------------------------------
+class NoErrOptionParser(optparse.OptionParser):
+    # Found this online... modified some 
+    def __init__(self,*args,**kwargs):
+        self.valid_args_cre_list = []
+        optparse.OptionParser.__init__(self, *args, **kwargs)
+
+    def error(self,msg):
+        optparse.OptionParser.error(self,msg)
+        pass
+
+    def add_option(self,*args,**kwargs):
+        self.valid_args_cre_list.append(re.compile('^'+args[0] +  "[ =]"))
+        self.valid_args_cre_list.append(re.compile('^' + args[0] + '$'))
+        optparse.OptionParser.add_option(self, *args, **kwargs)
+
+    def parse_args(self,*args,**kwargs):
+        # filter out invalid options
+        args_to_parse = args[0]
+        # all args are stored in args_to_parse
+        new_args_to_parse = []
+        for a in args_to_parse:
+            for cre in self.valid_args_cre_list:
+                if cre.match(a):
+                    new_args_to_parse.append(a)
+                    break
+                elif not a.startswith("-"):
+                    new_args_to_parse.append(a)
+                    break
+
+        #args that'll be used are stored in new_args_to_parse
+        # remove old values and insert the new
+        while len(args_to_parse) > 0:
+            args_to_parse.pop()
+        for a in new_args_to_parse:
+            args_to_parse.append(a)
+        
+        return optparse.OptionParser.parse_args(self,*args,**kwargs)
+
+
+def main():
+    theHostname = socket.gethostname()
+    theHostname = theHostname.split(".")[0]
+
+    whichAts= sys.argv[0]
+    atsArgs = ' '.join(sys.argv[1:])
+
+    #----------------------------------------------------------
+    #atsCommand = os.path.join(sys.exec_prefix, 'bin', 'atsb')
+    atsCommand= "atsb.new"
+
+    #----------------------------------------------------------
+    # inits
+    #----------------------------------------------------------
+    partitionDefault= None
+    numNodesDefault= -1
+    bankDefault= "axcode"
+
+    #----------------------------------------------------------
+    # defaults
+    #----------------------------------------------------------
+    sallocWrap= 0
+    toAdd= ""
+
+    #----------------------------------------------------------
+
+    #parser = optparse.OptionParser()
+    parser= NoErrOptionParser()
+    parser.add_option( "--batch",
+                      action="store_true", dest="batch", default=False,
+                      help="batch option for atsb ")
+
+    parser.add_option(
+            '--skip', action='store_true', dest='skip',  default = False,
+            help='skip actual execution of the tests, but show filtering results and missing test files.')
+
+
+    parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
+               default = numNodesDefault, 
+               help="Number of nodes to use")
+
+    parser.add_option("--partition", action="store", type="string", dest='partition', 
+                default = partitionDefault,
+                help = "Partition in which to run jobs.")
+
+    parser.add_option("--batchPartition", action="store", type="string", dest='batchPartition', 
+                default = 'pbatch',
+                help = "Batch partition in which to run jobs.")
+
+    parser.add_option("--bank", action="store", type="string", dest='bank', 
+                default = bankDefault,
+                help = "Bank to use for batch job.")
+
+    (options, args) = parser.parse_args(sys.argv[:])
+
+    if (d_debug==1):
+        print "options= ", options
+
+    if options.batch:
+        #Remove batch option
+        useSrunStep= " --useSrunStep "
+        atsArgs= atsArgs.replace('-b ', useSrunStep)
+        atsArgs= atsArgs.replace('--batch ', useSrunStep)
+        sallocWrap= 1          # for batch
+
+    #----------------------------------------------------------
+    #----------------------------------------------------------
+
+    if (d_debug==1):
+        print "whichAts= ", whichAts
+        print "atsArgs= ", atsArgs
+
+
+    # default settings
+    os.environ['MACHINE_TYPE']= 'chaosM'
+    os.environ['BATCH_TYPE']= 'BATCH_COMBINED'
+    #os.environ['BATCH_TYPE']= 'BATCH_SINGLE'       
+
+    #----------------------------------------------------------
+    # alastor
+    #----------------------------------------------------------
+    if theHostname.startswith('alastor'):
+        
+        if (atsArgs.find("--allInteractive") == -1):
+            toAdd +=  "--allInteractive "
+        sallocWrap= 1
+    #----------------------------------------------------------
+    # hera
+    # pdebug has a 30 min time limit.  Use node scheduling.
+    #----------------------------------------------------------
+    elif theHostname.startswith('hera'):
+        
+        if options.numNodes==-1:
+            options.numNodes= 4
+            toAdd +=  "--numNodes=" + str(options.numNodes) + " "
+
+        if (atsArgs.find("--removeSrunStep") == -1):
+            toAdd +=  "--removeSrunStep "
+
+    else:
+        #----------------------------------------------------------
+        # up, zeus
+        #----------------------------------------------------------
+        if (atsArgs.find("--allInteractive ") == -1):
+            toAdd +=  "--allInteractive "
+            sallocWrap= 1
+            os.environ['MACHINE_TYPE']= 'chaosM'      
+            os.environ['BATCH_TYPE']= 'BATCHALL'       
+
+    print "Rem:  setenv MACHINE_TYPE ",  os.environ['MACHINE_TYPE']
+    print "Rem:  setenv BATCH_TYPE ",  os.environ['BATCH_TYPE']
+
+    #----------------------------------------------------------
+    if options.numNodes==-1 and sallocWrap!=1:
+        options.numNodes= 1
+        toAdd +=  "--numNodes=" + str(options.numNodes) + " "
+
+
+    #----------------------------------------------------------
+    # if NOT batch
+    #----------------------------------------------------------
+    if not options.batch:
+        if options.partition is None:
+            options.partition= 'pdebug'
+        toAdd +=  "--partition=" + options.partition + " "          # ok to use default?
+
+        atsArgs= atsCommand + " " +  toAdd + atsArgs 
+
+        if sallocWrap==1:
+            finalCommandToRun= "salloc --exclusive -N " + str(options.numNodes) +  " -p " + options.partition + " srun -n1 -N1 --pty --preserve-env --mpi=none  " + atsArgs
+        else:
+            finalCommandToRun= atsArgs
+
+
+    #----------------------------------------------------------
+    # if batch
+    #----------------------------------------------------------
+    if options.batch:
+        atsArgs= atsCommand + " " +  toAdd + atsArgs 
+        finalCommandToRun= atsArgs
+        msubFilename= createMsubFile(finalCommandToRun, options.bank, options.batchPartition, 200, options.numNodes, '')
+        print "Command : ", finalCommandToRun
+        print "Written out to this file : ", msubFilename
+        if not options.skip:
+            runThisCommand('msub ' + msubFilename)
+        sys.exit()
+    #----------------------------------------------------------
+
+    if (d_debug==1):
+        print "atsCommand= ", atsCommand
+        print "atsArgs= ", atsArgs
+
+    runThisCommand(finalCommandToRun)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,25 @@
+import os
+glue(independent=True)
+glue(keep=True)
+my_checker = '/usr/apps/ats/7.0.0/lib/python2.7/site-packages/atsASC/Kripke/ats_check_log.py'
+
+
+t1=test  (executable = './a.out', clas = ' 6 30  200', np=2, nt=10, ngpu=1)
+t2=test  (executable = './a.out', clas = ' 6 15  200', np=2, nt=10, ngpu=1)
+t3=test  (executable = './a.out', clas = ' 6 20  200', np=2, nt=10, ngpu=1)
+t4=test  (executable = './a.out', clas = ' 6 10  200', np=2, nt=10, ngpu=1)
+
+t5=test  (executable = './a.out', clas = ' 6 30  200', np=2, nt=10, ngpu=2)
+t6=test  (executable = './a.out', clas = ' 6 15  200', np=2, nt=10, ngpu=2)
+t7=test  (executable = './a.out', clas = ' 6 20  200', np=2, nt=10, ngpu=2)
+t8=test  (executable = './a.out', clas = ' 6 10  200', np=2, nt=10, ngpu=2)
+
+#t11=test  (executable = './a.out', clas = ' 6 30  200', nn=2, np=2, nt=10, ngpu=2)
+#t12=test  (executable = './a.out', clas = ' 6 15  200', nn=2, np=2, nt=10, ngpu=2)
+#t13=test  (executable = './a.out', clas = ' 6 20  200', nn=2, np=2, nt=10, ngpu=2)
+#t14=test  (executable = './a.out', clas = ' 6 10  200', nn=2, np=2, nt=10, ngpu=2)
+
+#t23=test  (executable = './a.out', np=4, nt=10, ngpu=4)
+#t24=test  (executable = './a.out', np=4, nt=10, ngpu=4)
+#t25=test  (executable = './a.out', np=4, nt=10, ngpu=4)
+#t26=test  (executable = './a.out', np=4, nt=10, ngpu=4)

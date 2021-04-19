@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+declare -r ATS_PREFIX='#!/usr/apps/ats/'
+declare -r PYTHON_SUFFIX='/bin/python'
+declare -A VERSIONED_FILES
+
+function find_ats_files {
+    echo "Searching for ATS executable files..."
+    local ATS_FILES=($(find . -type f -executable -print0 \
+                     | xargs -0 grep -l ^${ATS_PREFIX}))
+    for ATS_FILE in ${ATS_FILES[@]}
+    do
+        local OLD_VERSION=$(head -1 $ATS_FILE | cut -d '/' -f 5)
+        VERSIONED_FILES["$OLD_VERSION"]+="$ATS_FILE "
+    done
+}
+
+function list_found_ats_files {
+    echo -n "Listed files use ATS in path "
+    echo -e "\033[1m${ATS_PREFIX}${ATS_VERSION}${PYTHON_SUFFIX}\033[0m:"
+    echo -e "\n${VERSIONED_FILES[$ATS_VERSION][@]}\n"
+}
+
+function request_new_ats_version {
+    echo -en "Updating \033[1mversion\033[0m in path: "
+    echo -e "${ATS_PREFIX}\033[1m${ATS_VERSION}\033[0m${PYTHON_SUFFIX}"
+    # Reuse previously entered value of $NEW_VERSION if applicable
+    read -e -i ${NEW_VERSION:-""} -p "Enter new version of ATS (or nothing to quit): " NEW_VERSION
+
+    if [[ -z $NEW_VERSION ]]; then
+        exit
+    elif [[ $NEW_VERSION == $ATS_VERSION ]]; then
+        echo -e "Version unchanged. Skipping update...\n"
+        return 1
+    fi
+}
+
+function handle_unknown_ats_path {
+    # TMP_PATH is /usr/apps/ats/$NEW_VERSION/bin/python
+    local TMP_PATH=${ATS_PREFIX:2}${NEW_VERSION}${PYTHON_SUFFIX}
+    # Test if new path exists as symlink or executable file.
+    if [[ -L "$TMP_PATH" || -x "$TMP_PATH" ]]; then
+	return 0
+    fi
+
+    PS3="Update path anyway? "
+    echo -e "\nWARNING: path \033[1m$TMP_PATH\033[0m does not exist."
+    local options=("yes" "no")
+    select opt in ${options[@]};
+    do
+        # Allows user to select option number (1 or 2) or enter "yes" or "no".
+        case $opt,$REPLY in
+                yes,*|*,yes)
+    	            return 0 ;;
+                no,*|*,no)
+    	            return 1 ;;
+                *)
+    	            echo "Please select yes or no." ;;
+        esac
+    done
+}
+
+function update_ats_files {
+    for ATS_FILE in ${VERSIONED_FILES[$ATS_VERSION][@]}
+    do
+	# Delimiter "|" used to allow "/" characters in path variables.
+        sed -i "1s|${ATS_VERSION}|${NEW_VERSION}|" $ATS_FILE
+        echo "ATS path updated in: $ATS_FILE"
+    done
+}
+
+function print_path_changes {
+    echo -en "\033[1mOLD\033[0m PATH: "
+    echo -e "${ATS_PREFIX}\033[1m${ATS_VERSION}\033[0m${PYTHON_SUFFIX}"
+    echo -en "\033[1mNEW\033[0m PATH: "
+    echo -e "${ATS_PREFIX}\033[1m${NEW_VERSION}\033[0m${PYTHON_SUFFIX}\n"
+}
+
+find_ats_files
+for ATS_VERSION in ${!VERSIONED_FILES[@]}
+do
+    list_found_ats_files
+    request_new_ats_version
+    if [[ $? -ne 0 ]]; then
+        continue
+    fi
+    handle_unknown_ats_path
+    if [[ $? -ne 0 ]]; then
+        continue
+    fi
+    update_ats_files
+    if [[ $? -ne 0 ]]; then
+        continue
+    fi
+    print_path_changes
+done
+

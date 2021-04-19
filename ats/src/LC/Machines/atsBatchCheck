@@ -1,0 +1,38 @@
+#!/usr/apps/ats/7.0.0/bin/python
+import sys
+import os, string, time, sys
+import time
+import lcBatch
+
+
+batchFilename= sys.argv[1]
+newBatchFilename= batchFilename + ".tmp"
+
+fp= open(batchFilename, 'r')
+newFp= open(newBatchFilename, 'w')
+
+allLines= fp.readlines()
+newStatus= None
+for aLine in allLines:
+    if 'status file:' in aLine:
+        statusFilename= aLine.split()[-1]
+    if 'job ID:' in aLine:
+        jobid= aLine.split()[-1]
+        print "JobID to check = ", jobid
+    if 'test status:' in aLine:
+        oldStatus= aLine.split()[-1]
+        if oldStatus=="SUBMITTED":
+            print "-----------------------------------------------------"
+            newStatus= lcBatch.checkStatusFile(statusFilename)
+            print "newStatus= ", newStatus
+        elif oldStatus=="UNKNOWN":
+            lcBatch.checkJob(jobid)
+    if newStatus is not None:
+        print >> newFp, "    test status:   %s" % (newStatus),
+        newStatus = None
+    else:
+        print >> newFp, aLine,
+
+fp.close()
+newFp.close()
+

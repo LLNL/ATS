@@ -1,0 +1,94 @@
+--------------------------------------------------------------------------------
+--                 READ.ME for hello_ats sample program                       --
+--------------------------------------------------------------------------------
+2019-Sep-5
+
+Sample use of lightweight ATS wrapper script
+
+How to use:
+
+    ats_hello               <- Lightweight wrapper to ATS for your project
+    hello_ats.c             <- Simple executable -- will be your projects exectuable(s)
+    create_test_ats.py      <- Python script which will create the test.ats file
+                               Enables projects to easily create tests with
+                               variable number of MPI processes, code executables,
+                               code arguments (test decks, etc), sandbox options,
+                               and post test checkers.
+
+Compile hello_ats.c with an mpi C wraper, such as mpigcc or mpiicc, creating
+an a.out executable in this directory like so:
+
+    mpicc hello_ats.c
+
+Run the ats_hello wrapper script like so:
+
+    ./ats_hello
+
+If run from a login node (such as Alastor), it will run tests which pass and
+fail, as well as checker scripts, some which pass, fail, are skipped.
+
+The end of the run should inclde:
+
+FAILED:  12 a(a.out_1), a(a.out_3), etc.
+PASSED:   18
+SKIPPED:  14
+
+It may also present some which are HALTED if errors are detected in slurm
+or mpi init by ATS.
+
+--------------------------------------------------------------------------------
+-- Flux testing notes (2019-Sep-06) from SAD
+--------------------------------------------------------------------------------
+
+In the ats_hello script one will run, search for 'Flux testing' to see comments
+on the current state of flux.
+
+There is a flux_direct.py module coded up by a developer with assistance from
+Tom Scogland.  One may use this module by uncommenting this line in the ats_hello
+script
+
+    os.environ['MACHINE_TYPE'] = "flux"
+
+ATS will then use this wrapper, as evidenced by the lines put to stdout:
+
+    from flux_direct import FluxDirect as Machine
+
+But the import of flux fails.  This is where we need to start the work.  Update
+the flux_direct.py file so that it can import flux. Then move on from there to
+make flux work.
+
+--------------------------------------------------------------------------------
+--  Notes on running
+--------------------------------------------------------------------------------
+
+* If run from a front end node, the ats_hello script will salloc 1 nodes and
+  run within that allocation.  If there are not 4 nodes available in the debug
+  queue, it will stall until nodes are available.  See following notes for
+  other options.
+
+* One may override the number of nodes to be used via the --numNodes option
+to ats_hello like so: ./ats_hello --numNodes=.2
+
+* ats_hello --help will show all options.
+
+* One may pre-allocate a set of nodes, and run ats_hello with that allocation.
+  One way to allocate 2 nodes on chaos and reserve all the cores for your
+  use for testing would be:
+
+  salloc -N2 -n2 -p pdebug --exclusive
+
+  Remember to exit and free the reserved nodes when done testing.
+
+* The sample test case runs parallel jobs up to 64 processors.  If one runs
+  in an allocation that has less than the number of processors, then those
+  jobs will be skipped, but others will run.
+
+* This is just a sample to get one started. There are many other ways to run,
+   more checkers can be specified, more ATS options, etc.
+
+* Contact Shawn Dawson for feedback and for questions about using ATS on your project
+
+
+--------------------------------------------------------------------------------
+--                           end of READ.ME                                   --
+--------------------------------------------------------------------------------

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+###########################################################################
+#  TOX WORKFLOW - RELOCATE VIRTUALENV CREATED BY TOX                      #
+#                                                                         #
+#  By default, tox creates a virtualenv in a ".tox" directory.            #
+#  For continuous integration purposes, this script moves this            #
+#  virtualenv to the path provided by the user.                           #
+#                                                                         #
+#  If the given directory does not exist, it is created.                  #
+#  If the given directory does exist, an attempt to move the virtualenv   #
+#  to that directory is made and pre-existing files are not overwritten.  #
+###########################################################################
+
+if [ -z "$2" ]; then
+    echo -en "\n\033[1mMISSING PATH ERROR: \033[0m"
+    echo -n "provide a source path and then a destination path to relocate "
+    echo "the ATS virtualenv."
+    exit 1
+fi
+
+mkdir -p "$2"
+echo "Moving ATS build from $1 to $2"
+
+# System configurations may be aliasing "cp" to "cp -i", blocking "-rf" flags.
+unalias cp
+cp -rf "$1"/* "$2"
