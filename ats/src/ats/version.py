@@ -1,7 +1,7 @@
 # begin of file
 #
-ATS_MAJOR = 6
-ATS_MINOR = 4
+ATS_MAJOR = 7
+ATS_MINOR = 0
 ATS_PATCH = 0
 
 #
