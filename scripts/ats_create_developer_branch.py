@@ -168,12 +168,6 @@ if __name__=="__main__":
     # -------------------------------------------------------------------------
     # Inspect the state of the local branch.  If there is uncommitted work
     # or unpushed work, then do not continue.
-    #
-    # 2019-09-11 SAD Note.
-    # I am being quite cautious here.  There should be no uncommitted or 
-    # or modified work on the local branch.  Similarly, there should be no
-    # need to do a pull from the remote bitbucket repo.  We may loosen
-    # these restritions in the future.
     # -------------------------------------------------------------------------
     code, out, err = runcommand_die_on_err("git status --porcelain");
     git_status = out.rstrip()
@@ -183,7 +177,6 @@ if __name__=="__main__":
         print("Info: local clone looks clean ... continuing")
     else:
         messages = ["Unsure of status of local branch %s. Will not continue" % local_branch]
-        messages.append("Contact Shawn Dawson for help")
         messages.append("")
         for line in git_status_lines: messages.append(line)
         error_and_exit(-1, messages)
@@ -202,7 +195,6 @@ if __name__=="__main__":
     # do not update if we are unsure of the results of the pull (if there are >1 line in the output)
     if len(git_pull_dry_run_lines) > 1:
         messages = ["Unsure of status of local branch %s. Will not continue" % local_branch]
-        messages.append("Contact Shawn Dawson for help")
         messages.append("")
         for line in git_pull_dry_run_lines: messages.append(line)
         error_and_exit(-1, messages)
@@ -230,8 +222,6 @@ if __name__=="__main__":
     # Now do the commands needed to create the developer branch push it to
     # the Bit Bucket repo and set it's origin correctly
     # -------------------------------------------------------------------------
-    #code, out, err = runcommand_die_on_err('git checkout main');
-    #code, out, err = runcommand_die_on_err('git pull');
     code, out, err = runcommand_die_on_err('git checkout -b %s' % branch_name);
     
     question = "Do you want to push developer branch '%s' to the remote repo %s" % (branch_name, remote_repo)
