@@ -16,7 +16,7 @@ Contact the ATS project lead dawson6@llnl.gov
 
 ## Contributing 
 
-Refer to file CONTRIBUTING.md
+Refer to file [CONTRIBUTING.md](Contributing)
 
 
 ## Release
