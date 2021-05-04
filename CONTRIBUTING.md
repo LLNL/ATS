@@ -7,7 +7,7 @@ requests as well as questions, feature requests, or bug reports via
 issues. Contact our team at dawson6@llnl.gov with any questions. Please also refer
 to our [Code Of Conduct](CODE_OF_CONDUCT.md).
 
-If you arent a developer at LLNL, you wont have permission to
+If you are not a developer at LLNL, you wont have permission to
 push new branches to the repository. First, you should create a fork.
 This will create your copy of the ATS repository and ensure you can
 push your changes up to GitHub and create PRs. 
