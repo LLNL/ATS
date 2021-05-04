@@ -2,6 +2,8 @@
 
 ## Description
 
+ATS is an Automated Test System. It is used to implement regression testing across a variety of HPC platforms. 
+
 ## Getting Started
 
 Clone this repository:
