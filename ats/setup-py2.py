@@ -15,7 +15,7 @@ setup(
     name="ats",
     author="Shawn A. Dawson",
     author_email="dawson6@llnl.gov",
-    url="http://computation.llnl.gov/research/mission-support/WCI/automated-testing-system",
+    url="https://github.com/LLNL/ATS",
     version=get_version(),
     description="Automated Testing System",
     install_requires=['numpy <= 1.16.5'],
