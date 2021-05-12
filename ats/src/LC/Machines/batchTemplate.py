@@ -1,1 +1,0 @@
-../atsMachines/batchTemplate.py
