@@ -2,6 +2,9 @@
 import sys
 import ats
 
-result = ats.manager.main()
-sys.exit(result)
+ats.manager.main()
+
+return_code = ats.manager._summary3()
+
+sys.exit(return_code)
 
