@@ -62,7 +62,7 @@ def addOptions(parser):
         mpibind='off',
         mpibind_executable="unset",
         blueos_old_defaults=False,
-        blueos_exclusive=False,
+        jsrun_exclusive=False,
         blueos_mpibind=False,
         blueos_lrun=False,
         blueos_lrun_pack=False,
@@ -72,7 +72,7 @@ def addOptions(parser):
         blueos_jsrun_bind="unset",
         ompProcBind="unset",
         blueos_ngpu=0,
-        blueos_jsrun_nn=-1,
+        # blueos_jsrun_nn=-1,
         blueos_np=-1,
         toss_nn=-1,
         kmpAffinity='granularity=core',
@@ -157,7 +157,7 @@ def addOptions(parser):
         parser.add_option('--old_defaults', action='store_true', dest='blueos_old_defaults',
             help='Blueos option: Use older default (prior to ATS version 5.9.98) settings for enviroment vars and binding.')
 
-        parser.add_option('--jsrun_exclusive', action='store_true', dest='blueos_exclusive',
+        parser.add_option('--jsrun_exclusive', action='store_true', dest='jsrun_exclusive',
             help='Blueos option: Run each test exclusively on a node(s). Do not share the node(s) with other tests.')
 
         parser.add_option('--mpibind', action='store_true', dest='blueos_mpibind',
@@ -190,14 +190,14 @@ def addOptions(parser):
         parser.add_option('--jsrun_omp', action='store_true', dest='blueos_jsrun_omp',
             help='Blueos option: Use jsrun with special options for OMP built codes.')
 
-        parser.add_option('--jsrun_nn', dest='blueos_jsrun_nn', type='int',
-            help='Blueos option: Sets or over-rides test specific settings of nn (number of nodes).  Setting this to 0 will allow multiple jobs to run per node concurrently, even when nn is specified for individual test cases. Synonym with --nn option.')
+        # parser.add_option('--jsrun_nn', dest='blueos_jsrun_nn', type='int',
+        #     help='Blueos option: Sets or over-rides test specific settings of nn (number of nodes).  Setting this to 0 will allow multiple jobs to run per node concurrently, even when nn is specified for individual test cases. Synonym with --nn option.')
 
         parser.add_option('--jsrun_np', dest='blueos_np', type='int',
             help='Blueos option: Over-rides test specific settings of np (number of processors).  Useful for GPU tests where the 4 MPI and 4 GPU devices are a common testing scenario')
 
-        parser.add_option('--nn', dest='blueos_jsrun_nn', type='int',
-            help='Blueos option: Sets of over-rides test specific settings of nn (number of nodes).  Setting this to 0 will allow multiple jobs to run per node concurrently, even when nn is specified for individual test cases. Synonym with --jsrun_nn option.')
+        # parser.add_option('--nn', dest='blueos_jsrun_nn', type='int',
+        #     help='Blueos option: Sets of over-rides test specific settings of nn (number of nodes).  Setting this to 0 will allow multiple jobs to run per node concurrently, even when nn is specified for individual test cases. Synonym with --jsrun_nn option.')
 
         parser.add_option('--jsrun_bind', action='store', type='string', dest='blueos_jsrun_bind',
             help='Blueos option: jsrun --bind option. "none", "rs" or "packed" may be useful for some projects. Use  "jsrun --help" to see other -b, --bind options.  If running with --mpibind this will be "none" and the mpibind application will manage the binding')
