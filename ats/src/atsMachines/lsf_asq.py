@@ -47,6 +47,7 @@ class lsfMachine (machines.Machine):
     canRunNow_numProcsAvailableReported = -1
     canRunNow_saved_string = ""
     debugClass = False
+    debugJsrun = False
 
     def init (self):
         
@@ -147,7 +148,8 @@ class lsfMachine (machines.Machine):
         self.old_defaults     = options.blueos_old_defaults
         self.lrun_jsrun_args  = options.blueos_lrun_jsrun_args
         self.mpibind          = options.blueos_mpibind
-        self.exclusive        = options.blueos_exclusive
+        self.exclusive        = options.jsrun_exclusive
+        self.jsrun_exclusive  = options.jsrun_exclusive
         self.lrun             = options.blueos_lrun
         self.lrun_pack        = options.blueos_lrun_pack
         self.jsrun            = options.blueos_jsrun
@@ -155,7 +157,7 @@ class lsfMachine (machines.Machine):
         self.jsrun_bind       = options.blueos_jsrun_bind
         self.ompProcBind      = options.ompProcBind
         self.ngpu             = options.blueos_ngpu
-        self.jsrun_nn         = options.blueos_jsrun_nn
+        # self.jsrun_nn         = options.blueos_jsrun_nn
         self.blueos_np        = options.blueos_np
         self.cpusPerTask      = options.cpusPerTask
         self.timelimit        = options.timelimit
@@ -175,6 +177,14 @@ class lsfMachine (machines.Machine):
         # set mpibind to True as well.  
         if self.mpibind_executable != "unset":
             self.mpibind = True
+
+        if lsfMachine.debugJsrun:
+            print "JSRUN 000 DEBUG lsf_asq self.lrun_jsrun_args =  '%s'" % self.lrun_jsrun_args
+            print "JSRUN 000 DEBUG lsf_asq self.jsrun           =  '%s'" % self.jsrun
+            print "JSRUN 000 DEBUG lsf_asq self.jsrun_omp       =  '%s'" % self.jsrun_omp
+            print "JSRUN 000 DEBUG lsf_asq self.jsrun_bind      =  '%s'" % self.jsrun_bind
+            # print "JSRUN 000 DEBUG lsf_asq self.jsrun_nn        =  '%s'" % self.jsrun_nn
+            print "JSRUN 000 DEBUG lsf_asq self.jsrun_exclusive =   %r " % self.jsrun_exclusive
 
         if lsfMachine.debugClass:
             print "DEBUG lsfMachine Class options.cuttime             = %s " % options.cuttime
@@ -210,7 +220,6 @@ class lsfMachine (machines.Machine):
             print "DEBUG lsfMachine Class options.filter              = %s " % options.filter
             print "DEBUG lsfMachine Class options.glue                = %s " % options.glue
 
-
         if lsfMachine.debugClass:
             print "DEBUG lsfMachine leaving self.npMax = %d " % self.npMax
             print "DEBUG lsfMachine leaving self.npMaxH = %d " % self.npMaxH
@@ -242,6 +251,12 @@ class lsfMachine (machines.Machine):
         # Command line ompNumThreads will over-ride what is in the deck.
         # Allows user to set nt on the ATS command line. If not specified.
         # will look in the deck.  If not there, will be set to 1
+
+        if lsfMachine.debugJsrun:
+            print "JSRUN 005 DEBUG"
+            print "JSRUN 005 DEBUG lsf_asq test.np                 =  %d " % test.np
+            print "JSRUN 005 DEBUG self.npMax                      =  %d " % self.npMax
+
         if configuration.options.ompNumThreads and configuration.options.ompNumThreads > 0:
             test.nt = configuration.options.ompNumThreads
             test.cpus_per_task = test.nt    # for compatability with another python file used by slurm and blueos machine
@@ -249,23 +264,32 @@ class lsfMachine (machines.Machine):
             test.nt = test.options.get('nt', 1)
             test.cpus_per_task = test.nt    # for compatability with another python file used by slurm and blueos machine
 
-        # Command line option jsrun_nn over-rides what is in the deck.  It will be -1 if not specified.
-        #print "ATS SAD DEBUG self.jsrun_nn = %i" % (self.jsrun_nn)
+        if lsfMachine.debugJsrun:
+            print "JSRUN 006 DEBUG lsf_asq test.nt                 =  %d " % test.nt
+            print "JSRUN 006 DEBUG lsf_asq test.cpus_per_task      =  %d " % test.cpus_per_task
 
-        if (self.jsrun_nn < 0):
-            test.num_nodes = test.options.get('nn', 0)
-        else:
-            test.num_nodes = self.jsrun_nn
+        #if (self.jsrun_nn < 1):
+        #    test.num_nodes = test.options.get('nn', 0)
+        #else:
+        #    test.num_nodes = self.jsrun_nn
+
+        test.num_nodes = test.options.get('nn', 0)
+
+        if lsfMachine.debugJsrun:
+            print "JSRUN 007 DEBUG test.num_nodes                  =  %s " % test.num_nodes
 
         # If num_nodes not specified check to see if we are running more than 40 MPI processes, if so we need
         # multiple nodes (hosts)
         if ((test.np * test.nt) > self.npMax):
             if test.num_nodes < 1:
-                if (self.jsrun_nn < 0):
+                # if (self.jsrun_nn < 1):
                     test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
                     test.nn = test.num_nodes
                     if configuration.options.verbose:
                         print "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." % (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt)
+
+        if lsfMachine.debugJsrun:
+            print "JSRUN 010 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes
 
     def calculateCommandList(self, test):
 
@@ -287,6 +311,11 @@ class lsfMachine (machines.Machine):
         test.ompProcBind     = self.ompProcBind
         test.mpi_um          = self.mpi_um
 
+        if lsfMachine.debugJsrun:
+            print "JSRUN 020 DEBUG lsf_asq test.jsrun_omp          =  %s " % test.jsrun_omp
+            print "JSRUN 020 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind
+            print "JSRUN 020 DEBUG lsf_asq test.lrun_jsrun_args    =  %s " % test.lrun_jsrun_args
+
         # Allow the ats command line --blueos_np option will over-ride the test specific np option
         if test.blueos_np > 0:
             test.np = test.blueos_np
@@ -295,7 +324,9 @@ class lsfMachine (machines.Machine):
         lsfMachine.set_nt_cpus_per_task_num_nodes(self, test)
         num_nodes = test.num_nodes
 
-        #print "ATS SAD DEBUG test.num_nodes %i num_nodes %i" % (test.num_nodes, num_nodes)
+        if lsfMachine.debugJsrun:
+            print "JSRUN 022 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes
+            print "JSRUN 022 DEBUG lsf_asq num_nodes               =  %d " % num_nodes
 
         temp_time_limit = test.options.get('timelimit', 59)
         time_limit      = Duration(temp_time_limit)
@@ -398,19 +429,25 @@ class lsfMachine (machines.Machine):
                     else:
                         if ( test.num_nodes > 0) :
                             return ["lrun",
+                                    "-v",
                                     "-N", str(test.num_nodes),
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + commandList
                         else :
                             return ["lrun",
+                                    "-v",
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + commandList
 
-                # 2019-04-25 Use this for both jsrun_omp and for --exclusive.
+
+                # 2019-04-25 Use this for both jsrun_omp and for --jsrun_exclusive.
                 #            Comment out the jsrun_omp only code below, as it works sometimes and hangs RM sometimes.
                 #            Also use exclusive if user has specified the num_nodes, or if it was set due to
                 #            the number of processors x threads requested for the test.
-                elif self.exclusive == True or self.jsrun_omp == True or test.num_nodes > 0:
+                elif self.jsrun_exclusive == True or self.jsrun_omp == True or test.num_nodes > 0:
+        
+                    # if omp or nn > 0, set exclusive for later use as well
+                    self.jsrun_exclusive = True
 
                     #
                     # If user did not specify number of nodes, calculated based on the number of processors requested.
@@ -419,6 +456,9 @@ class lsfMachine (machines.Machine):
                         test.num_nodes = math.ceil(float(test.np) / float(self.npMax))
                         if configuration.options.verbose:
                             print "ATS setting numNodes for test %i to %i based on test.np = %i,  number of cores per node of %i, and --exclusive option" % (test.serialNumber, test.num_nodes, test.np, self.npMax)
+
+                    if lsfMachine.debugJsrun:
+                        print "JSRUN 090 DEBUG test.num_nodes                  =  %d " % test.num_nodes
                     #
                     # Now that we know how many nodes we need, loop over the array of nodesInUse
                     #   and find the indexe for nodes not in use (slot will be 0 in this case)
@@ -464,6 +504,12 @@ class lsfMachine (machines.Machine):
                                 file.write("RS %i: { host: %i, cpu: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39, gpu: 0 1 2 3 }\n" % (rs_cntr, node))
                     file.close()
 
+                    #if lsfMachine.debugJsrun:
+                    if configuration.options.verbose:
+                        print "ATS created LSF jsrun resource file for test %s = %s" % (test.name, test.rs_filename)
+                        with open(test.rs_filename, 'r') as fin:
+                            print(fin.read())
+
                     if str_lrun_jsrun_args == "unset":
                         str_lrun_jsrun_args = ""
 
@@ -501,6 +547,8 @@ class lsfMachine (machines.Machine):
                 # I wanted the --jsrun option in case we flip the default.
                 # 2019-05-06:  Useful for non threaded MPI Code with or without GPU support.
                 else:
+                    if lsfMachine.debugJsrun:
+                        print "JSRUN 100 DEBUG lsf_asq "
 
                     test.jsrun_bind_r = "rs"
                     test.jsrun_bind_none = "none"
@@ -520,6 +568,15 @@ class lsfMachine (machines.Machine):
 
                     if str_lrun_jsrun_args == "unset":
                         str_lrun_jsrun_args = ""
+
+                    if lsfMachine.debugJsrun:
+                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind_r       =  %s " % test.jsrun_bind_r
+                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind_none    =  %s " % test.jsrun_bind_none
+                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind 
+                        print "JSRUN 110 DEBUG lsf_asq self.mpibind            =  %s " % self.mpibind 
+                        print "JSRUN 110 DEBUG lsf_asq str_lrun_jsrun_args     =  %s " % str_lrun_jsrun_args
+                        print "JSRUN 110 DEBUG lsf_asq cpu_per_rs              =  %d " % cpu_per_rs
+
 
                     if self.old_defaults:
 
@@ -575,77 +632,11 @@ class lsfMachine (machines.Machine):
                 print "ATS DISABLED ON LOGIN NODE OF ANSEL.  PLEASE RUN IN AN ALLOCATION."
                 sys.exit(-1)
         #
-        # This is not sierra, lassen, or ansel.  It must be manta.
+        # This is not sierra, lassen, ansel, or manta, what is this?
         #
         else:
-            my_bind_to = "none"
-            if self.bindToCore:
-                my_bind_to = "core"
-            elif self.bindToSocket:
-                my_bind_to = "socket"
-            elif self.bindToHwthread:
-                my_bind_to = "hwthread"
-            elif self.bindToL1cache:
-                my_bind_to = "l1cache"
-            elif self.bindToL2cache:
-                my_bind_to = "l2cache"
-            elif self.bindToL3cache:
-                my_bind_to = "l3cache"
-            elif self.bindToNuma:
-                my_bind_to = "numa"
-            elif self.bindToBoard:
-                my_bind_to = "board"
-            elif self.bindToNone:
-                my_bind_to = "none"
-
-            if self.mpibind == True:
-
-                if self.runningWithinBsub == True:
-                        return ["mpirun", 
-                        "-np", str(np),
-                        "--bind-to", my_bind_to,
-                        "/usr/tcetmp/packages/mpibind/bin/mpibind8",
-                    ] + commandList
-                else:
-                    if num_nodes < 1: 
-                        num_nodes   = math.ceil(float(np) / float(self.npMax))
-                    test.num_nodes = num_nodes
-                    return ["bsub", "-x", "-J", test.jobname,
-                        "-n", str(np),
-                        "-Is",
-                        "-W", str(time_mins),
-                        "-G", "guests",
-                        "mpirun", "-np", str(np),
-                        "--bind-to", "none",
-                        "/usr/tcetmp/packages/mpibind/bin/mpibind8",
-                        # "--mca", "mpi_restrict_libs none",
-                        # "-gpu",
-                        #"--report-bindings",
-                        #"--display-devel-allocation",
-                        #"--display-diffable-map",
-                    ] + commandList
-            else:
-                if self.runningWithinBsub == True:
-                        return ["mpirun", "-np", str(np),
-                        "--bind-to", my_bind_to,
-                    ] + commandList
-                else:
-                    if num_nodes < 1:
-                        num_nodes   = math.ceil(float(np) / float(self.npMax))
-                    test.num_nodes = num_nodes
-                    return ["bsub", "-x", "-J", test.jobname,
-                        "-n", str(np),
-                        "-Is",
-                        "-W", str(time_mins),
-                        "-G", "guests",
-                        "mpirun", "-np", str(np),
-                        "--bind-to", "none",
-                        # "-gpu",
-                        #"--report-bindings",
-                        #"--display-devel-allocation",
-                        #"--display-diffable-map",
-                    ] + commandList
-
+            print "ATS ERROR: Do not know what LSF machine %s is " % hwname
+            sys.exit(-1)
 
     def canRun(self, test):
         """Is this machine able to run the test interactively when resources become available? 
@@ -666,7 +657,6 @@ class lsfMachine (machines.Machine):
         numberNodesRemaining = self.numNodes - self.numberNodesExclusivelyUsed
         np = max(test.np, 1)
 
-
         lsfMachine.set_nt_cpus_per_task_num_nodes(self, test)
 
         #test.num_nodes = test.options.get('nn', 0)
@@ -680,12 +670,7 @@ class lsfMachine (machines.Machine):
         canRunNow_debug = lsfMachine.debugClass
         canRunNow_debug = False
 
-        #print "DEBG self.exclusive = %s\n" % self.exclusive
-        #print "DEBG test.num_nodes = %i\n" % test.num_nodes
-        #print "DEBG test.np = %i\n" % test.np
-        #print "DEBG self.npMax = %i\n" % self.npMax
-
-        if self.exclusive:
+        if self.jsrun_exclusive:
             if test.num_nodes < 1:
                 test.num_nodes = math.ceil(float(test.np) / float(self.npMax))
 
@@ -785,7 +770,7 @@ class lsfMachine (machines.Machine):
         #else:
         #    print "DEBUG noteLaunch 100 empty test.rs_nodesToUse"
 
-        if self.exclusive == True:
+        if self.jsrun_exclusive == True:
             numSlotsUsed = 0
             for slot in self.nodesInUse:
                 if slot == 1:
@@ -864,7 +849,7 @@ class lsfMachine (machines.Machine):
         """How many nodes or processors are free? ?"""
         numberNodesRemaining = self.numNodes              - self.numberNodesExclusivelyUsed
         numberTestsRemaining = self.numberTestsRunningMax - self.numberTestsRunning
-        if self.exclusive == True:
+        if self.jsrun_exclusive == True:
             if numberNodesRemaining != lsfMachine.remainingCapacity_numNodesReported:
                 lsfMachine.remainingCapacity_numNodesReported = numberNodesRemaining
                 if  lsfMachine.debugClass:
