@@ -490,7 +490,7 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
         #if ncs:
         print "   NCS:      %d" % len(ncs)
 
-        print "   ATS Summary3 returning %d total failure" % total_failures
+        print "\n   ATS returning %d total failure" % total_failures
         return total_failures
 
 

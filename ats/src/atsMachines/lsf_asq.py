@@ -439,6 +439,7 @@ class lsfMachine (machines.Machine):
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + commandList
 
+
                 # 2019-04-25 Use this for both jsrun_omp and for --jsrun_exclusive.
                 #            Comment out the jsrun_omp only code below, as it works sometimes and hangs RM sometimes.
                 #            Also use exclusive if user has specified the num_nodes, or if it was set due to
@@ -631,77 +632,11 @@ class lsfMachine (machines.Machine):
                 print "ATS DISABLED ON LOGIN NODE OF ANSEL.  PLEASE RUN IN AN ALLOCATION."
                 sys.exit(-1)
         #
-        # This is not sierra, lassen, or ansel.  It must be manta.
+        # This is not sierra, lassen, ansel, or manta, what is this?
         #
         else:
-            my_bind_to = "none"
-            if self.bindToCore:
-                my_bind_to = "core"
-            elif self.bindToSocket:
-                my_bind_to = "socket"
-            elif self.bindToHwthread:
-                my_bind_to = "hwthread"
-            elif self.bindToL1cache:
-                my_bind_to = "l1cache"
-            elif self.bindToL2cache:
-                my_bind_to = "l2cache"
-            elif self.bindToL3cache:
-                my_bind_to = "l3cache"
-            elif self.bindToNuma:
-                my_bind_to = "numa"
-            elif self.bindToBoard:
-                my_bind_to = "board"
-            elif self.bindToNone:
-                my_bind_to = "none"
-
-            if self.mpibind == True:
-
-                if self.runningWithinBsub == True:
-                        return ["mpirun", 
-                        "-np", str(np),
-                        "--bind-to", my_bind_to,
-                        "/usr/tcetmp/packages/mpibind/bin/mpibind8",
-                    ] + commandList
-                else:
-                    if num_nodes < 1: 
-                        num_nodes   = math.ceil(float(np) / float(self.npMax))
-                    test.num_nodes = num_nodes
-                    return ["bsub", "-x", "-J", test.jobname,
-                        "-n", str(np),
-                        "-Is",
-                        "-W", str(time_mins),
-                        "-G", "guests",
-                        "mpirun", "-np", str(np),
-                        "--bind-to", "none",
-                        "/usr/tcetmp/packages/mpibind/bin/mpibind8",
-                        # "--mca", "mpi_restrict_libs none",
-                        # "-gpu",
-                        #"--report-bindings",
-                        #"--display-devel-allocation",
-                        #"--display-diffable-map",
-                    ] + commandList
-            else:
-                if self.runningWithinBsub == True:
-                        return ["mpirun", "-np", str(np),
-                        "--bind-to", my_bind_to,
-                    ] + commandList
-                else:
-                    if num_nodes < 1:
-                        num_nodes   = math.ceil(float(np) / float(self.npMax))
-                    test.num_nodes = num_nodes
-                    return ["bsub", "-x", "-J", test.jobname,
-                        "-n", str(np),
-                        "-Is",
-                        "-W", str(time_mins),
-                        "-G", "guests",
-                        "mpirun", "-np", str(np),
-                        "--bind-to", "none",
-                        # "-gpu",
-                        #"--report-bindings",
-                        #"--display-devel-allocation",
-                        #"--display-diffable-map",
-                    ] + commandList
-
+            print "ATS ERROR: Do not know what LSF machine %s is " % hwname
+            sys.exit(-1)
 
     def canRun(self, test):
         """Is this machine able to run the test interactively when resources become available? 
