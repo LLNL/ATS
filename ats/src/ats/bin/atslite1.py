@@ -53,8 +53,8 @@ def main():
     # Also, if numNodes is found, after saving it for the salloc command we can
     # remove it from the argument list, as it will not be needed further.
     # -----------------------------------------------------------------------------
-    if 'bgqos' in sys_type:
-        numNodes = 64
+    if 'rznevada' in host:
+        numNodes = 2
     elif 'lassen' in host:
         numNodes = 2
     elif 'trinity_knl' in sys_type:

@@ -73,10 +73,19 @@ int main (int argc, char *argv[]) {
         if (my_size == 4) { printf("FAILURE\n"); } // when run with 4 mpi processes this test will print FAILURE, but still return 0
         else              { printf("SUCCESS\n"); } // print SUCCESS any other time
     }
+
+
+    printf("MPI Rank %d calling       MPI_Finalize\n", my_rank);
     MPI_Finalize();
+    printf("MPI Rank %d returned from MPI_Finalize\n", my_rank);
 
-    if ((my_size % 2) == 0) { exit(0); }    // If run with an even number of nodes, exit with 0
+    if ((my_size % 2) == 0) 
+    { 
+        printf("MPI Rank %d returning 0\n", my_rank);
+        exit(0); 
+    }    // If run with an even number of nodes, exit with 0
 
+    printf("MPI Rank %d returning -1\n", my_rank);
     exit(-1);   // if run with odd number of nodes exit with -1
 }
 

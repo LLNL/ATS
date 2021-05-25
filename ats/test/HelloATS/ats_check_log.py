@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/apps/ats/7.0.1/bin/python
 import os
 import sys
 

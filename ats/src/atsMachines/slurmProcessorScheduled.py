@@ -11,7 +11,6 @@
 #ATS:toss_3_x86_64           SELF SlurmProcessorScheduled 36
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64
 
-
 import inspect
 
 from ats import machines, debug, atsut
@@ -197,14 +196,15 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             print "DEBUG examineOptions leaving self.numberTestsRunningMax = %d " % self.numberTestsRunningMax
 
     def addOptions(self, parser): 
+        """Add options needed on this machine."""
 
         temp_uname = os.uname()
         host = temp_uname[1]
+
         the_partition = 'pdebug'
         if host.startswith('rzwhamo'):
             the_partition = 'nvidia'
 
-        "Add options needed on this machine."
         parser.add_option("--partition", action="store", type="string", dest='partition', 
             default = the_partition,
             help = "Partition in which to run jobs with np > 0")
@@ -287,6 +287,14 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             ex_or_sh = "--exclusive"      
         else:
             ex_or_sh = "--share"
+
+        temp_uname = os.uname()
+        host = temp_uname[1]
+
+        the_mpi_type='-v'
+        if host.startswith('rznevaxxx'):
+            the_mpi_type='--mpi=pmi2'
+
 
         if MY_SYS_TYPE.startswith('toss'):
             # none means to not spcify mpibind at all
@@ -490,7 +498,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if SlurmProcessorScheduled.debugClass:
                     print "SAD DEBUG SRUN100 "
 
-                return ["srun", "--label", "-J", test.jobname, 
+                return ["srun", the_mpi_type, "--label", "-J", test.jobname, 
                     "-p", self.partition,
                     ex_or_sh,
                     mpibind,
@@ -533,7 +541,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if test.cpus_per_task > 0:
 
                   if self.distribution == 'unset':
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         my_nodes,
@@ -541,7 +549,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                         "--ntasks=%i" % np \
                     ] + commandList
                   else:
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         my_nodes,
@@ -551,14 +559,14 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     ] + commandList
                 else:
                   if self.distribution == 'unset':
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         my_nodes,
                         "--ntasks=%i" % np \
                     ] + commandList
                   else:
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         my_nodes,
@@ -584,7 +592,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                         print "SAD DEBUG SRUN300 "
 
                     test.numNodesToUse = minNodes
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "-N%i-%i" % (minNodes, minNodes),
@@ -598,7 +606,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                         print "SAD DEBUG SRUN350 "
 
                     test.numNodesToUse = minNodes
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "--distribution=%s" % distribution,
@@ -620,7 +628,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if self.distribution == 'unset':
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN400 "
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
                             ex_or_sh,
                             "-n", str(np), 
@@ -631,7 +639,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 else:
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN450 "
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
                             "--distribution=%s" % distribution,
                             ex_or_sh,
@@ -746,7 +754,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN600 "
     
-                    return ["srun", "--label", "-J", test.jobname, 
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname, 
                         ex_or_sh,
                         mpibind,
                         "--distribution=%s" % distribution,
@@ -764,7 +772,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN700 "
     
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "--cpus-per-task=%i" % test.cpus_per_task,
@@ -776,7 +784,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN800 "
     
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "--distribution=%s" % distribution,
@@ -791,7 +799,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN900 "
     
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "--distribution=%s" % distribution,
@@ -804,7 +812,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN600 "
  
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         "--distribution=%s" % distribution,
@@ -816,7 +824,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN700 "
  
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "-n", str(np) ] + commandList
@@ -824,7 +832,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN800 "
  
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "--distribution=%s" % distribution,
@@ -833,7 +841,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN900 "
  
-                    return ["srun", "--label", "-J", test.jobname,
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
                             "--distribution=%s" % distribution,
