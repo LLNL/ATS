@@ -415,7 +415,7 @@ class lsfMachine (machines.Machine):
                                     "--env", str_omp_display_env,
                                     "--env", str_omp_num_threads,
                                     "--env", str_omp_proc_bind,
-                                    "-N", str(test.num_nodes),
+                                    "-N", str(int(test.num_nodes)),
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + str_mpibind + commandList
                         else :
@@ -430,7 +430,7 @@ class lsfMachine (machines.Machine):
                         if ( test.num_nodes > 0) :
                             return ["lrun",
                                     "-v",
-                                    "-N", str(test.num_nodes),
+                                    "-N", str(int(test.num_nodes)),
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + commandList
                         else :
