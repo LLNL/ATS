@@ -11,7 +11,7 @@ __all__ = ['NoNewFields', 'DebugFields']
 import logs
 import pprint
 
-#-----------------------------------------------------------------------------          
+#-----------------------------------------------------------------------------
 class NoNewFields(object):
     """Once the fields are set in __init__, setting a new field will raise
     AttributeError.
@@ -19,7 +19,7 @@ class NoNewFields(object):
     To specify your fields, override _names with a tuple listing the field names,
     e.g. _names = ('a', 'b', 'c').
     To initialize the fields to other than None, override _fieldDefault.
-    """        
+    """
     _fieldNames = ()
     _fieldDefault = None
 
@@ -31,7 +31,7 @@ class NoNewFields(object):
     def _addFields(self):
         for name in self._fieldNames:
             object.__setattr__(self, name, self._fieldDefault)
-            
+
     def __setPositionalFields(self, args):
         nameIter = iter(self._fieldNames)
         for value in args:
@@ -46,30 +46,30 @@ class NoNewFields(object):
     def __setKeywordFields(self, kwargs):
         for name, value in kwargs.iteritems():
             self.__setattr__(name, value)
-        
+
     def __setattr__(self, name, value):
         if name not in self.__dict__:
             raise AttributeError, \
                 'Field "%s" not found in "%s" object.' % (name, self.__class__)
         else:
             object.__setattr__(self, name, value)
-            
-#-----------------------------------------------------------------------------          
+
+#-----------------------------------------------------------------------------
 class DebugFields(object):
     """Adds PrettyPrinter behavior to classes.
     """
     #classwide indent, when setIndent has not been called:
     _indent = 0
     def __repr__(self):
-        return '%s:\n%s' % (self.__class__, 
+        return '%s:\n%s' % (self.__class__,
                             pprint.PrettyPrinter(indent = self._indent).
                             pformat(self.__dict__))
-        
+
     def setIndent(self, indent):
         # Sets indent for individual instance:
         self._indent = indent
-        
-#-----------------------------------------------------------------------------          
+
+#-----------------------------------------------------------------------------
 def demoNoNewFields():
     print("")
     logger = logs.getLogger('demoNoNewFields')
@@ -77,15 +77,15 @@ def demoNoNewFields():
     class XY(NoNewFields, DebugFields):
         _fieldNames = ('x', 'y')
         _fieldDefault = 99
-        
-    foo = XY()    
+
+    foo = XY()
     logger.info ("foo: %r" % foo)
     foo.x = 17
     logger.info ("foo: %r" % foo)
     try:
         foo.z = 18
     except AttributeError as x:
-        logger.info ("Got expected AttributeError:\n'%s'" % str(x)) 
+        logger.info ("Got expected AttributeError:\n'%s'" % str(x))
 
     bar = XY(1,2)
     logger.info ("bar: %r" % bar)
@@ -97,7 +97,7 @@ def demoNoNewFields():
         bar = XY (1,2,3)
     except AttributeError as x:
         logger.info ("Got expected AttributeError:\n'%s'" % str(x))
-    
+
     bat = XY(x=1, y=2)
     logger.info ("bat: %r" % bat)
     bat = XY(y=2)
@@ -108,6 +108,6 @@ def demoNoNewFields():
         bat = XY(x=1, y=2, z=3)
     except AttributeError as x:
         logger.info ("Got expected AttributeError:\n'%s'" % str(x))
-            
+
 if __name__ == '__main__':
     demoNoNewFields()

@@ -51,7 +51,7 @@ class noSrunMachine (machines.Machine):
 
         self.is_sequential = options.sequential
 
-        if self.is_sequential: 
+        if self.is_sequential:
             # Max number of tests to run at once, or max on a node, if multinode
             self.npMax = 1
 
@@ -166,5 +166,3 @@ class noSrunMachine (machines.Machine):
         terminal("CURRENTLY UTILIZING %d of %d processors." % (
             self.numberMaxProcessors - self.numProcsAvailable, self.numberMaxProcessors) )
         terminal("-"*80)
-
-

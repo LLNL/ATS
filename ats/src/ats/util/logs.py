@@ -46,7 +46,7 @@ def getLogger(name):
     result.setLevel(logging.INFO)
     """Calling the default logger (e.g. "logging.info") causes a lazy init of the
     root logger and
-    its handler, which subsequently sends all but debug messages to stderr.    
+    its handler, which subsequently sends all but debug messages to stderr.
     If you call the default logger and afterwards call a
     specific logger, the later messages will be output twice - once by the specific
     logger's handler, and once by the root logger's handler.  To prevent this,
@@ -63,15 +63,15 @@ def getLogger(name):
 #     print ("    Code: %s" % frame.f_code.co_name)
 #     print ("    Defined in: %s " % inspect.getmodule(frame))
 
-#-----------------------------------------------------------------------------          
+#-----------------------------------------------------------------------------
 import inspect
 class ScopeLoggers(logging.LoggerAdapter):
     """ Provides automatic logging of scope entry and exit.
-    
+
     Uses __init__ and __del__ to do the logging. Object destruction (which calls
-    __del__) has always been observed to occur at scope exit, but this is not 
-    guaranteed by Python. 
-    
+    __del__) has always been observed to occur at scope exit, but this is not
+    guaranteed by Python.
+
     Inherits from LoggerAdapter so it can override process(self, msg, kwargs)
     """
     _indent = 0
@@ -107,7 +107,7 @@ class ScopeLoggers(logging.LoggerAdapter):
         # LoggerAdapter doesn't have __del__ in Python 2.6 (old style class) so don't call it:
 #         super(ScopeLoggers, self).__del__()
 
-#-----------------------------------------------------------------------------          
+#-----------------------------------------------------------------------------
 def demoCallLogger(logger):
     print("")
     logger.debug ("Debug message")
@@ -228,4 +228,3 @@ def demoDebugFields():
 if __name__ == '__main__':
     demoLogging()
     demoDebugFields()
-    

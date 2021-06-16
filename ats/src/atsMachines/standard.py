@@ -25,40 +25,40 @@ class WinMachine (machines.Machine):
     def split(self, clas):
         return [clas]
 
-    def addOptions(self, parser): 
+    def addOptions(self, parser):
         " Not used by Windows but added just for compatability."
-        parser.add_option("--partition", action="store", type="string", dest='partition', 
-            default = 'pdebug', 
+        parser.add_option("--partition", action="store", type="string", dest='partition',
+            default = 'pdebug',
             help = "Partition in which to run jobs with np > 0")
 
         parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
-           default = -1, 
+           default = -1,
            help="Number of nodes to use")
 
         parser.add_option("--nompi", action="store_true", dest='nompi',
-           default = False, 
+           default = False,
            help="Run executables on nompi processor")
 
         parser.add_option("--oversubscribe", action="store", type='int', dest='oversubscribe',
-           default = 1, 
+           default = 1,
            help="Multiplier to number of processors to allow oversubscription of processors")
 
         parser.add_option("--mpiexe", action="store", type='string', dest='mpiexe',
                           default = "",
                           help="Location to mpiexe")
-        
 
-    def examineOptions(self, options): 
+
+    def examineOptions(self, options):
         "Examine options from command line, possibly override command line choices."
-        # Grab option values.    
+        # Grab option values.
         super(WinMachine, self).examineOptions(options)
         self.npMax= self.numberTestsRunningMax
-        
+
         import os
         if options.numNodes==-1:
             if os.environ.has_key('NUMBER_OF_PROCESSORS'):
                 options.numNodes= int(os.environ['NUMBER_OF_PROCESSORS'])
-               
+
             else:
                 options.numNodes= 1
         self.numNodes= options.numNodes
@@ -75,7 +75,7 @@ class WinMachine (machines.Machine):
         self.nompi = options.nompi
 
 
-    def calculateCommandList(self, test): 
+    def calculateCommandList(self, test):
         """Prepare for run of executable using a suitable command. First we get the plain command
          line that would be executed on a vanilla serial machine, then we modify it if necessary
          for use on this machines.
@@ -94,34 +94,34 @@ class WinMachine (machines.Machine):
 
         return commandList
 
-    def canRun(self, test): 
+    def canRun(self, test):
         return ''
 
-    def canRunNow(self, test): 
+    def canRunNow(self, test):
         "Is this machine able to run this test now? Return True/False"
         if self.nompi : test.np = 1
         np = max(test.np, 1)
         if self.nompi : return self.numProcsAvailable >= 1
         else : return self.numProcsAvailable >= np
-        
-    
+
+
     def noteLaunch(self, test):
         """A test has been launched."""
         if self.nompi : self.numProcsAvailable -= 1
         else :
             np = max(test.np, 1)
             self.numProcsAvailable -= np
-        
-        
-        
+
+
+
     def noteEnd(self, test):
         """A test has finished running. """
         if self.nompi : self.numProcsAvailable += 1
         else :
             np = max(test.np, 1)
             self.numProcsAvailable += np
-        
-    def periodicReport(self): 
+
+    def periodicReport(self):
         "Report on current status of tasks"
         terminal("-"*80)
         terminal("CURRENTLY UTILIZING %d of %d processors." % (
@@ -139,4 +139,3 @@ class WinMachine (machines.Machine):
                 test.child.terminate()
             except:
                 pass
-

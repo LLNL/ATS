@@ -1,15 +1,15 @@
 """Automated testing system module.
 
-This module is usually driven by an executable script, ``ats``, 
-or by a customized driver that either calls manager.main() or which calls the 
-same things with additional actions interspersed. 
+This module is usually driven by an executable script, ``ats``,
+or by a customized driver that either calls manager.main() or which calls the
+same things with additional actions interspersed.
 
-The module begins by importing two modules ``times`` and ``configuration``, 
-which must be done first. Then it sets up the ``manager`` object and the 
-``testEnvironment`` dictionary.  
+The module begins by importing two modules ``times`` and ``configuration``,
+which must be done first. Then it sets up the ``manager`` object and the
+``testEnvironment`` dictionary.
 
-From ``configuration`` the environment variables SYS_TYPE, BATCH_TYPE, 
-MACHINE_TYPE and MACHINE_DIR are obtained. These are used to choose the proper 
+From ``configuration`` the environment variables SYS_TYPE, BATCH_TYPE,
+MACHINE_TYPE and MACHINE_DIR are obtained. These are used to choose the proper
 execution module (called a machine in ATS).
 
 From the ``log`` module we get ``log`` and ``terminal``, two functions used
@@ -32,15 +32,15 @@ The following statuses are transitory or special-use:
 * HALTED (HALT) -- the test was halted by a time cutoff option.
 * LSFERROR (LSFE) -- the test encountered an error attributasble to LSF
 
-The classes AtsTest and AtsTestGroup are defined here to enable user 
-subclassing but must not be used directly -- creation of a test must go through 
+The classes AtsTest and AtsTestGroup are defined here to enable user
+subclassing but must not be used directly -- creation of a test must go through
 the ``test`` or ``testif`` commands, and groups via ``group`` and ``endgroup``.
 
 """
 import times
 import configuration
 from management import manager, testEnvironment   # manager.main() to execute
-from tests import AtsTest, AtsTestGroup  
+from tests import AtsTest, AtsTestGroup
 # for possible use in driver scripts or unit testing
 from atsut import AtsError, AttributeDict, \
                   StatusCode, statuses, debug, \
@@ -54,4 +54,3 @@ from times import Duration
 for key, value in statuses.items():
     exec "%s = %s" % (value.abr, key)
 del key, value
-

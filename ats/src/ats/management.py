@@ -28,7 +28,7 @@ def areBrothers(t1, t2):
 class AtsManager (object):
     """This class is instantiated as a singleton instance, manager.
 
-The principal entry is ``main``. 
+The principal entry is ``main``.
 
 Attributes:
 
@@ -65,7 +65,7 @@ Attributes:
         self.continuationFileName = ''
         self.saveResultsName = "atsr.py"
         self.saveXmlResultsName = "atsr.xml"
-        
+
         AtsTest.restart()
 
     def filter (self, *filters):
@@ -94,8 +94,8 @@ Attributes:
             log ('Added filter:', repr(f))
 
     def filterenv (self, test):
-        """Compute the environment in which filters for test will be 
-            evaluated.""" 
+        """Compute the environment in which filters for test will be
+            evaluated."""
         if not isinstance(test, AtsTest):
             raise AtsError, 'filterenv argument must be a test instance.'
         fe = {}
@@ -140,7 +140,7 @@ Attributes:
         echo = options.get('echo', True)
         log("Test environment symbols:", logging=logging, echo=echo)
         log.indent()
-        if not words: 
+        if not words:
             words = testEnvironment.keys()
             words.sort()
         for key in words:
@@ -161,14 +161,14 @@ Attributes:
                 del testEnvironment[x]
 
     def get(self, name):
-        """Return the definition of name from the test environment. 
+        """Return the definition of name from the test environment.
         """
         if testEnvironment.has_key(name):
             return testEnvironment.get(name)
 
         raise AtsError, \
-            "Could not find name %s in vocabulary." % name   
-        
+            "Could not find name %s in vocabulary." % name
+
     alreadysourced = []
 
     def source (self, *paths, **vocabulary):
@@ -180,11 +180,11 @@ Attributes:
         if debug():
             log("source:", ' '.join(paths), echo=True)
 
-        introspector = vocabulary.get('introspection', 
+        introspector = vocabulary.get('introspection',
                    testEnvironment.get('introspection', standardIntrospection))
 
         for path in paths:
-            self._source(path, introspector, vocabulary) 
+            self._source(path, introspector, vocabulary)
 
     def _source(self, path, introspector, vocabulary):
         "Process source file. Returns true if successful"
@@ -192,7 +192,7 @@ Attributes:
         t = abspath(path)
         directory, filename = os.path.split(t)
         name, e = os.path.splitext(filename)
-        if e: 
+        if e:
             namelist = [t]
         else:
             namelist = [t, t+'.ats', t+'.py']
@@ -218,7 +218,7 @@ Attributes:
         savetacked = dict(AtsTest.tacked)
         unstick() #clear sticky list at the start of a file.
         AtsTest.waitNewSource()
-        
+
         testenv = dict(testEnvironment)
         testenv.update(vocabulary)
         testenv['SELF'] = t1
@@ -241,10 +241,10 @@ Attributes:
             os.chdir(directory)
             try:
                 exec(code, testenv)
-                if debug(): 
+                if debug():
                     log('Finished ', t1, datestamp())
             except KeyboardInterrupt:
-               raise
+                raise
             except Exception as details:
                 self.badlist.append(t1)
                 log('Error while processing statements in', t1, ':', echo=True)
@@ -266,7 +266,7 @@ Attributes:
                 log(details, echo=True)
                 log('------------------------------------------', echo=True)
             log.dedent()
-        AtsTest.endGroup()   
+        AtsTest.endGroup()
         unstick()
         stick(**savestuck)
         untack()
@@ -301,13 +301,13 @@ ATS RESULTS %s""" % datestamp(long=1), echo = True)
                 echo = True)
             self.report()
             log('-------------------------------------------------',
-                echo = True) 
+                echo = True)
         if not configuration.options.skip:
             log("""
 ATS SUMMARY %s""" % datestamp(long=1), echo = True)
             self.summary(log)
             self._summary2(log)
-            
+
     def finalBanner(self):
         "Show final banner."
         log.logging = 1
@@ -348,7 +348,7 @@ ATS SUMMARY %s""" % datestamp(long=1), echo = True)
 
         for test in self.testlist:
             if doAll or test.notes or test.groupSerialNumber ==1 or \
-                test.group.echoStatus() or test.options.get('record', False): 
+                test.group.echoStatus() or test.options.get('record', False):
                 echo = True
             else:
                 echo = False
@@ -359,7 +359,7 @@ ATS SUMMARY %s""" % datestamp(long=1), echo = True)
                     echo=echo)
 
             for line in test.notes:
-                    log("NOTE:", line, echo=echo)
+                log("NOTE:", line, echo=echo)
 
             log.indent()
             if debug() or configuration.options.skip:
@@ -384,7 +384,7 @@ ATS SUMMARY %s""" % datestamp(long=1), echo = True)
 #RUNNING: %d %s""" % (len(running), ', '.join(running)), echo=True)
             log("RUNNING 2: %d %s""" % (len(running), ', '.join(running)), echo=True)
 
-        if ncs: 
+        if ncs:
             log("""\
 CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
                echo = True)
@@ -431,13 +431,13 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
                echo = True)
         if batched:
             log("BATCHED:  %d" % len(batched),
-               echo = True) 
+               echo = True)
         if filtered:
             log("FILTERED: %d" % len(filtered),
                echo = True)
         if skipped:
             log("SKIPPED:  %d" % len(skipped),
-               echo = True) 
+               echo = True)
 
     def _summary3(self):
         "Additional detail for  summary."
@@ -500,7 +500,7 @@ then keyword / value options::
 
     test(**options) or
     test(script, **options) or
-    test(script, clas, **options) 
+    test(script, clas, **options)
 
 See manual for discussion of these arguments.
 """
@@ -535,12 +535,12 @@ See manual for discussion of these arguments.
             if testobj.status is BATCHED:
 
                 if testobj.np > self.batchmachine.numberTestsRunningMax:
-                    testobj.set(FILTERED, 
+                    testobj.set(FILTERED,
                         "batch job filtered - Number of processors %d exceeds %d"% (testobj.np, self.batchmachine.numberTestsRunningMax))
                     return testobj
 
             elif testobj.np > self.machine.numberTestsRunningMax:
-                testobj.set(FILTERED, 
+                testobj.set(FILTERED,
                     "Number of processors %d exceeds %d"% (testobj.np, self.machine.numberTestsRunningMax))
                 return testobj
 
@@ -563,7 +563,7 @@ See manual for discussion of these arguments.
                 if 'UltraCheck107' not in testobj.name:
                     testobj.set(FILTERED, "Does not satisfy: %s" % unmatched)
 
-        log(testobj.status, "#%4d"% testobj.serialNumber, testobj.name, 
+        log(testobj.status, "#%4d"% testobj.serialNumber, testobj.name,
             testobj.message, echo=self.verbose)
 
         return testobj
@@ -587,7 +587,7 @@ We immediately make sure each input file exists and is readable.
             t = abspath(input_file)
             dir, filename = os.path.split(t)
             name, e = os.path.splitext(filename)
-            if e: 
+            if e:
                 namelist = [t]
             else:
                 namelist = [t, t+'.ats', t+'.py']
@@ -601,10 +601,10 @@ We immediately make sure each input file exists and is readable.
                 log.fatal_error('Cannot open %s.' % t)
             f.close()
             files.append(t1)
-            
+
         log("Input ok. Now collect the tests.")
-        
-        # Now collect the tests.   
+
+        # Now collect the tests.
         for t in files:
             self.source(t)
 
@@ -653,7 +653,7 @@ We immediately make sure each input file exists and is readable.
                 configuration.options.skip
         for t in self.testlist:
             log(repr(t), echo=echo)
-            
+
     def sortTests(self):
         """Sort the tests as to batch or interactive or other. Return two lists."""
 
@@ -669,24 +669,24 @@ We immediately make sure each input file exists and is readable.
             for t in batchTests:
                 log( t, "BATCH sorting error.", echo=True)
             raise ValueError, 'batch test(s) should not exist'
-      
+
         return interactiveTests, batchTests
-    
+
 
     def main(self, clas = '', adder=None, examiner=None):
         """
-This is the main driver code. 
-Returns true if all interactive tests found passed, false if interrupted or 
+This is the main driver code.
+Returns true if all interactive tests found passed, false if interrupted or
 an error occurs.
 
 ``clas`` is a string containing command-line options, such as::
 
     --debug --level 18
 
-If ``clas`` is blank, sys.argv[1:] is used as the arguments. 
+If ``clas`` is blank, sys.argv[1:] is used as the arguments.
 See ``configuration.init``.
 
-Routines ``adder`` and ``examiner``, if given,  are called in ``configuration`` 
+Routines ``adder`` and ``examiner``, if given,  are called in ``configuration``
 to allow user a chance to add options and examine results of option parsing.
 """
         self.init(clas, adder, examiner)
@@ -735,9 +735,9 @@ to allow user a chance to add options and examine results of option parsing.
         self.inputFiles = configuration.inputFiles
         self.machine = configuration.machine
         self.batchmachine = configuration.batchmachine
-        
+
         if configuration.options.nobatch:
-            self.batchmachine = None 
+            self.batchmachine = None
         self.verbose = configuration.options.verbose or debug()
         log.echo = self.verbose
         self.started = datestamp(long=1)
@@ -757,7 +757,7 @@ to allow user a chance to add options and examine results of option parsing.
             self.filter("level<= %s" % configuration.options.level)
 
     def firstBanner(self):
-        "Write the opening banner."     
+        "Write the opening banner."
         log.echo = True
         log('ATS START', atsStartTimeLong)
         log('ATS VERSION', version.version)
@@ -767,7 +767,7 @@ to allow user a chance to add options and examine results of option parsing.
         log('MACHINE_TYPE', configuration.MACHINE_TYPE)
         log('BATCH_TYPE', configuration.BATCH_TYPE)
         log("Machine description: ", self.machine.label(), echo=True)
-        
+
         if self.batchmachine:
             log("Batch facility name:", self.batchmachine.label(), echo=True)
         else:
@@ -778,15 +778,15 @@ to allow user a chance to add options and examine results of option parsing.
 
         if configuration.options.info or debug():
             configuration.documentConfiguration()
-            
+
         log.echo = self.verbose
         if configuration.options.oneFailure:
-            log('Will stop after first failure.') 
-    
+            log('Will stop after first failure.')
+
         if configuration.options.allInteractive:
             log('Will run all tests (including any batch tests) as interactive.')
 
-        log('Default time limit for each test=', 
+        log('Default time limit for each test=',
             Duration(configuration.timelimit))
 
     def core(self):
@@ -804,7 +804,7 @@ to allow user a chance to add options and examine results of option parsing.
         # Phase 1 -- collect the tests
         errorOccurred = False
         try:   # surround with keyboard interrupt, AtsError handlers
-            self.collectTests()             
+            self.collectTests()
         except AtsError:
             log("ATS error while collecting tests.", echo=True)
             log(traceback.format_exc(), echo=True)
@@ -824,7 +824,7 @@ to allow user a chance to add options and examine results of option parsing.
             for f in self.onCollectedRoutines:
                 log("Calling onCollected routine", f.__name__,
                     echo=self.verbose)
-                f(self)  
+                f(self)
         except KeyboardInterrupt:
             log("Keyboard interrupt while collecting tests, terminating.",
                 echo=True)
@@ -842,13 +842,13 @@ to allow user a chance to add options and examine results of option parsing.
             log("No tests found.", echo = True)
             return
 
-        # We have built up the list of tests.  Run functions added via 
+        # We have built up the list of tests.  Run functions added via
         # beforeRun() calls to allow user to do stuff like cleaning up old test
         # results before running or other things.
         self.preprocess()
 
         # Phase 2 -- dispatch the batch tests
-        
+
         if self.batchmachine and batchTests:
             if configuration.options.skip:
                 log("Skipping execution due to --skip")
@@ -876,7 +876,7 @@ to allow user a chance to add options and examine results of option parsing.
                 for f in self.onPrioritizedRoutines:
                     log("Calling onPrioritized routine", f.__name__,
                         echo=self.verbose)
-                    f(interactiveTests)  
+                    f(interactiveTests)
             except KeyboardInterrupt:
                 log("Keyboard interrupt while prioritizing tests, terminating.",
                     echo=True)
@@ -887,27 +887,27 @@ to allow user a chance to add options and examine results of option parsing.
                 errorOccured = True
             if errorOccurred:
                 return
-            
+
             try:
                 self.run(interactiveTests)
             except AtsError:
                 log(traceback.format_exc(), echo=True)
                 log("ATS error. Removing running jobs....", echo=True)
                 dieDieDie = True
-    
+
             except KeyboardInterrupt:
                 dieDieDie = True
                 log("Keyboard interrupt. Removing running jobs....", echo=True)
-    
+
         if dieDieDie:
-            time.sleep(3)   
+            time.sleep(3)
             for test in self.testlist:
                 if (test.status is RUNNING):
                     self.machine.kill(test)
-            
+
         self.machine.quit() #machine shutdown / cleanup
 
-        # Phase 4 -- Continuation file         
+        # Phase 4 -- Continuation file
 #        for t in interactiveTests:
 #            if t.status not in  (PASSED, EXPECTED, FILTERED):
 #                break
@@ -944,9 +944,9 @@ to allow user a chance to add options and examine results of option parsing.
             if os.path.isfile(continuationeFilePrev):
                 os.remove(continuationeFilePrev)
             os.rename(self.continuationFileName, continuationeFilePrev)
-        
 
-        # In this scheme, the job is rerun but previously passed jobs are 
+
+        # In this scheme, the job is rerun but previously passed jobs are
         # marked passed and batched jobs are marked SKIPPED.
         fc = open(self.continuationFileName, 'w')
         print >>fc, """
@@ -956,10 +956,10 @@ PASSED = ats.PASSED
 EXPECTED = ats.EXPECTED
 BATCHED = ats.BATCHED
 """
-        
-        # The goal here is to mark passed things that need not be rerun. 
-        # Sometimes something passed but a child did not, which could be a 
-        # fault in the parent so we rerun the parent. This scheme is 
+
+        # The goal here is to mark passed things that need not be rerun.
+        # Sometimes something passed but a child did not, which could be a
+        # fault in the parent so we rerun the parent. This scheme is
         # conservative. Also if anything fails in a group, rerun the whole group.
 
         remaining = {}
@@ -971,23 +971,23 @@ BATCHED = ats.BATCHED
                 remaining[t.serialNumber] = t
 
         while remaining:
-             sns = remaining.keys()
-             u = remaining[sns[0]]
-             brothers = [v for v in remaining.values() if areBrothers(u, v)]
-             for v in brothers:
-                 del remaining[v.serialNumber]
-             for v in brothers:
-                 if v.status not in (PASSED, EXPECTED):
-                     break
-             else: 
-                 for v in brothers:
+            sns = remaining.keys()
+            u = remaining[sns[0]]
+            brothers = [v for v in remaining.values() if areBrothers(u, v)]
+            for v in brothers:
+                del remaining[v.serialNumber]
+            for v in brothers:
+                if v.status not in (PASSED, EXPECTED):
+                    break
+            else:
+                for v in brothers:
                     print >>fc, "testlist[%d].set(%s, 'Previously ran.') # %s" % \
                                  (v.serialNumber-1, v.status.name, v.name)
 
         fc.close()
 
     def run(self, interactiveTests):
-        """Examine the interactive tests and hand them off to the machine. 
+        """Examine the interactive tests and hand them off to the machine.
            At this point they have been vetted as tests that the machine canRun.
         """
         machine = self.machine
@@ -998,7 +998,7 @@ BATCHED = ats.BATCHED
             log("In skip mode....!")
         else:
             log("Beginning test executions")
-        timeStatusReport = time.time()        
+        timeStatusReport = time.time()
         if configuration.options.continueFreq is not None:
             timeContinuation = time.time()
             # Convert minutes to seconds
@@ -1015,7 +1015,7 @@ BATCHED = ats.BATCHED
                 self.summary(terminal)
                 machine.scheduler.periodicReport()
             unfinished = machine.scheduler.step()
-            
+
             if configuration.options.continueFreq is not None:
                 timeNow= time.time()
                 if (timeNow-timeContinuation) >= continuationStep:
@@ -1044,7 +1044,7 @@ BATCHED = ats.BATCHED
         r.testlist = [t.getResults() for t in self.testlist]
 
         if not hasattr(self, 'machine'):
-             return r # never initialized, nothing else of interest.
+            return r # never initialized, nothing else of interest.
 
         r.inputFiles = self.inputFiles
         r.verbose = self.verbose
@@ -1060,7 +1060,7 @@ BATCHED = ats.BATCHED
             log('   Calling onResults function', hook.__name__, echo=True)
             hook(r, self)
         return r
-            
+
     def onSave(self, hook):
         """Add a hook for the results function. Will be passed two arguments:
 
@@ -1075,7 +1075,7 @@ dependents_serial contain the serial numbers of the relevant tests.
         self.onResultsRoutines.append(hook)
 
     def saveResults(self):
-        """Save the state to a file using saveResultsName as file name; 
+        """Save the state to a file using saveResultsName as file name;
            if not absolute, put it in the log directory.
         """
         filename = self.saveResultsName
@@ -1122,13 +1122,13 @@ dependents_serial contain the serial numbers of the relevant tests.
         # Finish off the xml file
         outf.write('    </testsuite>')
         outf.write("</testsuites>")
-        outf.close()        
+        outf.close()
 
     def printResults(self, file=sys.stdout):
         "Print state to file, formatting items with repr"
 # import * is bad style but helps with robustness with respect to ats changes:
         print >>file, """from ats import *"""
-        print >>file, "state = ", 
+        print >>file, "state = ",
         print >>file, repr(self.getResults())
         print >>file, "logDirectory = ", repr(log.directory)
         print >>file, "machineName = ", repr(self.machine.name)
@@ -1145,17 +1145,17 @@ class TestLike (AttributeDict):
             state.groups[n] = AtsTestGroup(n)
         self.group = state.groups[n]
         self.group.append(self)
-        
+
     def __str__ (self):
         return str(self.status) + ' ' + self.name + ' ' + self.message
- 
+
     def __repr__(self):
         return "Test #%d %s %s" %(self.serialNumber, self.name, self.status)
 
 
 for i in range(len(state.testlist)):
     state.testlist[i] = TestLike(state.testlist[i])
-    
+
 for t in state.testlist:
     if t.depends_on_serial == 0:
         t.depends_on = None
@@ -1163,9 +1163,9 @@ for t in state.testlist:
         t.depends_on = state.testlist[t.depends_on_serial -1 ]
     t.dependents = [state.testlist[serial-1] for serial in t.dependents_serial]
     t.waitUntil = [state.testlist[serial-1] for serial in t.waitUntil_serial]
-   
+
 # clean up
-del i, t 
+del i, t
 """
 
 # --------- END OF AtsManager --------------
@@ -1203,12 +1203,12 @@ MACHINE_DIR=configuration.MACHINE_DIR,
 #
 _filterwith = []
 def filterdefs (text=None):
-    """Add the given text into the environment 
+    """Add the given text into the environment
        used for filtering.
        With no arguments, clear defined list.
     """
     global _filterwith
-    if text is None: 
+    if text is None:
         log('filterdefs: erasing definitions')
         _filterwith = []
     else:
@@ -1230,7 +1230,7 @@ def filterdefs (text=None):
             log.dedent()
         _filterwith.append(text)
 
-# Set up the testing environment, add statuses to it.    
+# Set up the testing environment, add statuses to it.
 testEnvironment =AttributeDict(
         debug= debug,
         manager= manager,

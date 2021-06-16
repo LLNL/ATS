@@ -102,15 +102,15 @@ class FluxDirect (lcMachines.LCMachineCore):
                     fh.reactor_stop(fh.get_reactor()))
         self.timer.start()
 
-    def addOptions(self, parser): 
+    def addOptions(self, parser):
 
         "Add options needed on this machine."
-        parser.add_option("--partition", action="store", type="string", dest='partition', 
-            default = 'pdebug', 
+        parser.add_option("--partition", action="store", type="string", dest='partition',
+            default = 'pdebug',
             help = "Partition in which to run jobs with np > 0")
 
         parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
-           default = 2, 
+           default = 2,
            help="Number of nodes to use")
 
         parser.add_option("--distribution", action="store", type="string", dest='distribution',
@@ -124,7 +124,7 @@ class FluxDirect (lcMachines.LCMachineCore):
         return "FluxDirect: %d nodes, %d processors per node." % (
             self.numNodes, self.npMax)
 
-    def calculateCommandList(self, test): 
+    def calculateCommandList(self, test):
         """Prepare for run of executable using a suitable command. First we get the plain command
          line that would be executed on a vanilla serial machine, then we modify it if necessary
          for use on this machines.
@@ -150,11 +150,11 @@ class FluxDirect (lcMachines.LCMachineCore):
         return clist
 
     def canRun(self, test):
-        """Is this machine able to run the test interactively when resources become available? 
+        """Is this machine able to run the test interactively when resources become available?
            If so return ''.  Otherwise return the reason it cannot be run here.
         """
         np = max(test.np, 1)
-        if np > self.cores:   
+        if np > self.cores:
             return "Too many processors needed (%d)" % np
 
         return ''
@@ -164,7 +164,7 @@ class FluxDirect (lcMachines.LCMachineCore):
            Return True if able to start the test.
         """
         self.runOrder += 1
-        test.runOrder = self.runOrder 
+        test.runOrder = self.runOrder
         # TODO: consider incorporating helper into flux for this
         if test.commandList == ['not run']:
             test.commandList = self.calculateBasicCommandList(test)
@@ -241,5 +241,5 @@ class FluxDirect (lcMachines.LCMachineCore):
                 raise e
         # super(FluxDirect, self).checkRunning()
 
-    def getStatus (self, test): 
+    def getStatus (self, test):
         raise RuntimeError("Should not run")

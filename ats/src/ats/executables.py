@@ -22,4 +22,3 @@ class Executable(object):
 
     def __repr__ (self):
         return "Executable ('%s')" % str(self)
-   

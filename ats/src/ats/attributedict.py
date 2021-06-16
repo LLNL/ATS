@@ -7,7 +7,7 @@ class AttributeDict (dict):
        'items','iteritems', 'iterkeys', 'itervalues', 'keys', 'pop',
        'popitem', 'setdefault', 'update', 'values'
     """
-    
+
     def __init__(self, **kw):
         "Initialize like a dictionary."
         dict.__init__(self, **kw)
@@ -28,7 +28,7 @@ class AttributeDict (dict):
             del self[name]
         except KeyError:
             raise AttributeError, 'No attribute %s' % name
-        
+
     def __repr__(self):
         out = StringIO()
         print >>out, "AttributeDict("
@@ -40,7 +40,7 @@ class AttributeDict (dict):
         s = out.getvalue()
         out.close()
         return s
-    
+
     def __str__(self):
         "Prints the attributes in alphabetical order."
         out = StringIO()
@@ -62,4 +62,3 @@ if __name__ == "__main__":
     assert d['c'] == 3
     del d.b
     print d
-    

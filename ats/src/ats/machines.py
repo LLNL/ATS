@@ -1,4 +1,4 @@
-"""Definition of class Machine for overriding. 
+"""Definition of class Machine for overriding.
 """
 import subprocess, sys, os, time, shlex
 from atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
@@ -7,7 +7,7 @@ import configuration
 from log    import log, terminal, AtsLog
 from shutil import copytree, ignore_patterns
 
-def comparePriorities (t1, t2): 
+def comparePriorities (t1, t2):
     "Input is two tests; return comparison based on totalPriority."
     return t2.totalPriority - t1.totalPriority
 
@@ -30,11 +30,11 @@ class MachineCore(object):
     def split(self, astring):
         "Correctly split a clas string into a list of arguments for this machine."
         return shlex.split(astring)
-        
-    def calculateBasicCommandList(self, test): 
-        """Prepare for run of executable using a suitable command. 
-           Returns the plain command line that would be executed on a vanilla 
-           machine. 
+
+    def calculateBasicCommandList(self, test):
+        """Prepare for run of executable using a suitable command.
+           Returns the plain command line that would be executed on a vanilla
+           machine.
         """
         return test.executable.commandList + test.clas
 
@@ -80,13 +80,13 @@ class MachineCore(object):
         time.sleep(self.naptime)
         stillRunning = []
         for test in self.running:
-             done = self.getStatus(test)
-             if not done:
-                 stillRunning.append(test)
-             else:   # test has finished
-                 if test.status is not PASSED:
-                     if configuration.options.oneFailure:
-                         raise AtsError, "Test failed in oneFailure mode."
+            done = self.getStatus(test)
+            if not done:
+                stillRunning.append(test)
+            else:   # test has finished
+                if test.status is not PASSED:
+                    if configuration.options.oneFailure:
+                        raise AtsError, "Test failed in oneFailure mode."
         self.running = stillRunning
 
     def remainingCapacity(self):
@@ -94,12 +94,12 @@ class MachineCore(object):
 what is the largest job you could start at this time?"""
         return self.numberTestsRunningMax - self.numberTestsRunning
 
-    def getStatus (self, test): 
+    def getStatus (self, test):
         """
 Override this only if not using subprocess (unusual).
 Obtains the exit code of the test object process and then sets
 the status of the test object accordingly. Returns True if test done.
-           
+
 When a test has completed you must set test.statusCode and
 call self.testEnded(test, status). You may add a message as a third arg,
 which will be shown in the test's final report.
@@ -107,14 +107,14 @@ testEnded will call your bookkeeping method noteEnd.
 """
         test.child.poll()
         #print test.child.returncode
-        if test.child.returncode is None: 
+        if test.child.returncode is None:
             overtime, fraction = self.checkForTimeOut(test)
             #print "DEBUG getStatus 100"
             #print overtime
             #print fraction
             #print "DEBUG getStatus 200"
             if fraction > .9 or overtime != 0:
-                # If a process produces a lot of output, it may fill its output 
+                # If a process produces a lot of output, it may fill its output
                 # buffer and then block until something is read from it.
 
                 # How should testStdout handle this? ???
@@ -145,7 +145,7 @@ testEnded will call your bookkeeping method noteEnd.
                 #print "DEBUG getStatus 320"
                 # SAD
                 # Coding to detect SLURM deficiencies, and abort job.
-                # Implemented 2016-Aug-30 
+                # Implemented 2016-Aug-30
                 slurm_error = False;
                 f = open( test.errname, 'r')
                 lines = f.readlines()
@@ -236,7 +236,7 @@ testEnded will call your bookkeeping method noteEnd.
                     print "ATS LSF Development: LSFE Detected statusCode is %d " % test.statusCode
                     test.statusCode=2
                     test.setEndDateTime()
-                    status = LSFERROR 
+                    status = LSFERROR
 
                 else:
                     status= FAILED
@@ -259,7 +259,7 @@ testEnded will call your bookkeeping method noteEnd.
         return True
 
     def testEnded(self, test, status):
-        """Do book-keeping when a job has exited; 
+        """Do book-keeping when a job has exited;
 call noteEnd for machine-specific part.
 """
         if MachineCore.debugClass:
@@ -296,7 +296,7 @@ call noteEnd for machine-specific part.
                 print "DEBUG MachineCore.testEnded decreased self.numberNodesExclusivelyUsed by %d to %d (max is %d)" % \
                     (test.numNodesToUse, self.numberNodesExclusivelyUsed, self.numNodes)
 
-        test.set(status, test.elapsedTime())  
+        test.set(status, test.elapsedTime())
            #note test.status is not necessarily status after this!
            #see test.expectedResult
 
@@ -307,7 +307,7 @@ call noteEnd for machine-specific part.
             test.fileHandleClose()
 
         self.scheduler.testEnded(test)
-        
+
     def kill(self, test): # override if not using subprocess
         "Kill the job running test."
         if test.child:
@@ -316,7 +316,7 @@ call noteEnd for machine-specific part.
                 test.fileHandleClose()
 
     def launch (self, test):
-        """Start executable using a suitable command. 
+        """Start executable using a suitable command.
            Return True if able to do so.
            Call noteLaunch if launch succeeded."""
 
@@ -343,32 +343,32 @@ call noteEnd for machine-specific part.
         # To enable running of threaded codes in 1 thread mode, the OMP_NUM_THREADS must be
         # set either by the user before the run, or by the test 'nt' option, or by
         # the command line option to ATS --ompNumThreads.  If none of these are set, then
-        # set it to 1.  
+        # set it to 1.
         if configuration.options.ompNumThreads > 0:
-                # Priority 1 setting, ats command line
-                if configuration.options.verbose:
-                    print "ATS launch setting OMP_NUM_THREADS %d as user specified --ompNumThreads=%d" % \
-                        (configuration.options.ompNumThreads, configuration.options.ompNumThreads)
-                os.environ['OMP_NUM_THREADS'] = str(configuration.options.ompNumThreads)
+            # Priority 1 setting, ats command line
+            if configuration.options.verbose:
+                print "ATS launch setting OMP_NUM_THREADS %d as user specified --ompNumThreads=%d" % \
+                    (configuration.options.ompNumThreads, configuration.options.ompNumThreads)
+            os.environ['OMP_NUM_THREADS'] = str(configuration.options.ompNumThreads)
         else:
-                # Priority 2  setting, within an ATS test line
-                omp_num_threads = test.options.get('nt', -1)
-                if (omp_num_threads > 0):
+            # Priority 2  setting, within an ATS test line
+            omp_num_threads = test.options.get('nt', -1)
+            if (omp_num_threads > 0):
+                if configuration.options.verbose:
+                    print "ATS launch setting OMP_NUM_THREADS %d based on test 'nt'option" % omp_num_threads
+                os.environ['OMP_NUM_THREADS'] = str(omp_num_threads)
+            else:
+                # Priority 3 setting, the user has already set OMP_NUM_THREADS in their environment
+                if os.environ.has_key('OMP_NUM_THREADS'):
                     if configuration.options.verbose:
-                        print "ATS launch setting OMP_NUM_THREADS %d based on test 'nt'option" % omp_num_threads
-                    os.environ['OMP_NUM_THREADS'] = str(omp_num_threads)
+                        temp_omp= os.getenv("OMP_NUM_THREADS")
+                        # print "ATS detected that OMP_NUM_THREADS is already set to %s" % (temp_omp)
+                # Priority 4 setting, set it to 1 if it is not othewise set
                 else:
-                    # Priority 3 setting, the user has already set OMP_NUM_THREADS in their environment
-                    if os.environ.has_key('OMP_NUM_THREADS'):
-                        if configuration.options.verbose:
-                            temp_omp= os.getenv("OMP_NUM_THREADS")
-                            # print "ATS detected that OMP_NUM_THREADS is already set to %s" % (temp_omp)
-                    # Priority 4 setting, set it to 1 if it is not othewise set
-                    else:
-                        if configuration.options.verbose:
-                            print "ATS launch setting OMP_NUM_THREADS 1 by default for as it was not specified for the test."
-                            # print "    This should allow for threaded applications to run with non threaded tests with a single thread."
-                        os.environ['OMP_NUM_THREADS'] = str(1)
+                    if configuration.options.verbose:
+                        print "ATS launch setting OMP_NUM_THREADS 1 by default for as it was not specified for the test."
+                        # print "    This should allow for threaded applications to run with non threaded tests with a single thread."
+                    os.environ['OMP_NUM_THREADS'] = str(1)
 
         # Set default KMP_AFFINITY so that OpenMP runs are OK on Toss 3
         # This is experimental for now.
@@ -387,7 +387,7 @@ call noteEnd for machine-specific part.
 
         # LS_COLORS can mess up somesystem and is not needed for any platform by ATS
         os.environ['LS_COLORS'] = ""
-        
+
         # Bamboo env vars can also mess up somesystem runs by exceeding char limit for env vars
         # remove them
         os.environ['bamboo_shortJobName'] = ""
@@ -453,7 +453,7 @@ call noteEnd for machine-specific part.
         return result
 
     def __results(self, key, default, results, options):
-        val = results.get(key, default) 
+        val = results.get(key, default)
         if val == default:
             val = options.get(key, default)
         return val
@@ -497,7 +497,7 @@ call noteEnd for machine-specific part.
         test.outhandle.flush()
         os.fsync(test.outhandle.fileno())
 
-    def _launch(self, test): 
+    def _launch(self, test):
         """Replace if not using subprocess (unusual).
 The subprocess part of launch. Also the part that might fail.
 """
@@ -536,7 +536,7 @@ The subprocess part of launch. Also the part that might fail.
                 # This is old Paul DuBois coding, with ugly syntax.
                 #
                 # That is the syntax for the user within a 'test' or #ATS line is:
-                # env={'ANIMAL': 'duck', 'CITY': 'Seattle', 'PLANET': 'Venus'} 
+                # env={'ANIMAL': 'duck', 'CITY': 'Seattle', 'PLANET': 'Venus'}
                 #
                 # The apparent reason for this ugliness, is that is how the environment
                 # object is stored in Python.  So it amakes the coding easier
@@ -568,17 +568,17 @@ The subprocess part of launch. Also the part that might fail.
             # 2016-12-02
             # Default sleep is now 0 on all systems.
             if hasattr(test, 'runningWithinSalloc'):
-                    if configuration.options.sleepBeforeSrun > 0:
-                        if MachineCore.printSleepBeforeSrunNotice:
-                            MachineCore.printSleepBeforeSrunNotice = False
-                            print "ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun
-                        time.sleep(configuration.options.sleepBeforeSrun)
+                if configuration.options.sleepBeforeSrun > 0:
+                    if MachineCore.printSleepBeforeSrunNotice:
+                        MachineCore.printSleepBeforeSrunNotice = False
+                        print "ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun
+                    time.sleep(configuration.options.sleepBeforeSrun)
             else:
-                    if configuration.options.sleepBeforeSrun > 0:
-                        if MachineCore.printSleepBeforeSrunNotice:
-                            MachineCore.printSleepBeforeSrunNotice = False
-                            print "ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun
-                        time.sleep(configuration.options.sleepBeforeSrun)
+                if configuration.options.sleepBeforeSrun > 0:
+                    if MachineCore.printSleepBeforeSrunNotice:
+                        MachineCore.printSleepBeforeSrunNotice = False
+                        print "ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun
+                    time.sleep(configuration.options.sleepBeforeSrun)
 
 
             if testStdout == 'file':
@@ -589,11 +589,11 @@ The subprocess part of launch. Also the part that might fail.
                 self.log_prepend(test, test.outhandle)
 
                 if stdin_file is None:
-                    # SAD ambyr
-                    #print "DEBUG MachineCore._launch 050 "
-                    #print "DEBUG MachineCore._launch %s " % test.commandList
-                    #print E
-                    #test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E)
+                # SAD ambyr
+                #print "DEBUG MachineCore._launch 050 "
+                #print "DEBUG MachineCore._launch %s " % test.commandList
+                #print E
+                #test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E)
                     test.child = subprocess.Popen(test.commandList, universal_newlines=True, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E)
                     #test.child.wait()
                 else:
@@ -633,7 +633,7 @@ The subprocess part of launch. Also the part that might fail.
             self.numberTestsRunning += 1
             if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
                 print "DEBUG MachineCore.testEnded increased self.numberTestsRunning by 1 to %d " % (self.numberTestsRunning)
-            
+
             if test.numNodesToUse > 0:
                 self.numberNodesExclusivelyUsed += test.numNodesToUse
                 if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
@@ -648,7 +648,7 @@ The subprocess part of launch. Also the part that might fail.
 
             test.set(FAILED, str(e))
             return False
-   
+
     def startRun(self, test):
         """For interactive test object, launch the test object.
            Return True if able to start the test.
@@ -656,7 +656,7 @@ The subprocess part of launch. Also the part that might fail.
         if MachineCore.debugClass:
             print "DEBUG MachineCore.startRun invoked"
         self.runOrder += 1
-        test.runOrder = self.runOrder 
+        test.runOrder = self.runOrder
         return self.launch(test)
 
     def _execute(self, cmd_line, verbose=False, file_name=None, exit=True):
@@ -761,10 +761,10 @@ Some methods are possible overrides.
 Usually the parent version should be called too.
 To call the parent version of foo: super(YourClass, self).foo(args)
 However, the most important methods have a "basic" verison you can just call.
-You can call your class anything, just put the correct comment line at 
+You can call your class anything, just put the correct comment line at
 the top of your machine. See documentation for porting.
 """
-    def __init__(self, name, npMaxH):   
+    def __init__(self, name, npMaxH):
         """Be sure to call this from child if overridden
 
 Initialize this machine. npMax supplied by __init__, hardware limit.
@@ -787,24 +787,24 @@ is hard upper limit.
         self.scheduler = schedulers.StandardScheduler()
         self.init()
 
-        
-    def init(self):  
+
+    def init(self):
         "Override to add any needed initialization."
         pass
 
-    def addOptions(self, parser): 
+    def addOptions(self, parser):
         "Override to add  options needed on this machine."
         pass
 
-    def examineOptions(self, options): 
+    def examineOptions(self, options):
         """Examine options from command line, possibly override command line choices.
            Always call examineBasicOptions
         """
         self.examineBasicOptions(options)
-            
- 
-    def calculateCommandList(self, test): 
-        """Prepare for run of executable using a suitable command. 
+
+
+    def calculateCommandList(self, test):
+        """Prepare for run of executable using a suitable command.
 If overriding, get the vanilla one from ``calculateBasicCommand``,
 then modify if necessary.
         """
@@ -812,14 +812,14 @@ then modify if necessary.
 
     def periodicReport(self):
         "Make the machine-specific part of periodic report to the terminal."
-        terminal(len(self.running), "tests running on", self.numberTestsRunning, 
+        terminal(len(self.running), "tests running on", self.numberTestsRunning,
               "of", self.numberTestsRunningMax, "processors.")
 
-    def canRun(self, test): 
+    def canRun(self, test):
         """
 A child will almost always replace this method.
 
-Is this machine able to run the test interactively when resources become 
+Is this machine able to run the test interactively when resources become
 available?  If so return ''.
 
 Otherwise return the reason it cannot be run here.
@@ -828,7 +828,7 @@ Otherwise return the reason it cannot be run here.
             return "Too many processors needed (%d)" % test.np
         return ''
 
-    def canRunNow(self, test): 
+    def canRunNow(self, test):
         """
 A child will almost replace this method. No need to call parent version.
 
@@ -838,16 +838,16 @@ called if this succeeds.
 """
         return self.numberTestsRunning  + 1 <= self.numberTestsRunningMax
 
-    def noteLaunch(self, test): 
+    def noteLaunch(self, test):
         """
 A child will almost replace this method. No need to call parent version.
 
-test has been launched. Do your bookkeeping. numberTestsRunning has already 
+test has been launched. Do your bookkeeping. numberTestsRunning has already
 been incremented.
 """
         pass
 
-    def noteEnd(self, test): 
+    def noteEnd(self, test):
         """
 A child will almost replace this method. No need to call parent version.
 
@@ -855,8 +855,8 @@ test has finished running. Do any bookkeeping you need. numberTestsRunning has
 already been decremented.
 """
         pass
-    
-    def quit(self): 
+
+    def quit(self):
         """
 A child might replace this method. No need to call parent version.
 Final cleanup if any.
@@ -878,8 +878,8 @@ Include results from the scheduler.
 """
         result = AttributeDict()
         result.update(self.scheduler.getResults())
-        result.update( 
-           dict(name=self.name, 
+        result.update(
+           dict(name=self.name,
            numberTestsRunningMax = self.numberTestsRunningMax,
            hardLimit = self.hardLimit,
            naptime = self.naptime)
@@ -918,7 +918,7 @@ class BatchFacility(object):
         "Called when ats is done."
         pass
 
-        
+
 #-----------------------------------------------------------
 # class BatchSimulator
 #-----------------------------------------------------------
@@ -932,11 +932,11 @@ A fake batch you can use for debugging input by setting::
     def label(self):
         return "BatchSimulator"
 
-    def __init__(self, name, npMaxH):   
+    def __init__(self, name, npMaxH):
         self.name =  name
         self.npMaxH = npMaxH
         self.np = npMaxH
-        
+
     def load(self, batchlist):
         "Simulate the batch system"
         log("Simulation of batch load:",  echo=True)

@@ -64,9 +64,9 @@ def getTestStatusLists(testlist):
 
 def atsrToJUnit(atsrFile=None,junitOut=None,build=True ):
     '''Takes an atsr.py file and outputs the results in JUnit format.
-       Useful for reading in test reports in tools like Jenkins or Bamboo. 
+       Useful for reading in test reports in tools like Jenkins or Bamboo.
        The build option is used to record passed builds - if there's an atsr.py then the build step
-       likely passed.  This is included because we want to include the build logs in the 
+       likely passed.  This is included because we want to include the build logs in the
        xml file in the case that the build fails, and there needs to be a corresponding pass case
        for it to be interpreted correctly. (i.e. failed since & tests fixed are incorrect without this.
     '''
@@ -78,7 +78,7 @@ def atsrToJUnit(atsrFile=None,junitOut=None,build=True ):
     state = getStateFromFile(atsrFile)
     passed,failed,timedout,skipped,filtered,invalid,running = getTestStatusLists(state.testlist)
     outf = open(junitOut,'w')
-    # Start the xml file with needed tags 
+    # Start the xml file with needed tags
     outf.write('<?xml version="1.0" encoding="UTF-8"?> <testsuites>')
     outf.write('    <testsuite name="nightly">')
     writePassedBuild(outf)
@@ -104,15 +104,15 @@ def cleanTestCaseName( test ):
 
 def cleanErrorMessage( msg ):
     '''Converts the text from ats .err files to strings parsable by Bamboo from within the junit.xml format. '''
-    return  msg.replace('<','').replace('>','').replace('&','&amp;') 
-       
+    return  msg.replace('<','').replace('>','').replace('&','&amp;')
+
 
 def writeFailedCodeTestCase( f, test, err_path):
     '''Writes a test failure to junit file including ats log and error files for the failure.
     '''
     ## f is xml output filename
     ## test is the test object
-    ## err_path is the path to the ats logs directory 
+    ## err_path is the path to the ats logs directory
     cname = test.name.replace('&','and')
     testname = cleanTestCaseName(test)
     f.write('    <testcase status="run" time="%.3f" classname="%s" name="%s" >\n' % (elapsedTime(test), cname, testname) )
@@ -158,7 +158,7 @@ def writeStatusTestCase( f, test, status):
                                                                      test.name) )
     f.write('      <failure type="%s"> ATS set test case to %s.  See ats.log for details. </failure>\n' % (test.status,status))
     f.write('    </testcase>\n')
-                    
+
 def writePassedTestCase( f, test):
     cname = test.name.replace('&','and') # & is reserved in xml
     testname = cleanTestCaseName(test)
@@ -169,8 +169,8 @@ def writePassedTestCase( f, test):
 def elapsedTime( test ):
     "Returns formatted elapsed time of the run."
     try:
-      e = test.endTime
-      s = test.startTime
+        e = test.endTime
+        s = test.startTime
     except AttributeError, foo:
         return (0)
     return (e-s)
