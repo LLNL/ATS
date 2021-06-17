@@ -53,15 +53,15 @@ def runcommand_die_on_err (cmd):
                             shell=True,
                             universal_newlines=True)
     std_out, std_err = proc.communicate()
-    
+
     if proc.returncode != 0:
-        messages = []       
+        messages = []
         messages.append("%s" % cmd)
         messages.append("failed with return code %i" % proc.returncode)
         messages.append("%s" % std_out)
         messages.append("%s" % std_err)
         error_and_exit(proc.returncode, messages)
-        
+
     return proc.returncode, std_out, std_err
 
 def parse_arguments(args):
@@ -91,7 +91,7 @@ if __name__=="__main__":
     # and process command line arguments
     # -------------------------------------------------------------------------
     parser, args = parse_arguments(sys.argv[1:])
-    
+
     if args.feature is None and args.bugfix is None:
         parser.print_help()
         sys.exit(-1)
@@ -99,37 +99,37 @@ if __name__=="__main__":
     if args.feature is not None and args.bugfix is not None:
         parser.print_help()
         sys.exit(-1)
-    
-    if args.user is None: 
-        args.user = os.popen('whoami').read() 
+
+    if args.user is None:
+        args.user = os.popen('whoami').read()
         args.user = args.user.rstrip()
-    
+
     # -------------------------------------------------------------------------
     # Restrict the characters in the user and feature strings (branch name)
     # -------------------------------------------------------------------------
-    if args.feature is not None: 
+    if args.feature is not None:
         if not re.match(r'^[A-Za-z0-9_-]+$', args.feature):
             print("feature '%s' is invalid.  Must be alphanumeric (plus - and _)" % args.feature)
             print("Exiting without creating branch.")
             sys.exit(-1)
 
-    if args.bugfix is not None: 
+    if args.bugfix is not None:
         if not re.match(r'^[A-Za-z0-9_-]+$', args.bugfix):
             print("bugfix '%s' is invalid.  Must be alphanumeric (plus - and _)" % args.bugfix)
             print("Exiting without creating branch.")
             sys.exit(-1)
-    
+
     if not re.match(r'^[A-Za-z0-9_-]+$', args.user):
         print("user '%s' is invalid.  Must be alphanumeric (plus - and _)" % args.user)
         print("Exiting without creating branch.")
         sys.exit(-1)
-    
+
     # -------------------------------------------------------------------------
     # Do some verification and introspection on the git repo.
     # -------------------------------------------------------------------------
     if not os.path.isdir(".git"):
         error_and_exit(-1, [".git directory not found", "Please run this script from the top level of git clone"])
-    
+
     code, out, err = runcommand_die_on_err('git config --get remote.origin.url');
     remote_repo = out.rstrip()
 
@@ -180,12 +180,12 @@ if __name__=="__main__":
         messages.append("")
         for line in git_status_lines: messages.append(line)
         error_and_exit(-1, messages)
-        
+
     # the git pull puts messages in err. So catenate out and err strings.
     code, out, err = runcommand_die_on_err("git pull --dry-run");
     git_pull_dry_run = out.rstrip() + err.rstrip()
     git_pull_dry_run_lines = git_pull_dry_run.split('\n')
-    
+
     # do not update if it looks like we need to pull.
     if "bitbucket" in git_pull_dry_run and "From" in git_pull_dry_run:
         messages = ["Local branch %s needs to be pulled" % local_branch]
@@ -199,13 +199,13 @@ if __name__=="__main__":
         for line in git_pull_dry_run_lines: messages.append(line)
         error_and_exit(-1, messages)
 
-    
+
     # -------------------------------------------------------------------------
     # Tell user what we are going to do and prompt y/n to accept.
     # -------------------------------------------------------------------------
-    if args.feature is not None: 
+    if args.feature is not None:
         branch_name = '%s/%s/%s' % ("feature", args.user, args.feature)
-    elif args.bugfix is not None: 
+    elif args.bugfix is not None:
         branch_name = '%s/%s/%s' % ("bugfix", args.user, args.bugfix)
     else:
         # redundant, but I don't like else assumptions
@@ -215,7 +215,7 @@ if __name__=="__main__":
     question = "Do you want to create branch '%s'" % branch_name
     answer = yes_or_no(question, args.yes)
     if answer == False:
-        print("Exiting without creating branch '%s'" % branch_name) 
+        print("Exiting without creating branch '%s'" % branch_name)
         sys.exit(0)
 
     # -------------------------------------------------------------------------
@@ -223,13 +223,13 @@ if __name__=="__main__":
     # the Bit Bucket repo and set it's origin correctly
     # -------------------------------------------------------------------------
     code, out, err = runcommand_die_on_err('git checkout -b %s' % branch_name);
-    
+
     question = "Do you want to push developer branch '%s' to the remote repo %s" % (branch_name, remote_repo)
     answer = yes_or_no(question, args.yes)
     if answer == False:
         print("Exiting without pushing developer branch to the repo %s" % branch_name)
         sys.exit(0)
-    
+
     code, out, err = runcommand_die_on_err('git push --set-upstream origin %s' % branch_name);
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -7,7 +7,7 @@ from itertools import chain
 from atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, \
      CREATED, SKIPPED, HALTED, LSFERROR, EXPECTED, statuses, AtsError
 
-def comparePriorities (t1, t2): 
+def comparePriorities (t1, t2):
     "Input is two tests or groups; return comparison based on totalPriority."
     return t2.totalPriority - t1.totalPriority
 
@@ -30,14 +30,14 @@ class StandardScheduler (object):
         machine = configuration.machine
         self.verbose = configuration.options.verbose or debug() or \
                        configuration.options.skip
-        self.schedule = AtsLog(directory=log.directory, name='atss.log', 
+        self.schedule = AtsLog(directory=log.directory, name='atss.log',
             logging=True, echo=False)
-        
+
         for t in interactiveTests:
             waitOnMe = [x for x in interactiveTests if t in x.waitUntil]
             t.totalPriority += sum([w.priority for w in waitOnMe])
-        
-    def load(self, interactiveTests): 
+
+    def load(self, interactiveTests):
         """Initialize scheduler with a list of interactive tests to run from manager """
 #
         self.blocking = []
@@ -61,7 +61,7 @@ class StandardScheduler (object):
     def testlist(self):
         """Return the list of tests in groups that have not yet completed."""
         return chain(*self.groups)
-    
+
     def step(self):
         """Do one step of the loop, checking for tests that have finished and
            starting new ones. Return True until all tests done.
@@ -69,7 +69,7 @@ class StandardScheduler (object):
         machine.checkRunning()
         if machine.remainingCapacity() == 0:
             return True
-            
+
         # It is possible that a job can be started. Try to do so.
         # Note that this is not certain; for example, all waiting jobs have np = 2 but only one
         # processor available, so nothing is eligible.
@@ -115,7 +115,7 @@ class StandardScheduler (object):
         if d in self.blocks:
             # check if another group is blocking
             if test.group.number != self.blocks[d]:
-               return True
+                return True
         return False
 
     def addBlock(self, test):
@@ -141,7 +141,7 @@ class StandardScheduler (object):
         g = test.group
         if not g.isBlocking:
             return
-        
+
         for t in g:
             if t.independent:
                 continue
@@ -152,24 +152,24 @@ class StandardScheduler (object):
             # from the blocking list and unmark this group as blocking.
             g.isBlocking = False
             for t in g:
-               if t.independent:
-                   continue
-               d = t.block
-               if d:
-                  if d in self.blocks:
-                     del self.blocks[d]
+                if t.independent:
+                    continue
+                d = t.block
+                if d:
+                    if d in self.blocks:
+                        del self.blocks[d]
             self.schedule("Removed block", g.number)
-    
+
     def isEligible(self, test):
-        """Is test eligible to start now? 
-        """   
+        """Is test eligible to start now?
+        """
         #print "DEBUG isEligible invoked"
         return machine.canRunNow(test) and \
                (not self.isBlocked(test))  and \
                (not self.isWaiting(test))
-    
-    def findNextTest(self): 
-        """Return the next test to run, or None if none can be run now. 
+
+    def findNextTest(self):
+        """Return the next test to run, or None if none can be run now.
            Called by step
            Calls isEligible to check for resource conflicts with running tests.
            machine's canRunNow used to check hardware availability.
@@ -183,8 +183,8 @@ class StandardScheduler (object):
             if t.status is not CREATED:
                 continue
             if self.isEligible(t):
-                 #print "DEBUG findNextTest 300 return t"
-                 return t
+                #print "DEBUG findNextTest 300 return t"
+                return t
         else:
             self.reportObstacles()
             #print "DEBUG findNextTest 500 return None"
@@ -234,9 +234,9 @@ class StandardScheduler (object):
                   (m1, test.serialNumber, test.groupNumber, test.groupSerialNumber, test.name, msgHosts, my_nn, test.np, my_nt, my_ngpu, time.asctime())
 
         if configuration.options.showGroupStartOnly:
-           echo = (not result) or self.verbose or (test.groupSerialNumber == 1) or test.options.get('record', False)
+            echo = (not result) or self.verbose or (test.groupSerialNumber == 1) or test.options.get('record', False)
         else:
-           echo = (result) or self.verbose or test.options.get('record', False)
+            echo = (result) or self.verbose or test.options.get('record', False)
         log(msg, echo=echo)
         self.schedule(msg)
         if self.verbose or debug():
@@ -251,7 +251,7 @@ class StandardScheduler (object):
 Log result for every test but only show certain ones on the terminal.
 Prune group list if a group is finished.
 """
-        echo = self.verbose or (test.status not in (PASSED, EXPECTED)) 
+        echo = self.verbose or (test.status not in (PASSED, EXPECTED))
         g = test.group
         n = len(g)
         if n == 1:
@@ -284,7 +284,7 @@ Prune group list if a group is finished.
         if (not machine.numberTestsRunning) or debug():
             tc = [t for t in chain(*self.groups) if t.status is CREATED and \
                  ((not machine.canRunNow(t)) or self.isBlocked(t) or self.isWaiting(t))]
-            if not tc: 
+            if not tc:
                 return
             s("------------------------------------------------", echo=echo)
             s("Jobs ready to run but not able to due to wait, block, or cpu", echo=echo)
@@ -292,23 +292,22 @@ Prune group list if a group is finished.
             for t in tc:
                 s("%6d %9d %8d %5d %1d %1d %1d %s" % \
                    (t.serialNumber, t.totalPriority, t.priority, t.groupNumber,
-                    self.isWaiting(t), 
+                    self.isWaiting(t),
                     self.isBlocked(t), not machine.canRunNow(t), t.name), echo=echo)
             s(" ",echo=echo)
         elif self.verbose:
             tc = [t for t in chain(*self.groups) if t.status is CREATED and \
                  self.isBlocked(t) and (not self.isWaiting(t))]
-            if not tc: 
+            if not tc:
                 return
             s("------------------------------------------------", echo=echo)
             s("Jobs ready to run but not able due to block or cpu", echo=echo)
             s("Serial", "tPriority", "Priority", "Group", "B","C", "Name", echo=echo)
             for t in tc:
                 s("%6d %9d %8d %5d %1d %1d %s" % \
-                   (t.serialNumber, t.totalPriority, t.priority, t.groupNumber, 
+                   (t.serialNumber, t.totalPriority, t.priority, t.groupNumber,
                    self.isBlocked(t), not machine.canRunNow(t), t.name), echo=echo)
-         
+
     def getResults(self):
         """Results for the atsr file."""
         return AttributeDict(scheduler = self.name)
-    

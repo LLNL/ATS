@@ -17,7 +17,7 @@ _StatusCodesAbr = dict(
    EXPECTED = "EXPT",
    LSFERROR = "LSFE",
 )
-   
+
 class _StatusCode:
     def __init__(self, name):
         self.name = name
@@ -41,15 +41,15 @@ class _StatusCode:
         return "StatusCode(%s)" % repr(self.name)
 
 def StatusCode(name):
-   "Return a status code so that they compare with 'is'. "
-   try:
-       return statuses[name]
-   except KeyError:
-       new = _StatusCode(name)
-       statuses[name] = new
-       return new
+    "Return a status code so that they compare with 'is'. "
+    try:
+        return statuses[name]
+    except KeyError:
+        new = _StatusCode(name)
+        statuses[name] = new
+        return new
 
-CREATED = StatusCode("CREATED")    
+CREATED = StatusCode("CREATED")
 INVALID = StatusCode("INVALID")
 PASSED = StatusCode("PASSED")
 FAILED = StatusCode("FAILED")

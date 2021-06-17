@@ -142,7 +142,7 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
         print 'label=',lable,'; node=',node,'; user=',user
         print 'status=',status,'; lines=',lines
         print 'not possible. exiting'
-    return allJobs    
+    return allJobs
 
 
 
@@ -221,7 +221,7 @@ def checkJob(jobID,basenode=None):
                     if word.startswith('Creds') or word.startswith('qos'):
                         pass
                     else:
-                        # user:name1, group:name2 and account:name3 
+                        # user:name1, group:name2 and account:name3
                         key,val = word.split(':')
                         job[key] = val
             elif line.startswith('WallTime'):
@@ -279,7 +279,7 @@ def checkStatusFile(statusFilename):
     # ccode=-1: if file does not exist or is not accessible
     ccode,errmsg = checkFile(statusFilename)
 
-    # statusFilename exists and has a value 
+    # statusFilename exists and has a value
     # --------------------------------------
     if ccode == 0:
         fp = open(statusFilename)
@@ -297,8 +297,7 @@ def checkStatusFile(statusFilename):
             #print 'ERROR: %s: stat=%d'%(m,stat)
             #if debug: printObjInfo(self,msg=m)
             newStatus = atsut.FAILED
-    else:	
+    else:
         newStatus = None
-    
-    return newStatus
 
+    return newStatus
