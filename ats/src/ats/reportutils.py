@@ -64,9 +64,9 @@ def getTestStatusLists(testlist):
 
 def atsrToJUnit(atsrFile=None,junitOut=None,build=True ):
     '''Takes an atsr.py file and outputs the results in JUnit format.
-       Useful for reading in test reports in tools like Jenkins or Bamboo. 
+       Useful for reading in test reports in tools like Jenkins or Bamboo.
        The build option is used to record passed builds - if there's an atsr.py then the build step
-       likely passed.  This is included because we want to include the build logs in the 
+       likely passed.  This is included because we want to include the build logs in the
        xml file in the case that the build fails, and there needs to be a corresponding pass case
        for it to be interpreted correctly. (i.e. failed since & tests fixed are incorrect without this.
     '''
@@ -78,7 +78,7 @@ def atsrToJUnit(atsrFile=None,junitOut=None,build=True ):
     state = getStateFromFile(atsrFile)
     passed,failed,timedout,skipped,filtered,invalid,running = getTestStatusLists(state.testlist)
     outf = open(junitOut,'w')
-    # Start the xml file with needed tags 
+    # Start the xml file with needed tags
     outf.write('<?xml version="1.0" encoding="UTF-8"?> <testsuites>')
     outf.write('    <testsuite name="nightly">')
     writePassedBuild(outf)
@@ -104,33 +104,41 @@ def cleanTestCaseName( test ):
 
 def cleanErrorMessage( msg ):
     '''Converts the text from ats .err files to strings parsable by Bamboo from within the junit.xml format. '''
-    return  msg.replace('<','').replace('>','').replace('&','&amp;') 
-       
+    return  msg.replace('<','').replace('>','').replace('&','&amp;')
 
-def writeFailedCodeTestCase( f, test, err_path):
+
+def writeFailedCodeTestCase(f, test, err_path):
     '''Writes a test failure to junit file including ats log and error files for the failure.
     '''
-    ## f is xml output filename
-    ## test is the test object
-    ## err_path is the path to the ats logs directory 
+    # f is xml output filename
+    # test is the test object
+    # err_path is the path to the ats logs directory
     cname = test.name.replace('&','and')
     testname = cleanTestCaseName(test)
-    f.write('    <testcase status="run" time="%.3f" classname="%s" name="%s" >\n' % (elapsedTime(test), cname, testname) )
-    # Write error message:
-    # Invalid chars in the .err logs cause parse errors in Bamboo (xml parse errors - not Bamboo errors)
-    #  so we need to handle xml special chars before writing
-    logferr = open(glob.glob(err_path+'/*'+str(test.serialNumber)+'*.log.err')[0],'r')
-    rawmsg = logferr.read() # not readlines() - there are standard xml escapes to fix, we don't want to iterate over the whole message.
-    msg = "***** ats log.err file: *****\nTesting branch installation\n"
-    msg += cleanErrorMessage( rawmsg )
-    msg += "***** END ats log.err file: *****\n\n"
-    logferr.close()
-    logf = open(glob.glob(err_path+'/*'+str(test.serialNumber)+'*.log')[0],'r')
-    rawmsg = logf.read()
-    msg += "***** ats .log file: *****\n running from clone code \n"
-    msg += cleanErrorMessage( rawmsg )
-    msg += "***** END ats log.err file: *****\n"
-    logf.close()
+    f.write('    <testcase status="run" time="%.3f" classname="%s" name="%s" >\n' % (elapsedTime(test), cname, testname))
+
+    # Write error message: Invalid chars in the .err logs cause parse errors in Bamboo (xml parse
+    # errors - not Bamboo errors) so we need to handle xml special chars before writing handle the
+    # case where a combined log file is written
+    msg = ""
+    err_files = glob.glob(os.path.join(err_path, '*' + str(test.serialNumber) + '*.log.err'))
+    if len(err_files) > 0:
+        with open(err_files[0], 'r') as logferr:
+            # not readlines() - there are standard xml escapes to fix, we don't want to iterate over
+            # the whole message.
+            rawmsg = logferr.read()
+            msg += "***** ats log.err file: *****\nTesting branch installation\n"
+            msg += cleanErrorMessage(rawmsg)
+            msg += "***** END ats log.err file: *****\n\n"
+
+    log_files = glob.glob(os.path.join(err_path, '*' + str(test.serialNumber) + '*.log'))
+    if len(log_files) > 0:
+        with open(log_files[0], 'r') as logf:
+            rawmsg = logf.read()
+            msg += "***** ats log file: *****\n running from clone code \n"
+            msg += cleanErrorMessage(rawmsg)
+            msg += "***** END ats log file: *****\n"
+
     f.write('      <failure type="%s"> %s </failure>\n' % (test.status, msg))
     f.write('    </testcase>\n')
 
@@ -158,7 +166,7 @@ def writeStatusTestCase( f, test, status):
                                                                      test.name) )
     f.write('      <failure type="%s"> ATS set test case to %s.  See ats.log for details. </failure>\n' % (test.status,status))
     f.write('    </testcase>\n')
-                    
+
 def writePassedTestCase( f, test):
     cname = test.name.replace('&','and') # & is reserved in xml
     testname = cleanTestCaseName(test)
