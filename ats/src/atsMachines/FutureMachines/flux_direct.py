@@ -1,7 +1,7 @@
 #ATS:flux                  SELF FluxDirect  800000
 """A flux machine for ATS
 """
-
+from __future__ import print_function
 from ats import machines, debug, atsut
 from ats import log, terminal
 from ats import configuration
@@ -32,7 +32,7 @@ def update_test_status(json_response, arg, errnum):
     #print >>sys.stderr, response, jsc.job_num2state(response['state-pair']['nstate'])
     test_to_update = arg.submitted.get(response['jobid'], None)
     if test_to_update is None:
-        print "GOT UNEXPECTED RESPONSE", response
+        print("GOT UNEXPECTED RESPONSE %s" % response)
         return
     new_state = response['state-pair']['nstate']
     if new_state >= jsc.lib.J_NULL and new_state < jsc.lib.J_RUNNING:
@@ -59,7 +59,7 @@ def update_test_status(json_response, arg, errnum):
                 except:
                     exit_status = 5
                     for k in d:
-                        print "LWJ KVS DEBUG", k, '=', d[k]
+                        print("LWJ KVS DEBUG %s=%s" % (k, d[k]))
                 test_to_update.endTime = float(d['complete-time'])
                 if exit_status['min'] == exit_status['max'] and exit_status['min'] == 0:
                     status = PASSED
@@ -69,7 +69,7 @@ def update_test_status(json_response, arg, errnum):
             # it didn't run ok, don't check anything else
             if configuration.options.oneFailure:
                 raise AtsError, "Test failed in oneFailure mode."
-        print >>sys.stderr, "UPDATING TEST STATUS TO", status
+        print("UPDATING TEST STATUS TO %s" % status, file=sys.stderr)
         test_to_update.set(status, test_to_update.elapsedTime())
         arg.noteEnd(test_to_update)
 
@@ -204,7 +204,7 @@ class FluxDirect (lcMachines.LCMachineCore):
         jobspec['environ'].pop('PMIX_SERVER_URI2', None)
         # print jobspec
         job_response = self.fh.rpc_send('job.submit', jobspec)
-        print job_response
+        print(job_response)
         if job_response is None:
             raise RuntimeError("RPC response invalid")
         if job_response.get('errnum', None) is not None:
