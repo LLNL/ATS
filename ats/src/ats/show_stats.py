@@ -2,14 +2,11 @@
 """
 
 # from copy import copy
+import argparse
 import datetime
+import database.print_usage
 # from optparse import OptionParser
 # from optparse import Option, OptionValueError
-
-import database.print_usage
-import version
-
-import argparse
 
 def date(value):
     return datetime.datetime.strptime(value, '%Y-%m-%d')

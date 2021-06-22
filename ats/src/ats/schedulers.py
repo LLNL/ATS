@@ -1,11 +1,8 @@
 """Defines standard scheduler for interactive jobs."""
-import sys, time
-from log import AtsLog, log, terminal
-from atsut import AttributeDict
 from itertools import chain
-
-from atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, \
-     CREATED, SKIPPED, HALTED, LSFERROR, EXPECTED, statuses, AtsError
+import time
+from atsut import AttributeDict, debug, CREATED, EXPECTED, PASSED, RUNNING 
+from log import AtsLog, log
 
 def comparePriorities (t1, t2):
     "Input is two tests or groups; return comparison based on totalPriority."

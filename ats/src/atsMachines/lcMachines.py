@@ -1,9 +1,6 @@
-from ats import machines, debug, atsut
-from ats import log, terminal
-from ats import configuration
-from ats.atsut import RUNNING, TIMEDOUT
+import time
+from ats import debug, log, machines
 import utils
-import os, time
 
 class LCMachineCore (machines.Machine):
 
