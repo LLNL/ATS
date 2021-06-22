@@ -37,9 +37,9 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
     canRunNow_debugClass = False
 
     def init (self):
-        
+
         self.runningWithinSalloc = True
-    
+
         if "SLURM_JOB_NUM_NODES" in os.environ.keys():
             self.numNodes= int(os.getenv("SLURM_JOB_NUM_NODES"))
             self.npMax= int(os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0])
@@ -78,7 +78,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             print ""
 
         super(SlurmProcessorScheduled, self).init()
-    
+
     #
     # Slurm subtracts one node from the script itself which is running if an salloc is done beforehand.
     # original coding looked for 'bin/ats' process, which does not work with all the wrappers that
@@ -101,14 +101,14 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             if SlurmProcessorScheduled.debugClass:
                 print "DEBUG (checkForAtsProc is False) checkForAtsProc returning 0 (FALSE)"
             return 0
-            
+
 
     def getNumberOfProcessors(self):
         return self.numberMaxProcessors
-    
-    def examineOptions(self, options): 
+
+    def examineOptions(self, options):
         "Examine options from command line, possibly override command line choices."
-        # Grab option values.    
+        # Grab option values.
         # Note, this machines.Machine.examineOptions call will reset self.numberTestsRunningMax
         # self.numberTestsRunningMax is set in init(), not need to call machines.Machine.examineOptions
         # machines.Machine.examineOptions(self, options)
@@ -154,9 +154,9 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             self.npMax = options.npMax
         else:
             if self.runningWithinSalloc:
-               self.npMax = min(self.npMaxH, self.npMax)
+                self.npMax = min(self.npMaxH, self.npMax)
             else:
-               self.npMax = self.npMaxH
+                self.npMax = self.npMaxH
 
         if self.runningWithinSalloc:
             options.numNodes = self.numNodes
@@ -179,7 +179,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs = 1
 
         self.numProcsAvailable     = self.numberMaxProcessors
-        self.numberTestsRunningMax = self.numberMaxProcessors   
+        self.numberTestsRunningMax = self.numberMaxProcessors
 
         self.exclusive = options.exclusive
         self.mpibind   = options.mpibind
@@ -195,7 +195,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             print "DEBUG examineOptions leaving self.numberMaxProcessors = %d " % self.numberMaxProcessors
             print "DEBUG examineOptions leaving self.numberTestsRunningMax = %d " % self.numberTestsRunningMax
 
-    def addOptions(self, parser): 
+    def addOptions(self, parser):
         """Add options needed on this machine."""
 
         temp_uname = os.uname()
@@ -205,19 +205,19 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         if host.startswith('rzwhamo'):
             the_partition = 'nvidia'
 
-        parser.add_option("--partition", action="store", type="string", dest='partition', 
+        parser.add_option("--partition", action="store", type="string", dest='partition',
             default = the_partition,
             help = "Partition in which to run jobs with np > 0")
 
         parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
-           default = 2, 
+           default = 2,
            help="Number of nodes to use")
 
         parser.add_option("--distribution", action="store", type="string", dest='distribution',
            default = 'unset',
            help="srun distribution of mpi processes across nodes")
 
-        
+
     def getResults(self):
         """I'm not sure what this function is supposed to do"""
         return machines.Machine.getResults(self)
@@ -259,7 +259,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if configuration.options.verbose:
                         print "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." % (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt)
 
-    def calculateCommandList(self, test): 
+    def calculateCommandList(self, test):
         """Prepare for run of executable using a suitable command. First we get the plain command
          line that would be executed on a vanilla machine, then we modify it if necessary
          for use on this machines.
@@ -284,7 +284,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         # --exclusive is the default, but it can be switched via the --share ats argument
         #
         if self.exclusive == True:
-            ex_or_sh = "--exclusive"      
+            ex_or_sh = "--exclusive"
         else:
             ex_or_sh = "--share"
 
@@ -301,7 +301,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             if self.mpibind == "none":
                 mpibind = "--epilog=none"
             else:
-                mpibind = "--mpibind=%s" % self.mpibind 
+                mpibind = "--mpibind=%s" % self.mpibind
         else:
             mpibind = "--epilog=none"
 
@@ -318,8 +318,8 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         # nodes to run the specified number of processes.  In this mode, other mpi jobs should not share the node.  This allows
         # the user to undersubscribe the number of cores on the node so that they can do one or both of the following:
         #
-        # 1) access more memory per mpi process 
-        # 2) use threads to access multiple cores per mpi process 
+        # 1) access more memory per mpi process
+        # 2) use threads to access multiple cores per mpi process
         #
         #
         # Testing on rzzeus (8 cores per node)
@@ -334,35 +334,35 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         # And many other runs, result in the only predictable behavior for srun will require that
         #
         # BOTH THE FOLLOWING CONDITIONS ARE MET
-        # 
+        #
         # The number of processes requested (np in ATS speak, and --ntasks in slurm speak) evenly
         #     divides into the number of nodes requested (nn in ATS speak, and --nodes=9-9 in slurm speak)
         #     Valid examples are: 3 nodes requested and 3, 6, 9, 12 processors.
         #     This division will give us our tasks-per-node value.
         #
-        # AND 
+        # AND
         #
         # The tasks-per-node calculated above must divide evenly into the number of cores on a node. Thus
         #     Valid example of tasks-per-node on zeus    (8 cores per node)  are 1, 2, 4, 8
         #     Valid example "" ""             "" alastor (12 cores per node) are 1, 2, 4, 6, 12
         #     Valid example "" ""             "" alastor (20 cores per node) are 1, 2, 4, 5, 10
-        #     Valid example "" ""             "' merl    (16 cores per node) are 1, 2, 4, 8, 16 
+        #     Valid example "" ""             "' merl    (16 cores per node) are 1, 2, 4, 8, 16
         #
-        #       examples        requested   requested    calculated     calculated 
-        #             cores-    --nodes     --ntasks     (inferred)     --cpus-per-task 
-        #     machine per-node  nn         np            tasks-per-node cpus-per-task 
+        #       examples        requested   requested    calculated     calculated
+        #             cores-    --nodes     --ntasks     (inferred)     --cpus-per-task
+        #     machine per-node  nn         np            tasks-per-node cpus-per-task
         #                                                np / nn        cores-per-node / tasks-per-node
-        #     zeus    8         1           1            1 / 1 = 1      8 / 1 = 8 
+        #     zeus    8         1           1            1 / 1 = 1      8 / 1 = 8
         #     zeus    8         1           2            2 / 1 = 2      8 / 2 = 4
         #     zeus    8         1           4            4 / 1 = 4      8 / 4 = 2
         #     zeus    8         1           8            8 / 1 = 8      8 / 8 = 1
         #
-        #     zeus    8         2           2            2 / 2 = 1      8 / 2 = 8 
-        #     zeus    8         2           4            4 / 2 = 2      8 / 4 = 4 
-        #     zeus    8         2           8            8 / 2 = 4      8 / 8 = 2 
-        #     zeus    8         2          16            16/ 2 = 8      8 /16 = 1 
+        #     zeus    8         2           2            2 / 2 = 1      8 / 2 = 8
+        #     zeus    8         2           4            4 / 2 = 2      8 / 4 = 4
+        #     zeus    8         2           8            8 / 2 = 4      8 / 8 = 2
+        #     zeus    8         2          16            16/ 2 = 8      8 /16 = 1
         #
-        #     zeus    8         3           2            2 / 3 = INV    
+        #     zeus    8         3           2            2 / 3 = INV
         #     zeus    8         3           3            3 / 3 = 1      8 / 1 = 8
         #     zeus    8         3           4            4 / 3 = INV                (cannot evenly distribute 4 tasks on 3 nodes)
         #     zeus    8         3           6            6 / 3 = 2      8 / 2 = 4
@@ -381,10 +381,10 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         #  alastor   12         2          24           24 / 2 = 12    12 /12 = 1
         #
         #
-        # This is all calculated using the "nn=1" ATS option.  If it is present, then we go into 
+        # This is all calculated using the "nn=1" ATS option.  If it is present, then we go into
         # this extra set of calculations and accept or reject the test case.  There is no need for the user
         # to tell ATS about the number of threads.  If the code can use threads it may do so by specifying command
-        # line arguments.  
+        # line arguments.
         # ----------------------------------------------------------------------------------------------------------------------------
         # ----------------------------------------------------------------------------------------------------------------------------
         if num_nodes > 0:
@@ -412,9 +412,9 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 print "ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set."
                 sys.exit(1)
 
-            tasks_per_node        = np / num_nodes 
-            tasks_per_node_modulo = np % num_nodes 
-            if (tasks_per_node < 1) : 
+            tasks_per_node        = np / num_nodes
+            tasks_per_node_modulo = np % num_nodes
+            if (tasks_per_node < 1) :
                 tasks_per_node = 1
 
             if not tasks_per_node_modulo == 0:
@@ -426,9 +426,9 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 print "ATS Warning: np=%i nn=%i" % (np, num_nodes)
                 print "             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes)
                 print "             %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo)
-                print " " 
+                print " "
                 print "             %s " % test.name
-                print " " 
+                print " "
 
             # print "DEBUG slurmProcessorScheduled 000 user set nt = %d" % num_threads
             if test.cpus_per_task > -1:
@@ -437,7 +437,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
 
             else:
                 if (num_threads > 1):
-                    
+
                     cpus_per_task = int(num_threads)
 
                     # If ATS is running in such a way that slurm sees all the cores AND
@@ -498,7 +498,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if SlurmProcessorScheduled.debugClass:
                     print "SAD DEBUG SRUN100 "
 
-                return ["srun", the_mpi_type, "--label", "-J", test.jobname, 
+                return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                     "-p", self.partition,
                     ex_or_sh,
                     mpibind,
@@ -507,7 +507,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     "--ntasks=%i" % np \
                    ] + commandList
             else:
-                #print "SAD DEBUG runningWithinSalloc is True" 
+                #print "SAD DEBUG runningWithinSalloc is True"
 
                 if SlurmProcessorScheduled.debugClass:
                     print "SAD DEBUG SRUN200 "
@@ -516,7 +516,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 # as a job step, then srun has severe troubles with the --nodes=1 type option.  It will attempt to put
                 # all jobs on node 1, and the running shell counts against it as using a core.
                 # If running a wrapper  this is not the scenario, as those scripts.
-                # do something like:  
+                # do something like:
                 #
                 #    salloc -N 4 -p pdebug --exclusive ezats ...
                 #
@@ -528,7 +528,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 # By default ATS should 'do the best thing'  But if the user wants a strict interpretation of the nn
                 # option, then they may over-ride this default.
-                # 
+                #
                 #my_nodes="--nodes=%i" % (num_nodes) SAD TESTING
                 my_nodes="--epilog=none"
                 if (self.strict_nn == False):
@@ -540,39 +540,39 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 if test.cpus_per_task > 0:
 
-                  if self.distribution == 'unset':
-                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                        ex_or_sh,
-                        mpibind,
-                        my_nodes,
-                        "--cpus-per-task=%i" % cpus_per_task,
-                        "--ntasks=%i" % np \
-                    ] + commandList
-                  else:
-                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                        ex_or_sh,
-                        mpibind,
-                        my_nodes,
-                        "--distribution=%s" % distribution,
-                        "--cpus-per-task=%i" % cpus_per_task,
-                        "--ntasks=%i" % np \
-                    ] + commandList
+                    if self.distribution == 'unset':
+                        return ["srun", the_mpi_type, "--label", "-J", test.jobname,
+                            ex_or_sh,
+                            mpibind,
+                            my_nodes,
+                            "--cpus-per-task=%i" % cpus_per_task,
+                            "--ntasks=%i" % np \
+                        ] + commandList
+                    else:
+                        return ["srun", the_mpi_type, "--label", "-J", test.jobname,
+                            ex_or_sh,
+                            mpibind,
+                            my_nodes,
+                            "--distribution=%s" % distribution,
+                            "--cpus-per-task=%i" % cpus_per_task,
+                            "--ntasks=%i" % np \
+                        ] + commandList
                 else:
-                  if self.distribution == 'unset':
-                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                        ex_or_sh,
-                        mpibind,
-                        my_nodes,
-                        "--ntasks=%i" % np \
-                    ] + commandList
-                  else:
-                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                        ex_or_sh,
-                        mpibind,
-                        my_nodes,
-                        "--distribution=%s" % distribution,
-                        "--ntasks=%i" % np \
-                    ] + commandList
+                    if self.distribution == 'unset':
+                        return ["srun", the_mpi_type, "--label", "-J", test.jobname,
+                            ex_or_sh,
+                            mpibind,
+                            my_nodes,
+                            "--ntasks=%i" % np \
+                        ] + commandList
+                    else:
+                        return ["srun", the_mpi_type, "--label", "-J", test.jobname,
+                            ex_or_sh,
+                            mpibind,
+                            my_nodes,
+                            "--distribution=%s" % distribution,
+                            "--ntasks=%i" % np \
+                        ] + commandList
 
 
         # We are running on the login node, not within an salloc allocation
@@ -596,7 +596,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                             ex_or_sh,
                             mpibind,
                             "-N%i-%i" % (minNodes, minNodes),
-                            "-n", str(np), 
+                            "-n", str(np),
                             "-p", self.partition] + commandList
                 #
                 # Exclusive command with distribution specified
@@ -614,7 +614,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                             "-n", str(np),
                             "-p", self.partition] + commandList
             #
-            # If running shared, then do not specify a -N option and let the mpi 
+            # If running shared, then do not specify a -N option and let the mpi
             # processes be mapped at will by slurm.  Note that this will use more than the
             # 4 nodes say, as it is not based on total number of MPI processes, which may be
             # spread across more nodes.  For example, if 4 nodes is our limit, then this
@@ -631,7 +631,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
                             ex_or_sh,
-                            "-n", str(np), 
+                            "-n", str(np),
                             "-p", self.partition] + commandList
                 #
                 # Exclusive command with distribution specified
@@ -682,14 +682,14 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         # Adding --distribution=block further enforces this notion.
         #
         # I'm going with this option to see how it works out
-        # 40mins on rzmerl 
+        # 40mins on rzmerl
         #
         # ----------------------------------------------------------------------------------------------------------------------------
         #
         # 2014-Sep-18 Notes:
         #
         # In the following, if "--exclusive -N1" is used on a pre-allocated xterm, this winds up serializing all jobs on Node 1
-        # of a 4 node allocation.  
+        # of a 4 node allocation.
         #
         # On the other hand, if submitted from the front end, where atswrapper does the salloc it does the correct thing.
         # and will put each job an any of the available nodes.
@@ -722,7 +722,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 # see NOTE 123 above for explanation here
                 if self.slurmSeesATSProcessAsUsingACore:
                     while (cpus_per_task > 1) and ((np * cpus_per_task) >= self.numberMaxProcessors):
-                       cpus_per_task -= 1
+                        cpus_per_task -= 1
 
                 test.cpus_per_task  = cpus_per_task
 
@@ -744,7 +744,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                         print "             schedule this job to run, resulting in a hang."
                         print "ATS ADVICE:  Consider allocating %d nodes for testing" % (self.numNodes + 1)
 
-            if test.cpus_per_task > 0: 
+            if test.cpus_per_task > 0:
                 #
                 # I'm not sure exactly how we get into here, this may be dead code, it is untested at of 2014-Oct-7
                 # The case where there is no SLURM_JOBID should be handled above from the login node.
@@ -753,25 +753,25 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     test.numNodesToUse = minNodes
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN600 "
-    
-                    return ["srun", the_mpi_type, "--label", "-J", test.jobname, 
+
+                    return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         "--distribution=%s" % distribution,
                         "-N%i" % (minNodes),
                         "--cpus-per-task=%i" % test.cpus_per_task,
                         "-n", str(np) ] + commandList
-    
+
                 #
-                # If distribution is unset, then trust slurm to do 
-                # the right thing.  No need to specify -N in order to make slurm work, or to 
+                # If distribution is unset, then trust slurm to do
+                # the right thing.  No need to specify -N in order to make slurm work, or to
                 # specify cyclic as it is the default anyway.
                 #
                 elif self.distribution == 'unset':
-    
+
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN700 "
-    
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
@@ -783,7 +783,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 elif distribution == 'cyclic':
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN800 "
-    
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
@@ -792,13 +792,13 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                             "-n", str(np) ] + commandList
                 #
                 # If distribution is block, then do a 'packed block' distribution, filling up all of node 1
-                # before moving onto node two.  This can be achieved by adding the -NminNodes-TotalNodes 
+                # before moving onto node two.  This can be achieved by adding the -NminNodes-TotalNodes
                 # to the srun line.  Note that this will not pack if the --share option is chosen.
                 #
                 else:
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN900 "
-    
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
@@ -811,19 +811,19 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     test.numNodesToUse = minNodes
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN600 "
- 
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
                         mpibind,
                         "--distribution=%s" % distribution,
                         "-N%i" % (minNodes),
                         "-n", str(np) ] + commandList
- 
+
                 elif self.distribution == 'unset':
- 
+
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN700 "
- 
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
@@ -831,7 +831,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 elif distribution == 'cyclic':
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN800 "
- 
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
@@ -840,7 +840,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 else:
                     if SlurmProcessorScheduled.debugClass:
                         print "SAD DEBUG SRUN900 "
- 
+
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
                             mpibind,
@@ -850,11 +850,11 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
 
 
     def canRun(self, test):
-        """Is this machine able to run the test interactively when resources become available? 
+        """Is this machine able to run the test interactively when resources become available?
            If so return ''.  Otherwise return the reason it cannot be run here.
         """
         np = max(test.np, 1)
-        if np > self.numberMaxProcessors:   
+        if np > self.numberMaxProcessors:
             return "Too many processors needed (%d)" % np
 
         return ''
@@ -906,7 +906,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                         printDebug(self, numberNodesRemaining, num_nodes, np)
                         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
                             print "DEBUG canRunNow returning FALSE based on sequential option: numProcsAvailable = %d < numberMaxProcessors = %d" % (self.numProcsAvailable, self.numberMaxProcessors)
-            
+
                 return False
 
         # if the test object has nn defined, then see if we have enuf nodes available
@@ -915,7 +915,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         if num_nodes > 0:
             np = num_nodes * self.npMax
             my_numProcsAvailable = self.numProcsAvailable + SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs
-            
+
             if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
                 string = "%d_%d" % (numberNodesRemaining, my_numProcsAvailable)
                 if string != SlurmProcessorScheduled.canRunNow_saved_string:
@@ -971,8 +971,8 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             ("Stop ", test.serialNumber, test.name, my_nn, my_np, my_nt, time.asctime())
 
         print msg
-        
-    def periodicReport(self): 
+
+    def periodicReport(self):
         "Report on current status of tasks"
         if len(self.running):
             terminal("CURRENTLY RUNNING %d tests:" % len(self.running),
@@ -992,10 +992,10 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         #    print "DEBUG remainingCapacity self.numNodes                    =%d" % (self.numNodes)
         #    print "DEBUG remainingCapacity self.numberNodesExclusivelyUsed  =%d" % (self.numberNodesExclusivelyUsed)
         #    print "DEBUG remainingCapacity self.numProcsAvailable           =%d" % (self.numProcsAvailable)
-        #    print "DEBUG remainingCapacity self.numberTestsRunningMax       =%d" % (self.numberTestsRunningMax) 
-        #    print "DEBUG remainingCapacity self.numberTestsRunning          =%d" % (self.numberTestsRunning) 
+        #    print "DEBUG remainingCapacity self.numberTestsRunningMax       =%d" % (self.numberTestsRunningMax)
+        #    print "DEBUG remainingCapacity self.numberTestsRunning          =%d" % (self.numberTestsRunning)
         #    print "DEBUG remainingCapacity numberNodesRemaining             =%d" % (numberNodesRemaining)
-        #    print "DEBUG remainingCapacity numberTestsRemaining             =%d" % (numberTestsRemaining) 
+        #    print "DEBUG remainingCapacity numberTestsRemaining             =%d" % (numberTestsRemaining)
 
         if self.exclusive == True and not "SLURM_JOBID" in os.environ.keys():
             if numberNodesRemaining != SlurmProcessorScheduled.remainingCapacity_numNodesReported:

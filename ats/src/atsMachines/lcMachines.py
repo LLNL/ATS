@@ -11,11 +11,11 @@ class LCMachineCore (machines.Machine):
         # let's not call squeue too often..
         self.lastTimeSqueueCalled= time.time() # note the time when 'squeue -s' command used
         self.lastSqueueResult= None
-        
-    
-    def kill(self, test): 
+
+
+    def kill(self, test):
         "Final cleanup if any."
-        
+
         for killTimes in xrange(0,1):
 
             if self.lastSqueueResult is None or ( (time.time() - self.lastTimeSqueueCalled) > 60):   # in seconds
@@ -24,8 +24,8 @@ class LCMachineCore (machines.Machine):
                 #if debug():
                 #    log("---- LCMachineCore::kill(), stepIdLines  %s ----\n" %  (self.lastSqueueResult) )
 
-            killAttempted= False       
-    	    for line in self.lastSqueueResult:
+            killAttempted= False
+            for line in self.lastSqueueResult:
                 if test.jobname in line:
                     scancelCommand= 'scancel ' + line.split()[0]
                     if debug():
@@ -37,18 +37,13 @@ class LCMachineCore (machines.Machine):
                     killAttempted= True
                     break
 
-            if not killAttempted:    
+            if not killAttempted:
                 break
-            
+
             if debug():
                 log("---- LCMachineCore::kill, CALLED AGAIN %s test name: %s %s" %  ((killTimes+1), test.jobname, test.serialNumber), echo=True)
             time.sleep(1)
-            
+
             self.lastSqueueResult= None
             time.sleep(2)
             #log("---- LCMachineCore::kill(), check line: %s" %  (line), echo=True)
-
-
-
-
-

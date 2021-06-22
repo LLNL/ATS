@@ -6,7 +6,7 @@ _localtime = time.localtime()
 atsStartTime = time.strftime("%y%m%d%H%M%S",_localtime)
 atsStartTimeLong = time.strftime('%B %d, %Y %H:%M:%S', _localtime)
 
- 
+
 def datestamp (long=0):
     "Return formatted date and time. Shorter version is just time."
     if long:
@@ -49,7 +49,7 @@ def wallTime():
 class Duration(object):
     """A duration of time in seconds.
 
-You can create a Duration from, or compare one to, an integer or 
+You can create a Duration from, or compare one to, an integer or
 string specification such as 1m20s
 
 Example::
@@ -61,7 +61,7 @@ Example::
 """
     def __init__ (self, value=0):
         self.value = timeSpecToSec(value)
-        
+
     def __gt__(self, other):
         if isinstance(other, Duration):
             return self.value > other.value
@@ -142,12 +142,7 @@ def timeSpecToSec(spec):
                 s = 0
             else:
                 s = int(sp)
-                
+
         return (h*3600 + 60 * m + s)
     except Exception, e:
         raise AtsError, "Bad time specification: %s" % specIn
-
-
-
-
-        

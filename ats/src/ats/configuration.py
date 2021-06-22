@@ -1,11 +1,11 @@
 """
 Configuration and command-line processing.
 
-Attributes include SYS_TYPE, MACHINE_TYPE, MACHINE_DIR, BATCH_TYPE, usage, 
+Attributes include SYS_TYPE, MACHINE_TYPE, MACHINE_DIR, BATCH_TYPE, usage,
 options, defaultExecutable, inputFiles, timelimit, machine, batchmachine,
 ATSROOT, cuttime, log.
-     
-The log object is created by importing log, but it can't write to a file 
+
+The log object is created by importing log, but it can't write to a file
 until we process the options and get the desired properties.
 """
 import os, sys, socket
@@ -32,11 +32,11 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 
 import atsMachines
 MACHINE_DIR = atsMachines.__path__
-#MACHINE_DIR = abspath(os.environ.get('MACHINE_DIR', 
+#MACHINE_DIR = abspath(os.environ.get('MACHINE_DIR',
 #                             os.path.join(sys.prefix, 'atsMachines')))
 MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
 if MACHINE_OVERRIDE_DIR:
-   MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
+    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
 
 MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
@@ -119,10 +119,10 @@ def addOptions(parser):
     parser.add_option('--allInteractive', action='store_true', dest='allInteractive',
         help='Run every test in interactive mode.')
 
-    parser.add_option('--combineOutErr', action='store_true', dest='combineOutErr', 
+    parser.add_option('--combineOutErr', action='store_true', dest='combineOutErr',
         help='For each test, combine its log and err files.')
 
-    parser.add_option('--strict_nn', action='store_true', dest='strict_nn', 
+    parser.add_option('--strict_nn', action='store_true', dest='strict_nn',
         help='Strictly observe test "nn" options, this may result in reduced througput or even slurm srun hangs.')
 
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
@@ -131,7 +131,7 @@ def addOptions(parser):
     parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
         help='Blueos option: Adds LSF option --smpiargs="-gpu" to enable CUDA aware MPI with unified or device memory. Synonym with --m_gpu option')
 
-    parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck', 
+    parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck',
         help='Bypass check which prohibits ATS from running on serial machines such as rztrona or borax.')
 
     parser.add_option('--share', action='store_false', dest='exclusive',
@@ -203,10 +203,10 @@ def addOptions(parser):
             help='Blueos option: jsrun --bind option. "none", "rs" or "packed" may be useful for some projects. Use  "jsrun --help" to see other -b, --bind options.  If running with --mpibind this will be "none" and the mpibind application will manage the binding')
 
         parser.add_option('--jsrun_ngpu', dest='blueos_ngpu', type='int',
-            help='Blueos option: Sets of orver-rides test specific settings of ngpu (number of gpu devices per resource/test case). Maps to jsrun --gpu_per_rs option.  Default is 0. Number of GPU devices to use for the test.') 
+            help='Blueos option: Sets of orver-rides test specific settings of ngpu (number of gpu devices per resource/test case). Maps to jsrun --gpu_per_rs option.  Default is 0. Number of GPU devices to use for the test.')
 
         parser.add_option('--lrun_ngpu', dest='blueos_ngpu', type='int',
-            help='Blueos option: Sets of orver-rides test specific settings of ngpu (number of gpu devices per MPI process)) Maps to lrun -g option. Default is 0. Number of GPU devices for each MPI rank in each test.') 
+            help='Blueos option: Sets of orver-rides test specific settings of ngpu (number of gpu devices per MPI process)) Maps to lrun -g option. Default is 0. Number of GPU devices for each MPI rank in each test.')
 
     # Old Power8 MPI run options
     #if SYS_TYPE == "blueos_3_ppc64le_ib":
@@ -245,20 +245,20 @@ def addOptions(parser):
         help='Number of seconds to sleep before each srun. Default is 0 on all systems.')
 
     parser.add_option('--continueFreq', dest='continueFreq', type='float',
-        help="""Frequency in minutes to write a continuation file. The default 
+        help="""Frequency in minutes to write a continuation file. The default
 is to only write a continuation file at the end of the run, and only if any
 tests failed."""
         )
 
     parser.add_option('--cutoff', dest='cuttime',
-        help="""Set the HALTED halt time limit on each test. Over-rides job timelimit.  
+        help="""Set the HALTED halt time limit on each test. Over-rides job timelimit.
 All jobs will be HALTED at this time.
-The value may be given as a digit followed by an s, m, or h to give the time in 
-seconds, minutes (the default), or hours. This value if 
-given causes jobs to fail with status HALTED if they 
+The value may be given as a digit followed by an s, m, or h to give the time in
+seconds, minutes (the default), or hours. This value if
+given causes jobs to fail with status HALTED if they
 run this long and have not already timed out or finished."""
         )
-                      
+
     parser.add_option('--debug', action='store_true', dest='debug',
         help='debug ; turn on debugging flag for detailed debugging output during the run')
 
@@ -266,8 +266,8 @@ run this long and have not already timed out or finished."""
         help='Set code to be tested.')
 
     parser.add_option('-f', '--filter', action='append', dest='filter',
-        help="""add a filter; may be repeated. Be sure to use quotes if the filter contains spaces and remember that the shell will remove one level of quotes. 
-Example: --filter 'np>2' 
+        help="""add a filter; may be repeated. Be sure to use quotes if the filter contains spaces and remember that the shell will remove one level of quotes.
+Example: --filter 'np>2'
 would run only jobs needing more than 2 processors.""")
 
     parser.add_option('-g', '--glue', action='append', dest='glue',
@@ -309,19 +309,19 @@ statement at the start of the input.""")
         help='Stop if a test fails.')
 
     parser.add_option('--reportFreq', dest='reportFreq', type='int',
-        help='Number of minutes between periodic reports.') 
+        help='Number of minutes between periodic reports.')
 
     parser.add_option('--ompNumThreads', dest='ompNumThreads', type='int',
-        help='OMP_NUM_THREADS env setting ATS will set before test run.') 
+        help='OMP_NUM_THREADS env setting ATS will set before test run.')
 
     parser.add_option('--cpusPerTask', dest='cpusPerTask', type='int',
-        help='Slurm set -cpus_per_task option. Lrun set -c option. Jsrun ignored.') 
+        help='Slurm set -cpus_per_task option. Lrun set -c option. Jsrun ignored.')
 
     parser.add_option('--sequential', action='store_true', dest='sequential',
-        help='Run each test consecutively.  Do not run concurrent test jobs.') 
+        help='Run each test consecutively.  Do not run concurrent test jobs.')
 
     parser.add_option('--nosrun', action='store_true', dest='nosrun',
-        help='Run the code without srun.') 
+        help='Run the code without srun.')
 
     parser.add_option('--showGroupStartOnly', action='store_true', dest='showGroupStartOnly',
         help='Only show start of first test in group, not subsequent steps.')
@@ -334,7 +334,7 @@ statement at the start of the input.""")
 
     # "terminal" will send the standard output and stderr to the
     # screen/terminal in real time as the test progresses.
-    # "both" will send it to the screen and to a log file, but the 
+    # "both" will send it to the screen and to a log file, but the
     #     output happens at the end of each test's run.
     parser.add_option('--testStdout', action='store', type='string', dest='testStdout',
         help="""Redirect a test's stdout/stderr to a 'file' (default), the 'terminal', 'both'.
@@ -343,17 +343,17 @@ but 'both' sends the output at the end of each test's run."""
         )
 
     parser.add_option('--prerunScript', action='store', type='string', dest='globalPrerunScript',
-        help="""Script to run before start of each test.""" 
+        help="""Script to run before start of each test."""
         )
 
     parser.add_option('--postrunScript', action='store', type='string', dest='globalPostrunScript',
-        help="""Script to run after completion of each test.""" 
+        help="""Script to run after completion of each test."""
         )
 
     parser.add_option('-t', '--timelimit', dest='timelimit',
         help="""Set the TIMEOUT default time limit on each test. This may be over-ridden for specific tests.
-Jobs will TIMEOUT at this time.  The value may be given 
-as a digit followed by an s, m, or h to give the time in seconds, minutes 
+Jobs will TIMEOUT at this time.  The value may be given
+as a digit followed by an s, m, or h to give the time in seconds, minutes
 (the default), or hours."""
         )
 
@@ -361,21 +361,21 @@ as a digit followed by an s, m, or h to give the time in seconds, minutes
         help='verbose mode; increased level of terminal output')
 
 def documentConfiguration():
-     """Write the configuration to the log."""
-     log('Configuration:')
-     log.indent()
-     log('Input files:',  inputFiles)
-     log('Python path:', sys.executable)
-     log('ATS from ', os.path.dirname(__file__))
-     log('ATS version:', version.version)
-     log('Options:')
-     log.indent()
-     olist = options.keys()
-     olist.sort()
-     for k in olist:
-         log(k + ":", repr(getattr(options, k)))
-     log.dedent()
-     log.dedent()
+    """Write the configuration to the log."""
+    log('Configuration:')
+    log.indent()
+    log('Input files:',  inputFiles)
+    log('Python path:', sys.executable)
+    log('ATS from ', os.path.dirname(__file__))
+    log('ATS version:', version.version)
+    log('Options:')
+    log.indent()
+    olist = options.keys()
+    olist.sort()
+    for k in olist:
+        log(k + ":", repr(getattr(options, k)))
+    log.dedent()
+    log.dedent()
 
 def init(clas = '', adder = None, examiner=None):
     """Called by manager.init(class, adder, examiner)
@@ -396,13 +396,13 @@ def init(clas = '', adder = None, examiner=None):
     machineDirs = MACHINE_DIR
 
     if MACHINE_OVERRIDE_DIR:
-       machineDirs.append(MACHINE_OVERRIDE_DIR)
+        machineDirs.append(MACHINE_OVERRIDE_DIR)
 
     machineList = []
     for machineDir in machineDirs:
-       machineList.extend(
-           [os.path.join(machineDir,x) for x in os.listdir(machineDir)
-            if x.endswith('.py') and not x.endswith('__init__.py')])
+        machineList.extend(
+            [os.path.join(machineDir,x) for x in os.listdir(machineDir)
+             if x.endswith('.py') and not x.endswith('__init__.py')])
 
     machine = None
     batchmachine = None
@@ -427,9 +427,9 @@ def init(clas = '', adder = None, examiner=None):
                 machineName, moduleName, machineClass, npMaxH = items
                 if init_debugClass:
                     print "DEBUG init machineName=%s moduleName=%s machineClass=%s npMaxH=%s" % (machineName, moduleName, machineClass, npMaxH)
-                
+
                 # print "DEBUG init MACHINE_TYPE=%s machineName=%s moduleName=%s machineClass=%s npMaxH=%s" % (MACHINE_TYPE, machineName, moduleName, machineClass, npMaxH)
-                
+
                 if machineName == MACHINE_TYPE:
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
@@ -437,27 +437,27 @@ def init(clas = '', adder = None, examiner=None):
                     print "from atsMachines.%s import %s as Machine" % (moduleName, machineClass)
                     exec('from atsMachines.%s import %s as Machine' % (moduleName, machineClass))
                     machine = Machine(machineName, int(npMaxH))
-                  
+
             elif line.startswith('#BATS:') and not batchmachine:
                 items = line[6:-1].split()
                 machineName, moduleName, machineClass, npMaxH = items
-            
+
                 if machineName == BATCH_TYPE:
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     bspecFoundIn = full_path
                     exec('from atsMachines.%s import %s as BMachine' % (moduleName, machineClass))
                     batchmachine = BMachine(moduleName, int(npMaxH))
-                   
+
         f.close()
-        
+
         if machine and batchmachine:
             break
 
     if machine is None:
         terminal("No machine specifications for", SYS_TYPE, "found, using generic.")
         machine = machines.Machine('generic', -1)
-        
+
 # create the option set
     usage = "usage: %prog [options] [input files]"
     parser = OptionParser(usage=usage, version="%prog " + version.version)
@@ -469,7 +469,7 @@ def init(clas = '', adder = None, examiner=None):
     if batchmachine:
         batchmachine.addOptions(parser)
 # user callback?
-    if adder is not None: 
+    if adder is not None:
         adder(parser)
 # parse the command line
     if clas:
@@ -498,7 +498,7 @@ def init(clas = '', adder = None, examiner=None):
         sequential = options.sequential,
         nosrun = options.nosrun
         )
-    
+
 # let the machine(s) modify the results or act upon them in other ways.
     machine.examineOptions(options)
     if batchmachine:
@@ -513,7 +513,7 @@ def init(clas = '', adder = None, examiner=None):
     log.mode="w"
     log.logging = 1
 # user callback?
-    if examiner is not None: 
+    if examiner is not None:
         examiner(options)
 
     if specFoundIn:
@@ -527,7 +527,7 @@ def init(clas = '', adder = None, examiner=None):
     cuttime = options.cuttime
     if cuttime is not None:
         cuttime = Duration(cuttime)
-    timelimit = Duration(options.timelimit) 
+    timelimit = Duration(options.timelimit)
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     commandList = machine.split(repr(defaultExecutable))
@@ -535,4 +535,3 @@ def init(clas = '', adder = None, examiner=None):
         ATSROOT = os.environ['ATSROOT']
     else:
         ATSROOT = os.path.dirname(defaultExecutable.path)
-

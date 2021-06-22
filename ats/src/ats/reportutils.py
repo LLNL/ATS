@@ -177,8 +177,8 @@ def writePassedTestCase( f, test):
 def elapsedTime( test ):
     "Returns formatted elapsed time of the run."
     try:
-      e = test.endTime
-      s = test.startTime
+        e = test.endTime
+        s = test.startTime
     except AttributeError, foo:
         return (0)
     return (e-s)

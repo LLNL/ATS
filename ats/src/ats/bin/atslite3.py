@@ -14,7 +14,7 @@ from ats.util.generic_utils import execute, clean_old_sandboxes, \
 def main():
     #--------------------------------------------------------------------------
     # Get the sys_type
-    # See if there is a slurm_job_id (which will be the case if the nodes are 
+    # See if there is a slurm_job_id (which will be the case if the nodes are
     # pre-allocated on chaos
     # -------------------------------------------------------------------------
     sys_type     = os.getenv("SYS_TYPE")
@@ -22,7 +22,7 @@ def main():
     slurm_job_id = os.getenv("SLURM_JOB_ID")
     temp_uname   = os.uname()
     host         = temp_uname[1]
-    
+
     # Look for file.ats on the command line.  If one is not found, we will attempt to create one,
     # but if one is specified, then verify it exists and then use it.
     #
@@ -44,7 +44,7 @@ def main():
             test_ats_file = arg
             if not os.path.exists(test_ats_file):
                 sys.exit("Bummer! Did not find test file %s" % (test_ats_file))
-    
+
     # -------------------------------------------------------------------------
     # Set default numNodes to 4, but allow user to override it with
     # the --numNodes=99 option
@@ -63,15 +63,15 @@ def main():
         numNodes = 1
     else:
         numNodes = 4
-    
+
     my_bank = "guests"
-    
+
     for index, arg in enumerate(sys.argv):
         if (arg.find('nosub') >= 0):
             nosub_found = True
             print "INFO: atslite3 %s option will be used " %  arg
             del sys.argv[index]
-    
+
     for index, arg in enumerate(sys.argv):
         if (arg.find('numNodes') >= 0):
             (key, val) = arg.split('=',1)
@@ -84,7 +84,7 @@ def main():
                 sys.exit(-1)
             del sys.argv[index]
             break
-    
+
     for index, arg in enumerate(sys.argv):
         if (arg.find('bank') >= 0):
             (key, val) = arg.split('=',1)
@@ -93,16 +93,16 @@ def main():
             my_bank = val
             print "INFO: atslite3 %s option will use bank %s" % (arg, my_bank)
             del sys.argv[index]
-    
+
     # -------------------------------------------------------------------------
     # call ASC routines to set the machine type based on the sys type and get
     # the name of the interactive partition
     # -------------------------------------------------------------------------
     if "MACHINE_TYPE" not in os.environ:
         set_machine_type_based_on_sys_type()
-    
+
     interactive_partition = get_interactive_partition()
-    
+
     for index, arg in enumerate(sys.argv):
         if (arg.find('partition') >= 0):
             (key, val) = arg.split('=',1)
@@ -117,7 +117,7 @@ def main():
     cmd = myats + " " + ' '.join(sys.argv[1:])
 
     create_test_ats_py = "%s/%s" % (os.getcwd(),"create_test_ats.py")
-    
+
     # If user did not specify a file, then we will default to test.ats, or attempt to create
     # it if it does not exist using a script the user provides in this directory
     if (test_ats_file is ""):
@@ -172,7 +172,7 @@ def main():
 
     ats_lite_ats = Popen( cmd, shell=True)
 
-    ats_lite_ats.wait() 
+    ats_lite_ats.wait()
 
     return_code = ats_lite_ats.returncode
     #print "ATS finished, exiting with return code "

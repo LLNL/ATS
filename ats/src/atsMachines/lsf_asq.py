@@ -11,10 +11,10 @@ import utils, math
 import sys, os, time
 from subprocess import check_output
 
-# 
+#
 # Update python module path so we can import the 'times' module
 # that is part of the ATS source code
-# 
+#
 tempstr = sys.executable
 tempstr = tempstr.replace('bin/python','')
 atsdir  = os.path.join(tempstr, 'lib/python2.7/site-packages/ats');
@@ -50,7 +50,7 @@ class lsfMachine (machines.Machine):
     debugJsrun = False
 
     def init (self):
-        
+
         self.runningWithinBsub = True
 
         # Detect how many cores have been reserved for the OS, default it to 2 if not detectable
@@ -82,7 +82,7 @@ class lsfMachine (machines.Machine):
         #print "DEBUG lsfMachine init self.runningWithinBsub is %r" % self.runningWithinBsub
 
         self.nodesInUse = [0] * self.numNodes
-    
+
         super(lsfMachine, self).init()
 
     def checkForAtsProc(self):
@@ -174,7 +174,7 @@ class lsfMachine (machines.Machine):
         self.bindToNone = options.bindToNone
 
         # If user specified a path to mpibind, then
-        # set mpibind to True as well.  
+        # set mpibind to True as well.
         if self.mpibind_executable != "unset":
             self.mpibind = True
 
@@ -283,10 +283,10 @@ class lsfMachine (machines.Machine):
         if ((test.np * test.nt) > self.npMax):
             if test.num_nodes < 1:
                 # if (self.jsrun_nn < 1):
-                    test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
-                    test.nn = test.num_nodes
-                    if configuration.options.verbose:
-                        print "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." % (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt)
+                test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
+                test.nn = test.num_nodes
+                if configuration.options.verbose:
+                    print "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." % (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt)
 
         if lsfMachine.debugJsrun:
             print "JSRUN 010 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes
@@ -376,11 +376,11 @@ class lsfMachine (machines.Machine):
                     str_args = test.options.get('lsfrun')
                     return str_args.split() + commandList
                 # End of Coding suggested by Chris Scroeder
-                
+
                 if self.lrun == True:
 
                     # SAD Note 2020-02-27 test.cpus_per_task is set based on the nt or the ompNumThreads option.
-                    #                     which is the number of threads to spawn.  There is a separate 
+                    #                     which is the number of threads to spawn.  There is a separate
                     #                     cpusPerTask which may be set as well, for allocating more cores, but
                     #                     not necessarily threading over them. Comes in handy in edge cases.
                     if test.cpus_per_task > 1:
@@ -389,7 +389,7 @@ class lsfMachine (machines.Machine):
                         str_lrun_jsrun_args="-c " + str(test.cpusPerTask) + " " + str_lrun_jsrun_args
 
                     if test.ngpu > 0:
-                        str_lrun_jsrun_args="-g " + str(test.ngpu) + " " + str_lrun_jsrun_args         
+                        str_lrun_jsrun_args="-g " + str(test.ngpu) + " " + str_lrun_jsrun_args
 
                     if test.lrun_pack:
                         # Add --pack as it was requested
@@ -407,7 +407,7 @@ class lsfMachine (machines.Machine):
                         # if mpibind executable specified, use it even for with no defaults
                         # Take care to add the mpibind executable as the very last argument
                         str_lrun_jsrun_args = str_lrun_jsrun_args + " " + self.mpibind_executable
-                        
+
                     if self.old_defaults:
                         if ( test.num_nodes > 0) :
                             return ["lrun",
@@ -445,14 +445,14 @@ class lsfMachine (machines.Machine):
                 #            Also use exclusive if user has specified the num_nodes, or if it was set due to
                 #            the number of processors x threads requested for the test.
                 elif self.jsrun_exclusive == True or self.jsrun_omp == True or test.num_nodes > 0:
-        
+
                     # if omp or nn > 0, set exclusive for later use as well
                     self.jsrun_exclusive = True
 
                     #
                     # If user did not specify number of nodes, calculated based on the number of processors requested.
                     #
-                    if test.num_nodes < 1:  
+                    if test.num_nodes < 1:
                         test.num_nodes = math.ceil(float(test.np) / float(self.npMax))
                         if configuration.options.verbose:
                             print "ATS setting numNodes for test %i to %i based on test.np = %i,  number of cores per node of %i, and --exclusive option" % (test.serialNumber, test.num_nodes, test.np, self.npMax)
@@ -528,19 +528,19 @@ class lsfMachine (machines.Machine):
                             str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind
 
                     if self.old_defaults:
-                            return ["jsrun",
-                                str_smpi,
-                                "--env", str_omp_display_env,
-                                "--env", str_omp_num_threads,
-                                "--env", str_omp_proc_bind,
-                                "-U",   test.rs_filename,
-                                "--np", str(np),
-                            ] + str_lrun_jsrun_args.split() + commandList
+                        return ["jsrun",
+                            str_smpi,
+                            "--env", str_omp_display_env,
+                            "--env", str_omp_num_threads,
+                            "--env", str_omp_proc_bind,
+                            "-U",   test.rs_filename,
+                            "--np", str(np),
+                        ] + str_lrun_jsrun_args.split() + commandList
                     else:
-                            return ["jsrun",
-                                "-U",   test.rs_filename,
-                                "--np", str(np),
-                            ] + str_lrun_jsrun_args.split() + commandList
+                        return ["jsrun",
+                            "-U",   test.rs_filename,
+                            "--np", str(np),
+                        ] + str_lrun_jsrun_args.split() + commandList
 
 
                 # This is also the default whether or not --jsrun was specified.
@@ -572,8 +572,8 @@ class lsfMachine (machines.Machine):
                     if lsfMachine.debugJsrun:
                         print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind_r       =  %s " % test.jsrun_bind_r
                         print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind_none    =  %s " % test.jsrun_bind_none
-                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind 
-                        print "JSRUN 110 DEBUG lsf_asq self.mpibind            =  %s " % self.mpibind 
+                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind
+                        print "JSRUN 110 DEBUG lsf_asq self.mpibind            =  %s " % self.mpibind
                         print "JSRUN 110 DEBUG lsf_asq str_lrun_jsrun_args     =  %s " % str_lrun_jsrun_args
                         print "JSRUN 110 DEBUG lsf_asq cpu_per_rs              =  %d " % cpu_per_rs
 
@@ -584,7 +584,7 @@ class lsfMachine (machines.Machine):
                             str_smpi,
                             "--env", str_omp_display_env,
                             "--env", str_omp_num_threads,
-                            # "--env", str_omp_proc_bind, SAD questions if this is useful, comment out 
+                            # "--env", str_omp_proc_bind, SAD questions if this is useful, comment out
                             "-n", "1",
                             "-r", "1",
                             "-a", str(np),
@@ -624,7 +624,7 @@ class lsfMachine (machines.Machine):
                                 "-c", str(cpu_per_rs),
                                 "-g", str(test.ngpu)
                             ] + str_lrun_jsrun_args.split() + commandList
-  
+
             # This following section is for Ansel, running from the login node.  So bsub is needed.
             #
             else:
@@ -639,13 +639,13 @@ class lsfMachine (machines.Machine):
             sys.exit(-1)
 
     def canRun(self, test):
-        """Is this machine able to run the test interactively when resources become available? 
+        """Is this machine able to run the test interactively when resources become available?
            If so return ''.  Otherwise return the reason it cannot be run here.
         """
         np = max(test.np, 1)
         if np > self.numberMaxProcessors:
             return "Too many processors needed : %d requested %d is the max" % (np, self.numberMaxProcessors)
-            
+
         return ''
 
     def canRunNow(self, test):
@@ -684,7 +684,7 @@ class lsfMachine (machines.Machine):
         if self.runningWithinBsub == False:
             my_output = check_output("lsfjobs | grep `whoami` | wc -l", shell=True);
             my_num_lsf_jobs_running = int(my_output)
-    
+
             if nosrun == False:
                 string = "%d" % my_num_lsf_jobs_running
                 if my_num_lsf_jobs_running > self.numNodes - 1:
@@ -702,7 +702,7 @@ class lsfMachine (machines.Machine):
                         lsfMachine.canRunNow_saved_string = string
                         if canRunNow_debug:
                             print "DEBUG canRunNow returning FALSE based on sequential option: "
-                    
+
                 return False
 
         # if the test object has a specified number of nodes defined, then see if we have enuf nodes available
@@ -712,7 +712,7 @@ class lsfMachine (machines.Machine):
 
             np = test.num_nodes * self.npMax
 
-            my_numProcsAvailable = self.numProcsAvailable 
+            my_numProcsAvailable = self.numProcsAvailable
 
             if canRunNow_debug:
                 string = "%i >= %i and %i >= %i" % (numberNodesRemaining, test.num_nodes, my_numProcsAvailable, np)
@@ -831,7 +831,7 @@ class lsfMachine (machines.Machine):
 
             #print "DEBUG noteEnd 100 decreasing self.numberNodesExclusivelyUsed from %d to %d out of %d" % (self.numberNodesExclusivelyUsed, self.numberNodesExclusivelyUsed - test.num_nodes, self.numNodes)
             self.numberNodesExclusivelyUsed -= test.num_nodes
-        
+
         if hasattr(test, 'rs_filename'):
             if os.path.isfile(test.rs_filename):
                 #print "DEBUG noteEnd unlinking '%s'" % test.rs_filename
@@ -893,7 +893,7 @@ class lsfMachine (machines.Machine):
                         print "DEBUG remainingCapacity EEE returning %d " % (self.numProcsAvailable)
                     return self.numProcsAvailable
 
-    def kill(self, test): 
+    def kill(self, test):
         "Final cleanup if any."
         # kill the test
         import subprocess
@@ -906,4 +906,3 @@ class lsfMachine (machines.Machine):
                         log("---- bkill() in lsf_asq.py, command= bkill -J %s failed with return code -%d  ----" %  (test.jobname, retcode), echo=True)
                 except OSError, e:
                     log("---- bkill() in lsf_asq.py, execution of command failed (bkill -J %s) failed:  %s----" %  (test.jobname, e), echo=True)
-

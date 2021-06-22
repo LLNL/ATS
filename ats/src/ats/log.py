@@ -18,7 +18,7 @@ class AtsLog (object):
 
     def set (self, directory = '', name = ''):
         "Set the name and directory of the log file."
-        if not directory: 
+        if not directory:
             directory = os.getcwd()
         if not name:
             name = "ats.log"
@@ -38,9 +38,9 @@ class AtsLog (object):
         if not os.path.isdir(self.directory):
             os.makedirs(self.directory)
         return open(filename, mode)
-           
+
     def putlist(self, linelist, **kw):
-        """Write a list of lines that include newline at end. 
+        """Write a list of lines that include newline at end.
            Keywords echo and logging.
         """
 # doesn't seem worth it to check for bad keywords
@@ -58,7 +58,7 @@ class AtsLog (object):
         if echo:
             d = sys.stderr
             for line in linelist:
-                 print >>d, indentation + line,
+                print >>d, indentation + line,
             print >>d
 
     def write (self, *items, **kw):
@@ -86,7 +86,7 @@ class AtsLog (object):
             if logging:
                 d = self._open(self.name, self.mode)
                 self.mode = 'a'
-                if first_line: 
+                if first_line:
                     print >>d, line
                 else:
                     print >>d, "    " + line    # Indent 2nd and subsequent lines
@@ -95,12 +95,12 @@ class AtsLog (object):
             if echo:
                 d = sys.stderr
                 d.flush()
-                if first_line: 
+                if first_line:
                     try:
                         print >>d, line
                     except:
                         pass
-                else: 
+                else:
                     try:
                         print >>d, "    " + line    # Indent 2nd and subsequent lines
                     except:
@@ -112,7 +112,7 @@ class AtsLog (object):
     def indent (self):
         self.__previous.append(self.leading)
         self.leading += self.indentation
-        
+
     def dedent (self):
         try:
             self.leading = self.__previous.pop()
@@ -126,8 +126,8 @@ class AtsLog (object):
         except Exception:
             print >>sys.stderr, msg
         raise SystemExit, 1
-                
-log = AtsLog(name="ats.log") 
+
+log = AtsLog(name="ats.log")
 terminal = AtsLog(echo=True, logging=False)
 
 if __name__ == "__main__":
