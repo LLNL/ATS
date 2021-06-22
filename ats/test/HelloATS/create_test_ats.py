@@ -1,7 +1,8 @@
-#!/usr/apps/ats/7.0.1/bin/python
+#!/usr/bin/env python3
 """Create a test.ats file."""
 import itertools
 import os
+import sys
 
 
 def get_file_header():
@@ -9,13 +10,13 @@ def get_file_header():
     ats_log_checker_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'ats_check_log.py')
     if not os.path.isfile(ats_log_checker_path):
-        exit(1)
+        sys.exit(1)
 
-    ofp_header = """import os
+    ofp_header = f"""import os
 glue(independent=True)
 glue(keep=True)
-my_checker = '%s'
-""" % ats_log_checker_path
+my_checker = '{ats_log_checker_path}'
+"""
     return ofp_header
 
 
@@ -52,4 +53,4 @@ if __name__ == "__main__":
             ofp.write(test)
             ofp.write(testif)
 
-    print "Most Excellent! Created ats test file %s\n" % TEST_ATS
+    print(f"Most Excellent! Created ats test file {TEST_ATS}\n")
