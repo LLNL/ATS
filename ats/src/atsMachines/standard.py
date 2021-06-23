@@ -3,9 +3,8 @@
 #ATS:win32 SELF WinMachine 1
 #BATS:batchsimulator machines BatchSimulator 1200
 
-import ats, os
-from ats import machines
-from ats import terminal
+import os
+from ats import machines, terminal
 from ats.atsut import RUNNING, TIMEDOUT
 
 class WinMachine (machines.Machine):
@@ -54,7 +53,6 @@ class WinMachine (machines.Machine):
         super(WinMachine, self).examineOptions(options)
         self.npMax= self.numberTestsRunningMax
 
-        import os
         if options.numNodes==-1:
             if os.environ.has_key('NUMBER_OF_PROCESSORS'):
                 options.numNodes= int(os.environ['NUMBER_OF_PROCESSORS'])
