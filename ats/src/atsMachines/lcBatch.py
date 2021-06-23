@@ -44,16 +44,16 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
 
     allJobs = {}
     if status is not None:
-        print
-        print 'cmd=',cmd
-        print 'status=',status
-        print 'lines=',lines
+        print()
+        print('cmd=%s' % cmd)
+        print('status=%s' % status)
+        print('lines=%s' % lines)
         if status == 32512:
-            print 'ERROR: showq command not found: status=%s'%status
-            print '       cannot execute showq command from %s'%node2runCMD
+            print('ERROR: showq command not found: status=%s' % status)
+            print('       cannot execute showq command from %s' % node2runCMD)
             sys.exit(1)
         elif status == 256:
-            print 'Failed to run showq command with status=%s. Retry'%status
+            print('Failed to run showq command with status=%s. Retry' % status)
             if label is None:
                 # lists active, eligible and blocked jobs
                 allJobs['active'] = {}
@@ -63,8 +63,8 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
                 allJobs[label] = {}
             return allJobs
         else:
-            print 'ERROR: failed to run showq command with status=%s'%status
-            print '       executed showq from %s'%node2runCMD
+            print('ERROR: failed to run showq command with status=%s' % status)
+            print('       executed showq from %s' % node2runCMD)
             sys.exit(1)
 
     if lines:
@@ -89,8 +89,9 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
                     words = line.split()
                     num_jobs = int(words[0])
                     if num_jobs != len(jobs):
-                        print 'num_jobs=',num_jobs,'; len(jobs)=',len(jobs)
-                        print 'ERROR: num_jobs != len(jobs)'
+                        print('num_jobs=%s; len(jobs)=%s' % (num_jobs,
+                                                             len(jobs)))
+                        print('ERROR: num_jobs != len(jobs)')
                         sys.exit(1)
                     else:
                         jobs = {}
@@ -120,8 +121,9 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
                     words = line.split()
                     num_jobs = int(words[0])
                     if num_jobs != len(jobs):
-                        print 'num_jobs=',num_jobs,'; len(jobs)=',len(jobs)
-                        print 'ERROR: num_jobs != len(jobs)'
+                        print('num_jobs=%s; len(jobs)=%s' % (num_jobs,
+                                                             len(jobs)))
+                        print('ERROR: num_jobs != len(jobs)')
                         sys.exit(1)
                 elif line.startswith('Total job'):
                     pass
@@ -137,11 +139,11 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
 
     # lines == [] and status == None: not possible
     else:
-        print
-        print 'showq(label,node,user) returned lines==[] and status==None'
-        print 'label=',lable,'; node=',node,'; user=',user
-        print 'status=',status,'; lines=',lines
-        print 'not possible. exiting'
+        print()
+        print('showq(label,node,user) returned lines==[] and status==None')
+        print('label=%s; node=%s; user=%s' % (label, node, user))
+        print('status=%s; lines=%s' % (status, lines))
+        print('not possible. exiting')
     return allJobs
 
 
@@ -151,7 +153,7 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
 
 def realHostName(host):
     if host == '' or host is None:
-        print 'host name is None or empty'
+        print('host name is None or empty')
         return None
 
     host0 = host.lower()

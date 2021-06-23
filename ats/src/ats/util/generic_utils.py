@@ -43,16 +43,16 @@ def importName( moduleName, name, default_func=None, verbose=False ):
     At run time, dynamically import 'name' from 'moduleName'.
     """
     if verbose:
-        print "Loading %s from %s." % ( name, moduleName )
+        print("Loading %s from %s." % (name, moduleName))
     func = default_func
     try:
         my_mod = __import__( moduleName, globals(), locals(), [name] )
         func   =  vars(my_mod)[name]
     except ImportError, value:
-        print "Import of function %s from %s failed: %s" % (name, moduleName, value )
+        print("Import of function %s from %s failed: %s" % (name, moduleName, value))
         raise StandardError
     except KeyError, value:
-        print "KeyError during import of function %s from %s failed: %s" % (name, moduleName, value )
+        print("KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
         pass
 
     return func
@@ -329,7 +329,7 @@ def clean_old_sandboxes():
     for name in names:
         if name.startswith("sandbox"):
             if os.path.isdir(name):
-                print "Removing %s" % (name)
+                print("Removing %s" % (name))
                 shutil.rmtree(name)
 
 ####################################################################################
@@ -341,7 +341,7 @@ def clean_old_ats_log_dirs():
         if name.startswith("blueos_3") or name.startswith("toss_4_x86_64_ib") or name.startswith("toss_3_x86_64_ib"):
             if name.endswith("logs"):
                 if os.path.isdir(name):
-                    print "Removing %s" % (name)
+                    print("Removing %s" % (name))
                     shutil.rmtree(name)
 
 ####################################################################################
@@ -365,7 +365,7 @@ def set_machine_type_based_on_sys_type():
     temp_uname   = os.uname()
     host         = temp_uname[1]
 
-    print host
+    print(host)
 
     try:
         if host.startswith('rzalastor'):
@@ -467,7 +467,7 @@ def create_ats_file_version_001(independent, checker, test_ats, nprocs, codes, a
 
     ofp.close()
 
-    print "Most Excellent! Created ats test file",test_ats,"\n"
+    print("Most Excellent! Created ats test file %s\n" % test_ats)
 
 ####################################################################################
 # Routine to create test.ats type files based on generic input
@@ -522,7 +522,7 @@ def create_ats_file_version_001_nosrun_on_checker(independent, checker, test_ats
 
     ofp.close()
 
-    print "Most Excellent! Created ats test file",test_ats,"\n"
+    print("Most Excellent! Created ats test file %s\n" % test_ats)
 
 ####################################################################################
 # Routine to create test.ats type files based on generic input
@@ -566,7 +566,7 @@ def create_ats_file_version_002(independent, test_ats, nprocs, codes, args, stdi
 
     ofp.close()
 
-    print "Most Excellent! Created ats test file",test_ats,"\n"
+    print("Most Excellent! Created ats test file %s\n" % test_ats)
 
 
 ####################################################################################
@@ -620,7 +620,7 @@ def create_ats_file_version_003(independent, checker, test_ats, nprocs, code, ar
 
     ofp.close()
 
-    print "Most Excellent! Created ats test file",test_ats,"\n"
+    print("Most Excellent! Created ats test file %s\n" % test_ats)
 
 ####################################################################################
 # Routine to create test.ats type files based on generic input
@@ -694,7 +694,7 @@ def create_ats_file_version_004(independent, checker, test_ats, nprocs, nprocs_c
 
     ofp.close()
 
-    print "Most Excellent! Created ats test file",test_ats,"\n"
+    print("Most Excellent! Created ats test file %s\n" % test_ats)
 
     return test_num
 
@@ -778,7 +778,7 @@ def create_ats_file_version_005(independent, sandbox, ignoreReturnCode, nosrun, 
 
     ofp.close()
 
-    print "Most Excellent! Created ats test file",test_ats,"\n"
+    print("Most Excellent! Created ats test file %s\n" % test_ats)
 
     return test_num
 

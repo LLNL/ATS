@@ -71,7 +71,7 @@ def main():
     for index, arg in enumerate(sys.argv):
         if (arg.find('nosub') >= 0):
             nosub_found = True
-            print "INFO: atslite1 %s option will be used " %  arg
+            print("INFO: atslite1 %s option will be used " % arg)
             del sys.argv[index]
 
     for index, arg in enumerate(sys.argv):
@@ -82,9 +82,9 @@ def main():
             if val.isdigit():
                 numNodes = int(val)
             else:
-                print "Error '%s' is invalid" % arg
+                print("Error '%s' is invalid" % arg)
                 sys.exit(-1)
-            print "INFO: atslite1 %s option will use %i nodes" % (arg, numNodes)
+            print("INFO: atslite1 %s option will use %i nodes" % (arg, numNodes))
             del sys.argv[index]
             break
 
@@ -94,7 +94,7 @@ def main():
             if val.startswith('"') and val.endswith('"'):   # strip off possible quotes
                 val = val[1:-1]
             my_bank = val
-            print "INFO: atslite1 %s option will use bank %s" % (arg, my_bank)
+            print("INFO: atslite1 %s option will use bank %s" % (arg, my_bank))
             del sys.argv[index]
 
     # -----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ def main():
             if val.startswith('"') and val.endswith('"'):   # strip off possible quotes
                 val = val[1:-1]
             interactive_partition = val
-            print "INFO: atslite1 will use partition %s" % interactive_partition
+            print("INFO: atslite1 will use partition %s" % interactive_partition)
 
     myats = os.path.join(sys.exec_prefix, 'bin', 'ats')
     cmd = myats + " --verbose " + ' '.join(sys.argv[1:])
@@ -126,10 +126,10 @@ def main():
         cmd = cmd + " " + test_ats_file
 
     if os.path.exists(test_ats_file):
-        print "Found %s." % (test_ats_file)
+        print("Found %s." % test_ats_file)
     else:
         if os.path.exists(create_test_ats_py):
-            print "Found %s." % (create_test_ats_py)
+            print("Found %s." % create_test_ats_py)
             return_code = execute(create_test_ats_py, None, True)
             if (return_code != 0):
                 sys.exit(1)
@@ -140,11 +140,11 @@ def main():
     clean_old_ats_log_dirs()
 
     if nosub_found is True:
-        print "nosub option -- running ATS directly without salloc or bsub on %s" % sys_type
+        print("nosub option -- running ATS directly without salloc or bsub on %s" % sys_type)
 
     elif 'bgqos' in sys_type:
         cmd = "%s --numNodes=%d" % (cmd, numNodes)
-        print "Running script on login node -- each test will have a separate srun allocation"
+        print("Running script on login node -- each test will have a separate srun allocation")
 
     elif 'lassen' in host:
         if lsb_batch_jid is None:
@@ -163,13 +163,13 @@ def main():
                 cmd = 'bsub -x -n %d -Is -XF -W 120 -G %s %s' % (myNumProcs, my_bank, cmd)
 
     elif exclusive_found is True:
-        print "Running script on login node -- each test will have a separate srun allocation"
+        print("Running script on login node -- each test will have a separate srun allocation")
         cmd = "%s --numNodes=%d" % (cmd, numNodes)
 
     elif slurm_job_id is None:
         cmd = 'salloc -N %d -p %s --exclusive %s' % (numNodes, interactive_partition, cmd)
 
-    print "Executing: %s" % cmd
+    print("Executing: %s" % cmd)
 
     ats_lite_ats = Popen( cmd, shell=True)
 

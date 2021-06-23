@@ -179,57 +179,60 @@ class lsfMachine (machines.Machine):
             self.mpibind = True
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 000 DEBUG lsf_asq self.lrun_jsrun_args =  '%s'" % self.lrun_jsrun_args
-            print "JSRUN 000 DEBUG lsf_asq self.jsrun           =  '%s'" % self.jsrun
-            print "JSRUN 000 DEBUG lsf_asq self.jsrun_omp       =  '%s'" % self.jsrun_omp
-            print "JSRUN 000 DEBUG lsf_asq self.jsrun_bind      =  '%s'" % self.jsrun_bind
+            JSRUN_DEBUG = "JSRUN 000 DEBUG lsf_asq"
+            print("%s self.lrun_jsrun_args =  '%s'" % (JSRUN_DEBUG, self.lrun_jsrun_args))
+            print("%s self.jsrun           =  '%s'" % (JSRUN_DEBUG, self.jsrun))
+            print("%s self.jsrun_omp       =  '%s'" % (JSRUN_DEBUG, self.jsrun_omp))
+            print("%s self.jsrun_bind      =  '%s'" % (JSRUN_DEBUG, self.jsrun_bind))
             # print "JSRUN 000 DEBUG lsf_asq self.jsrun_nn        =  '%s'" % self.jsrun_nn
-            print "JSRUN 000 DEBUG lsf_asq self.jsrun_exclusive =   %r " % self.jsrun_exclusive
+            print("%s self.jsrun_exclusive =   %r " % (JSRUN_DEBUG, self.jsrun_exclusive))
 
         if lsfMachine.debugClass:
-            print "DEBUG lsfMachine Class options.cuttime             = %s " % options.cuttime
-            print "DEBUG lsfMachine Class options.timelimit           = %s " % options.timelimit
-            print "DEBUG lsfMachine Class options.globalPostrunScript = %s " % options.globalPostrunScript
-            print "DEBUG lsfMachine Class options.globalPrerunScript  = %s " % options.globalPrerunScript
-            print "DEBUG lsfMachine Class options.testStdout          = %s " % options.testStdout
-            print "DEBUG lsfMachine Class options.logdir              = %s " % options.logdir
-            print "DEBUG lsfMachine Class options.level               = %s " % options.level
-            print "DEBUG lsfMachine Class options.npMax               = %s " % options.npMax
-            print "DEBUG lsfMachine Class options.reportFreq          = %s " % options.reportFreq
-            print "DEBUG lsfMachine Class options.ompNumThreads       = %s " % options.ompNumThreads
-            print "DEBUG lsfMachine Class options.sleepBeforeSrun     = %s " % options.sleepBeforeSrun
-            print "DEBUG lsfMachine Class options.continueFreq        = %s " % options.continueFreq
-            print "DEBUG lsfMachine Class options.verbose             = %s " % options.verbose
-            print "DEBUG lsfMachine Class options.debug               = %s " % options.debug
-            print "DEBUG lsfMachine Class options.info                = %s " % options.info
-            print "DEBUG lsfMachine Class options.hideOutput          = %s " % options.hideOutput
-            print "DEBUG lsfMachine Class options.keep                = %s " % options.keep
-            print "DEBUG lsfMachine Class options.logUsage            = %s " % options.logUsage
-            print "DEBUG lsfMachine Class options.okInvalid           = %s " % options.okInvalid
-            print "DEBUG lsfMachine Class options.oneFailure          = %s " % options.oneFailure
-            print "DEBUG lsfMachine Class options.sequential          = %s " % options.sequential
-            print "DEBUG lsfMachine Class options.nosrun              = %s " % options.nosrun
-            print "DEBUG lsfMachine Class options.checkForAtsProc     = %s " % options.checkForAtsProc
-            print "DEBUG lsfMachine Class options.showGroupStartOnly  = %s " % options.showGroupStartOnly
-            print "DEBUG lsfMachine Class options.skip                = %s " % options.skip
-            print "DEBUG lsfMachine Class options.blueos_exclusive    = %s " % options.blueos_exclusive
-            print "DEBUG lsfMachine Class options.mpibind             = %s " % options.mpibind
-            print "DEBUG lsfMachine Class options.mpibind_executable  = %s " % options.mpibind_executable
-            print "DEBUG lsfMachine Class options.combineOutErr       = %s " % options.combineOutErr
-            print "DEBUG lsfMachine Class options.allInteractive      = %s " % options.allInteractive
-            print "DEBUG lsfMachine Class options.filter              = %s " % options.filter
-            print "DEBUG lsfMachine Class options.glue                = %s " % options.glue
+            DEBUG_LSF = "DEBUG lsfMachine Class "
+            print("%s options.cuttime             = %s " % (DEBUG_LSF, options.cuttime))
+            print("%s options.timelimit           = %s " % (DEBUG_LSF, options.timelimit))
+            print("%s options.globalPostrunScript = %s " % (DEBUG_LSF, options.globalPostrunScript))
+            print("%s options.globalPrerunScript  = %s " % (DEBUG_LSF, options.globalPrerunScript))
+            print("%s options.testStdout          = %s " % (DEBUG_LSF, options.testStdout))
+            print("%s options.logdir              = %s " % (DEBUG_LSF, options.logdir))
+            print("%s options.level               = %s " % (DEBUG_LSF, options.level))
+            print("%s options.npMax               = %s " % (DEBUG_LSF, options.npMax))
+            print("%s options.reportFreq          = %s " % (DEBUG_LSF, options.reportFreq))
+            print("%s options.ompNumThreads       = %s " % (DEBUG_LSF, options.ompNumThreads))
+            print("%s options.sleepBeforeSrun     = %s " % (DEBUG_LSF, options.sleepBeforeSrun))
+            print("%s options.continueFreq        = %s " % (DEBUG_LSF, options.continueFreq))
+            print("%s options.verbose             = %s " % (DEBUG_LSF, options.verbose))
+            print("%s options.debug               = %s " % (DEBUG_LSF, options.debug))
+            print("%s options.info                = %s " % (DEBUG_LSF, options.info))
+            print("%s options.hideOutput          = %s " % (DEBUG_LSF, options.hideOutput))
+            print("%s options.keep                = %s " % (DEBUG_LSF, options.keep))
+            print("%s options.logUsage            = %s " % (DEBUG_LSF, options.logUsage))
+            print("%s options.okInvalid           = %s " % (DEBUG_LSF, options.okInvalid))
+            print("%s options.oneFailure          = %s " % (DEBUG_LSF, options.oneFailure))
+            print("%s options.sequential          = %s " % (DEBUG_LSF, options.sequential))
+            print("%s options.nosrun              = %s " % (DEBUG_LSF, options.nosrun))
+            print("%s options.checkForAtsProc     = %s " % (DEBUG_LSF, options.checkForAtsProc))
+            print("%s options.showGroupStartOnly  = %s " % (DEBUG_LSF, options.showGroupStartOnly))
+            print("%s options.skip                = %s " % (DEBUG_LSF, options.skip))
+            print("%s options.blueos_exclusive    = %s " % (DEBUG_LSF, options.blueos_exclusive))
+            print("%s options.mpibind             = %s " % (DEBUG_LSF, options.mpibind))
+            print("%s options.mpibind_executable  = %s " % (DEBUG_LSF, options.mpibind_executable))
+            print("%s options.combineOutErr       = %s " % (DEBUG_LSF, options.combineOutErr))
+            print("%s options.allInteractive      = %s " % (DEBUG_LSF, options.allInteractive))
+            print("%s options.filter              = %s " % (DEBUG_LSF, options.filter))
+            print("%s options.glue                = %s " % (DEBUG_LSF, options.glue))
 
         if lsfMachine.debugClass:
-            print "DEBUG lsfMachine leaving self.npMax = %d " % self.npMax
-            print "DEBUG lsfMachine leaving self.npMaxH = %d " % self.npMaxH
-            print "DEBUG lsfMachine leaving self.numberMaxProcessors = %d " % self.numberMaxProcessors
-            print "DEBUG lsfMachine leaving self.numberTestsRunningMax = %d " % self.numberTestsRunningMax
-            print "DEBUG lsfMachine leaving self.numNodes = %d " % self.numNodes
-            print "DEBUG lsfMachine leaving self.numProcsAvailable = %d " % self.numProcsAvailable
-            print "DEBUG lsfMachine leaving self.numberTestsRunningMax = %d " % self.numberTestsRunningMax
-            print "DEBUG lsfMachine leaving self.exclusive = %r " % self.exclusive
-            print "DEBUG lsfMachine leaving self.timelimit = %s " % self.timelimit
+            DEBUG_LSF = "DEBUG lsfMachine leaving "
+            print("%s self.npMax = %d " % (DEBUG_LSF, self.npMax))
+            print("%s self.npMaxH = %d " % (DEBUG_LSF, self.npMaxH))
+            print("%s self.numberMaxProcessors = %d " % (DEBUG_LSF, self.numberMaxProcessors))
+            print("%s self.numberTestsRunningMax = %d " % (DEBUG_LSF, self.numberTestsRunningMax))
+            print("%s self.numNodes = %d " % (DEBUG_LSF, self.numNodes))
+            print("%s self.numProcsAvailable = %d " % (DEBUG_LSF, self.numProcsAvailable))
+            print("%s self.numberTestsRunningMax = %d " % (DEBUG_LSF, self.numberTestsRunningMax))
+            print("%s self.exclusive = %r " % (DEBUG_LSF, self.exclusive))
+            print("%s self.timelimit = %s " % (DEBUG_LSF, self.timelimit))
 
     def addOptions(self, parser):
 
@@ -253,9 +256,9 @@ class lsfMachine (machines.Machine):
         # will look in the deck.  If not there, will be set to 1
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 005 DEBUG"
-            print "JSRUN 005 DEBUG lsf_asq test.np                 =  %d " % test.np
-            print "JSRUN 005 DEBUG self.npMax                      =  %d " % self.npMax
+            print("JSRUN 005 DEBUG")
+            print("JSRUN 005 DEBUG lsf_asq test.np                 =  %d " % test.np)
+            print("JSRUN 005 DEBUG self.npMax                      =  %d " % self.npMax)
 
         if configuration.options.ompNumThreads and configuration.options.ompNumThreads > 0:
             test.nt = configuration.options.ompNumThreads
@@ -265,8 +268,8 @@ class lsfMachine (machines.Machine):
             test.cpus_per_task = test.nt    # for compatability with another python file used by slurm and blueos machine
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 006 DEBUG lsf_asq test.nt                 =  %d " % test.nt
-            print "JSRUN 006 DEBUG lsf_asq test.cpus_per_task      =  %d " % test.cpus_per_task
+            print("JSRUN 006 DEBUG lsf_asq test.nt                 =  %d " % test.nt)
+            print("JSRUN 006 DEBUG lsf_asq test.cpus_per_task      =  %d " % test.cpus_per_task)
 
         #if (self.jsrun_nn < 1):
         #    test.num_nodes = test.options.get('nn', 0)
@@ -276,7 +279,7 @@ class lsfMachine (machines.Machine):
         test.num_nodes = test.options.get('nn', 0)
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 007 DEBUG test.num_nodes                  =  %s " % test.num_nodes
+            print("JSRUN 007 DEBUG test.num_nodes                  =  %s " % test.num_nodes)
 
         # If num_nodes not specified check to see if we are running more than 40 MPI processes, if so we need
         # multiple nodes (hosts)
@@ -286,10 +289,11 @@ class lsfMachine (machines.Machine):
                 test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
                 test.nn = test.num_nodes
                 if configuration.options.verbose:
-                    print "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." % (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt)
+                    print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
+                          (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt))
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 010 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes
+            print("JSRUN 010 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes)
 
     def calculateCommandList(self, test):
 
@@ -312,9 +316,9 @@ class lsfMachine (machines.Machine):
         test.mpi_um          = self.mpi_um
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 020 DEBUG lsf_asq test.jsrun_omp          =  %s " % test.jsrun_omp
-            print "JSRUN 020 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind
-            print "JSRUN 020 DEBUG lsf_asq test.lrun_jsrun_args    =  %s " % test.lrun_jsrun_args
+            print("JSRUN 020 DEBUG lsf_asq test.jsrun_omp          =  %s " % test.jsrun_omp)
+            print("JSRUN 020 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind)
+            print("JSRUN 020 DEBUG lsf_asq test.lrun_jsrun_args    =  %s " % test.lrun_jsrun_args)
 
         # Allow the ats command line --blueos_np option will over-ride the test specific np option
         if test.blueos_np > 0:
@@ -325,8 +329,8 @@ class lsfMachine (machines.Machine):
         num_nodes = test.num_nodes
 
         if lsfMachine.debugJsrun:
-            print "JSRUN 022 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes
-            print "JSRUN 022 DEBUG lsf_asq num_nodes               =  %d " % num_nodes
+            print("JSRUN 022 DEBUG lsf_asq test.num_nodes          =  %d " % test.num_nodes)
+            print("JSRUN 022 DEBUG lsf_asq num_nodes               =  %d " % num_nodes)
 
         temp_time_limit = test.options.get('timelimit', 59)
         time_limit      = Duration(temp_time_limit)
@@ -455,10 +459,11 @@ class lsfMachine (machines.Machine):
                     if test.num_nodes < 1:
                         test.num_nodes = math.ceil(float(test.np) / float(self.npMax))
                         if configuration.options.verbose:
-                            print "ATS setting numNodes for test %i to %i based on test.np = %i,  number of cores per node of %i, and --exclusive option" % (test.serialNumber, test.num_nodes, test.np, self.npMax)
+                            print("ATS setting numNodes for test %i to %i based on test.np = %i,  number of cores per node of %i, and --exclusive option" %
+                                  (test.serialNumber, test.num_nodes, test.np, self.npMax))
 
                     if lsfMachine.debugJsrun:
-                        print "JSRUN 090 DEBUG test.num_nodes                  =  %d " % test.num_nodes
+                        print("JSRUN 090 DEBUG test.num_nodes =  %d " % test.num_nodes)
                     #
                     # Now that we know how many nodes we need, loop over the array of nodesInUse
                     #   and find the indexe for nodes not in use (slot will be 0 in this case)
@@ -506,7 +511,7 @@ class lsfMachine (machines.Machine):
 
                     #if lsfMachine.debugJsrun:
                     if configuration.options.verbose:
-                        print "ATS created LSF jsrun resource file for test %s = %s" % (test.name, test.rs_filename)
+                        print("ATS created LSF jsrun resource file for test %s = %s" % (test.name, test.rs_filename))
                         with open(test.rs_filename, 'r') as fin:
                             print(fin.read())
 
@@ -548,7 +553,7 @@ class lsfMachine (machines.Machine):
                 # 2019-05-06:  Useful for non threaded MPI Code with or without GPU support.
                 else:
                     if lsfMachine.debugJsrun:
-                        print "JSRUN 100 DEBUG lsf_asq "
+                        print("JSRUN 100 DEBUG lsf_asq ")
 
                     test.jsrun_bind_r = "rs"
                     test.jsrun_bind_none = "none"
@@ -570,12 +575,12 @@ class lsfMachine (machines.Machine):
                         str_lrun_jsrun_args = ""
 
                     if lsfMachine.debugJsrun:
-                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind_r       =  %s " % test.jsrun_bind_r
-                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind_none    =  %s " % test.jsrun_bind_none
-                        print "JSRUN 110 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind
-                        print "JSRUN 110 DEBUG lsf_asq self.mpibind            =  %s " % self.mpibind
-                        print "JSRUN 110 DEBUG lsf_asq str_lrun_jsrun_args     =  %s " % str_lrun_jsrun_args
-                        print "JSRUN 110 DEBUG lsf_asq cpu_per_rs              =  %d " % cpu_per_rs
+                        print("JSRUN 110 DEBUG lsf_asq test.jsrun_bind_r =  %s " % test.jsrun_bind_r)
+                        print("JSRUN 110 DEBUG lsf_asq test.jsrun_bind_none =  %s " % test.jsrun_bind_none)
+                        print("JSRUN 110 DEBUG lsf_asq test.jsrun_bind =  %s " % test.jsrun_bind)
+                        print("JSRUN 110 DEBUG lsf_asq self.mpibind =  %s " % self.mpibind)
+                        print("JSRUN 110 DEBUG lsf_asq str_lrun_jsrun_args =  %s " % str_lrun_jsrun_args)
+                        print("JSRUN 110 DEBUG lsf_asq cpu_per_rs =  %d " % cpu_per_rs)
 
 
                     if self.old_defaults:
@@ -629,13 +634,13 @@ class lsfMachine (machines.Machine):
             #
             else:
 
-                print "ATS DISABLED ON LOGIN NODE OF ANSEL.  PLEASE RUN IN AN ALLOCATION."
+                print("ATS DISABLED ON LOGIN NODE OF ANSEL.  PLEASE RUN IN AN ALLOCATION.")
                 sys.exit(-1)
         #
         # This is not sierra, lassen, ansel, or manta, what is this?
         #
         else:
-            print "ATS ERROR: Do not know what LSF machine %s is " % hwname
+            print("ATS ERROR: Do not know what LSF machine %s is " % hwname)
             sys.exit(-1)
 
     def canRun(self, test):
@@ -689,7 +694,7 @@ class lsfMachine (machines.Machine):
                 string = "%d" % my_num_lsf_jobs_running
                 if my_num_lsf_jobs_running > self.numNodes - 1:
                     if string != lsfMachine.canRunNow_saved_string:
-                        print "ATS LSF Development: User has %d jobs already running.  Waiting for one to finish" % my_num_lsf_jobs_running
+                        print("ATS LSF Development: User has %d jobs already running.  Waiting for one to finish" % my_num_lsf_jobs_running)
                     lsfMachine.canRunNow_saved_string = string
                     return False
 
@@ -701,7 +706,7 @@ class lsfMachine (machines.Machine):
                     if string != lsfMachine.canRunNow_saved_string:
                         lsfMachine.canRunNow_saved_string = string
                         if canRunNow_debug:
-                            print "DEBUG canRunNow returning FALSE based on sequential option: "
+                            print("DEBUG canRunNow returning FALSE based on sequential option: ")
 
                 return False
 
@@ -719,9 +724,11 @@ class lsfMachine (machines.Machine):
                 if string != lsfMachine.canRunNow_saved_string:
                     lsfMachine.canRunNow_saved_string = string
                     if numberNodesRemaining >= test.num_nodes and my_numProcsAvailable >= np:
-                        print "DEBUG canRunNow returning TRUE  based on node avail: %d is  >= %d and proc avail : %d is  >= %d (%s)" % (test.num_nodes, numberNodesRemaining, my_numProcsAvailable, np,test.name)
+                        print("DEBUG canRunNow returning TRUE  based on node avail: %d is  >= %d and proc avail : %d is  >= %d (%s)" %
+                              (test.num_nodes, numberNodesRemaining, my_numProcsAvailable, np,test.name))
                     else:
-                        print "DEBUG canRunNow returning FALSE based on node avail: %d not >= %d  or proc avail : %d not >= %d (%s)" % (test.num_nodes, numberNodesRemaining, my_numProcsAvailable, np,test.name)
+                        print("DEBUG canRunNow returning FALSE based on node avail: %d not >= %d  or proc avail : %d not >= %d (%s)" %
+                              (test.num_nodes, numberNodesRemaining, my_numProcsAvailable, np,test.name))
 
             # print "DEBUG canRunNow returning %d >= %d and %d >= %d" % (numberNodesRemaining, test.num_nodes, my_numProcsAvailable, np)
             return numberNodesRemaining >= test.num_nodes and my_numProcsAvailable >= np
@@ -733,9 +740,11 @@ class lsfMachine (machines.Machine):
                 if string != lsfMachine.canRunNow_saved_string:
                     lsfMachine.canRunNow_saved_string = string
                     if self.numProcsAvailable >= (test.np * test.nt):
-                        print "DEBUG canRunNow returning TRUE  based on proc avail: %d is  >= %d (%s)" % (self.numProcsAvailable, (np * nt),test.name)
+                        print("DEBUG canRunNow returning TRUE  based on proc avail: %d is  >= %d (%s)" %
+                              (self.numProcsAvailable, (np * nt),test.name))
                     else:
-                        print "DEBUG canRunNow returning FALSE based on proc avail: %d not >= %d (%s)" % (self.numProcsAvailable, (np * nt),test.name)
+                        print("DEBUG canRunNow returning FALSE based on proc avail: %d not >= %d (%s)" %
+                              (self.numProcsAvailable, (np * nt),test.name))
 
             #print "DEBUG canRunNow returning self.numProcsAvailable %d >= np %d?" % (self.numProcsAvailable, np)
             return self.numProcsAvailable >= (test.np * test.nt)
@@ -776,7 +785,8 @@ class lsfMachine (machines.Machine):
                 if slot == 1:
                     numSlotsUsed += 1
             if self.numberNodesExclusivelyUsed != numSlotsUsed:
-                print "Programmer Error numSlotsUsed = %i numberNodesExclusivelyUsed = %i\n" % (numSlotsUsed, self.numberNodesExclusivelyUsed)
+                print("Programmer Error numSlotsUsed = %i numberNodesExclusivelyUsed = %i\n" %
+                      (numSlotsUsed, self.numberNodesExclusivelyUsed))
                 sys.exit(-1)
 
     def noteEnd(self, test):
@@ -804,7 +814,7 @@ class lsfMachine (machines.Machine):
             ("Stop ", test.serialNumber, test.name, msgHosts, test.num_nodes, my_np, my_nt, my_ngpu, time.asctime())
 
         os.system("stty sane")  # Keep the terminal sane on blueos
-        print msg
+        print(msg)
         os.system("stty sane")  # Keep the terminal sane on blueos
 
         #print "DEBUG noteEnd 100 test.name = %s test.num_nodes = %i np = %i nt = %i num_procs_used = %i" % (test.name, test.num_nodes, my_np, my_nt, test.num_procs_used)
@@ -821,12 +831,14 @@ class lsfMachine (machines.Machine):
                 cntNumNodes += 1
                 slotNum = nodeNum - 1   # nodeNum is 1 based, convert to 0 based index forarray
                 if slotNum > self.numNodes:
-                    print "Programmer Error: noteEnd, slotNum=%i self.npMax=%i\n" % (slotNum, self.numNodes)
+                    print("Programmer Error: noteEnd, slotNum=%i self.npMax=%i\n" %
+                          (slotNum, self.numNodes))
                     sys.exit(-1)
                 self.nodesInUse[slotNum] = 0;
 
             if cntNumNodes != test.num_nodes:
-                print "Programmer Error: noteEnd, cntNumNodes=%i test.num_nodes=%i\n" % (cntNumNodes, test.num_nodes)
+                print("Programmer Error: noteEnd, cntNumNodes=%i test.num_nodes=%i\n" %
+                      (cntNumNodes, test.num_nodes))
                 sys.exit(-1)
 
             #print "DEBUG noteEnd 100 decreasing self.numberNodesExclusivelyUsed from %d to %d out of %d" % (self.numberNodesExclusivelyUsed, self.numberNodesExclusivelyUsed - test.num_nodes, self.numNodes)
@@ -837,7 +849,7 @@ class lsfMachine (machines.Machine):
                 #print "DEBUG noteEnd unlinking '%s'" % test.rs_filename
                 os.unlink(test.rs_filename)
             else:
-                print "Programmer Error: Can not find file '%s'\n" % test.rs_filename
+                print("Programmer Error: Can not find file '%s'\n" % test.rs_filename)
 
         #print self.nodesInUse
 
@@ -853,44 +865,44 @@ class lsfMachine (machines.Machine):
             if numberNodesRemaining != lsfMachine.remainingCapacity_numNodesReported:
                 lsfMachine.remainingCapacity_numNodesReported = numberNodesRemaining
                 if  lsfMachine.debugClass:
-                    print "DEBUG remainingCapacity AAA %d Nodes Available" % numberNodesRemaining
+                    print("DEBUG remainingCapacity AAA %d Nodes Available" % numberNodesRemaining)
 
             if numberNodesRemaining < 1:
                 if False:
-                    print "DEBUG remainingCapacity AAA1 returning 0 "
+                    print("DEBUG remainingCapacity AAA1 returning 0 ")
                 return 0
             else:
                 if False:
-                    print "DEBUG remainingCapacity AAA2 returning %d " % (numberNodesRemaining)
+                    print("DEBUG remainingCapacity AAA2 returning %d " % (numberNodesRemaining))
                 return numberNodesRemaining
         else:
             if numberNodesRemaining < 1:
                 if numberNodesRemaining != lsfMachine.remainingCapacity_numNodesReported:
                     lsfMachine.remainingCapacity_numNodesReported = numberNodesRemaining
                     if False:
-                        print "DEBUG remainingCapacity BBB %d Nodes Available" % numberNodesRemaining
+                        print("DEBUG remainingCapacity BBB %d Nodes Available" % numberNodesRemaining)
 
                 if numberNodesRemaining < 1:
                     if False:
-                        print "DEBUG remainingCapacity BBB1 returning 0 "
+                        print("DEBUG remainingCapacity BBB1 returning 0 ")
                     return 0
                 else:
                     if False:
-                        print "DEBUG remainingCapacity BBB2 returning %d " % (numberNodesRemaining)
+                        print("DEBUG remainingCapacity BBB2 returning %d " % (numberNodesRemaining))
                     return numberNodesRemaining
             else:
                 if self.numProcsAvailable != lsfMachine.remainingCapacity_numProcsReported:
                     lsfMachine.remainingCapacity_numProcsReported = self.numProcsAvailable
                     if False:
-                        print "DEBUG remainingCapacity CCC self.numProcsAvailable = %d " % (self.numProcsAvailable)
+                        print("DEBUG remainingCapacity CCC self.numProcsAvailable = %d " % (self.numProcsAvailable))
 
                 if self.numProcsAvailable < 1:
                     if False:
-                        print "DEBUG remainingCapacity DDD returning 0 "
+                        print("DEBUG remainingCapacity DDD returning 0 ")
                     return 0
                 else:
                     if False:
-                        print "DEBUG remainingCapacity EEE returning %d " % (self.numProcsAvailable)
+                        print("DEBUG remainingCapacity EEE returning %d " % (self.numProcsAvailable))
                     return self.numProcsAvailable
 
     def kill(self, test):
@@ -900,7 +912,7 @@ class lsfMachine (machines.Machine):
         if self.runningWithinBsub == False:
             if test.status is RUNNING or test.status is TIMEDOUT:
                 try:
-                    print "ATS cancelling job: bkill -J " + test.jobname
+                    print("ATS cancelling job: bkill -J " + test.jobname)
                     retcode= subprocess.call("bkill -J " + test.jobname, shell=True)
                     if retcode < 0:
                         log("---- bkill() in lsf_asq.py, command= bkill -J %s failed with return code -%d  ----" %  (test.jobname, retcode), echo=True)

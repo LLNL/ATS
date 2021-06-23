@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys, os
 from atsut import abspath, AtsError, debug
 import configuration
@@ -51,15 +52,15 @@ class AtsLog (object):
             d = self._open(self.name, self.mode)
             self.mode = 'a'
             for line in linelist:
-                print >>d, indentation + line,
-            print >>d
+                print(indentation + line, file=d)
+            print('', file=d)
             d.close()
 
         if echo:
             d = sys.stderr
             for line in linelist:
-                print >>d, indentation + line,
-            print >>d
+                print(indentation + line, file=d)
+            print('', file=d)
 
     def write (self, *items, **kw):
         "Write one line, like a print. Keywords echo and logging."
@@ -87,9 +88,9 @@ class AtsLog (object):
                 d = self._open(self.name, self.mode)
                 self.mode = 'a'
                 if first_line:
-                    print >>d, line
+                    print(line, file=d)
                 else:
-                    print >>d, "    " + line    # Indent 2nd and subsequent lines
+                    print("    %s" % line, file=d)
                 d.close()
 
             if echo:
@@ -97,12 +98,12 @@ class AtsLog (object):
                 d.flush()
                 if first_line:
                     try:
-                        print >>d, line
+                        print(line, file=d)
                     except:
                         pass
                 else:
                     try:
-                        print >>d, "    " + line    # Indent 2nd and subsequent lines
+                        print("    %s" % line, file=d)
                     except:
                         pass
             first_line = False
@@ -125,6 +126,7 @@ class AtsLog (object):
             self('Fatal error:', msg, echo=True)
         except Exception:
             print >>sys.stderr, msg
+            print(msg, file=sys.stderr)
         raise SystemExit, 1
 
 log = AtsLog(name="ats.log")
@@ -132,7 +134,7 @@ terminal = AtsLog(echo=True, logging=False)
 
 if __name__ == "__main__":
     log = AtsLog(logging=True, directory='test.logs')
-    print log.directory, log.name, log.shortname
+    print("%s%s%s" % (log.directory, log.name, log.shortname))
     log('a','b','c')
     log.indent()
     log('this should be indented')

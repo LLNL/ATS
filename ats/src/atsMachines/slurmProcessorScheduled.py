@@ -54,7 +54,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 self.hostname= os.getenv("HOSTNAME")
                 if self.hostname.startswith('rzalastor'):
                     if self.npMax == 36:
-                        print "Setting npMax to 20 on alastor"
+                        print("Setting npMax to 20 on alastor")
                         self.npMax = 20
                         self.npMaxH = 20
 
@@ -62,20 +62,20 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         self.slurmSeesATSProcessAsUsingACore = False
         if "SLURM_PTY_PORT" in os.environ.keys() or "SLURM_STEP_ID" in os.environ.keys():
             self.slurmSeesATSProcessAsUsingACore = True
-            print ""
-            print "ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU. "
-            print "            ATS Will ignore 'nn' (number of noes) test options and allow processes."
-            print "            to span multiple nodes for better throughput and to help prevent srun hangs"
-            print ""
-            print "            NOTE: This feature may not fix possible hangs resulting from a single test "
-            print "                  case which utilizes all allocated cores. Slurm may not see all "
-            print "                  the cores as usable and accept the job but not schedule it, resulting in a hang"
-            print ""
-            print "            The node spanning behavior may be overridden with the --strict_nn ATS option."
-            print ""
-            print "            CAUTION: Use of --strict_nn may result in slurm/srun hangs which are "
-            print "                      beyond the control of ATS, depending on how the nodes were allocated"
-            print ""
+            print("""
+ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
+            ATS Will ignore 'nn' (number of noes) test options and allow processes.
+            to span multiple nodes for better throughput and to help prevent srun hangs
+
+            NOTE: This feature may not fix possible hangs resulting from a single test
+                  case which utilizes all allocated cores. Slurm may not see all 
+                  the cores as usable and accept the job but not schedule it, resulting in a hang
+
+            The node spanning behavior may be overridden with the --strict_nn ATS option.
+
+            CAUTION: Use of --strict_nn may result in slurm/srun hangs which are 
+                     beyond the control of ATS, depending on how the nodes were allocated
+""")
 
         super(SlurmProcessorScheduled, self).init()
 
@@ -91,15 +91,15 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         if self.checkForAtsProcFlag == True:
             if "SLURM_PTY_PORT" in os.environ.keys() or "SLURM_STEP_ID" in os.environ.keys():
                 if SlurmProcessorScheduled.debugClass:
-                    print "DEBUG checkForAtsProc returning 1 (TRUE)"
+                    print("DEBUG checkForAtsProc returning 1 (TRUE)")
                 return 1
             else:
                 if SlurmProcessorScheduled.debugClass:
-                    print "DEBUG checkForAtsProc returning 0 (FALSE)"
+                    print("DEBUG checkForAtsProc returning 0 (FALSE)")
                 return 0
         else:
             if SlurmProcessorScheduled.debugClass:
-                print "DEBUG (checkForAtsProc is False) checkForAtsProc returning 0 (FALSE)"
+                print("DEBUG (checkForAtsProc is False) checkForAtsProc returning 0 (FALSE)")
             return 0
 
 
@@ -117,38 +117,39 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         self.checkForAtsProcFlag = options.checkForAtsProc
 
         if SlurmProcessorScheduled.debugClass:
-            print "DEBUG SlurmProcessorScheduled Class options.cuttime             = %s " % options.cuttime
-            print "DEBUG SlurmProcessorScheduled Class options.timelimit           = %s " % options.timelimit
-            print "DEBUG SlurmProcessorScheduled Class options.globalPostrunScript = %s " % options.globalPostrunScript
-            print "DEBUG SlurmProcessorScheduled Class options.globalPrerunScript  = %s " % options.globalPrerunScript
-            print "DEBUG SlurmProcessorScheduled Class options.testStdout          = %s " % options.testStdout
-            print "DEBUG SlurmProcessorScheduled Class options.logdir              = %s " % options.logdir
-            print "DEBUG SlurmProcessorScheduled Class options.level               = %s " % options.level
-            print "DEBUG SlurmProcessorScheduled Class options.npMax               = %s " % options.npMax
-            print "DEBUG SlurmProcessorScheduled Class options.reportFreq          = %s " % options.reportFreq
-            print "DEBUG SlurmProcessorScheduled Class options.ompNumThreads       = %s " % options.ompNumThreads
-            print "DEBUG SlurmProcessorScheduled Class options.cpusPerTask         = %s " % options.cpusPerTask
-            print "DEBUG SlurmProcessorScheduled Class options.sleepBeforeSrun     = %s " % options.sleepBeforeSrun
-            print "DEBUG SlurmProcessorScheduled Class options.continueFreq        = %s " % options.continueFreq
-            print "DEBUG SlurmProcessorScheduled Class options.verbose             = %s " % options.verbose
-            print "DEBUG SlurmProcessorScheduled Class options.debug               = %s " % options.debug
-            print "DEBUG SlurmProcessorScheduled Class options.info                = %s " % options.info
-            print "DEBUG SlurmProcessorScheduled Class options.hideOutput          = %s " % options.hideOutput
-            print "DEBUG SlurmProcessorScheduled Class options.keep                = %s " % options.keep
-            print "DEBUG SlurmProcessorScheduled Class options.logUsage            = %s " % options.logUsage
-            print "DEBUG SlurmProcessorScheduled Class options.okInvalid           = %s " % options.okInvalid
-            print "DEBUG SlurmProcessorScheduled Class options.oneFailure          = %s " % options.oneFailure
-            print "DEBUG SlurmProcessorScheduled Class options.sequential          = %s " % options.sequential
-            print "DEBUG SlurmProcessorScheduled Class options.nosrun              = %s " % options.nosrun
-            print "DEBUG SlurmProcessorScheduled Class options.checkForAtsProc     = %s " % options.checkForAtsProc
-            print "DEBUG SlurmProcessorScheduled Class options.showGroupStartOnly  = %s " % options.showGroupStartOnly
-            print "DEBUG SlurmProcessorScheduled Class options.skip                = %s " % options.skip
-            print "DEBUG SlurmProcessorScheduled Class options.exclusive           = %s " % options.exclusive
-            print "DEBUG SlurmProcessorScheduled Class options.mpibind             = %s " % options.mpibind
-            print "DEBUG SlurmProcessorScheduled Class options.combineOutErr       = %s " % options.combineOutErr
-            print "DEBUG SlurmProcessorScheduled Class options.allInteractive      = %s " % options.allInteractive
-            print "DEBUG SlurmProcessorScheduled Class options.filter              = %s " % options.filter
-            print "DEBUG SlurmProcessorScheduled Class options.glue                = %s " % options.glue
+            DEBUG_SLURM = "DEBUG SlurmProcessorScheduled Class"
+            print("%s options.cuttime             = %s " % (DEBUG_SLURM, options.cuttime))
+            print("%s options.timelimit           = %s " % (DEBUG_SLURM, options.timelimit))
+            print("%s options.globalPostrunScript = %s " % (DEBUG_SLURM, options.globalPostrunScript))
+            print("%s options.globalPrerunScript  = %s " % (DEBUG_SLURM, options.globalPrerunScript))
+            print("%s options.testStdout          = %s " % (DEBUG_SLURM, options.testStdout))
+            print("%s options.logdir              = %s " % (DEBUG_SLURM, options.logdir))
+            print("%s options.level               = %s " % (DEBUG_SLURM, options.level))
+            print("%s options.npMax               = %s " % (DEBUG_SLURM, options.npMax))
+            print("%s options.reportFreq          = %s " % (DEBUG_SLURM, options.reportFreq))
+            print("%s options.ompNumThreads       = %s " % (DEBUG_SLURM, options.ompNumThreads))
+            print("%s options.cpusPerTask         = %s " % (DEBUG_SLURM, options.cpusPerTask))
+            print("%s options.sleepBeforeSrun     = %s " % (DEBUG_SLURM, options.sleepBeforeSrun))
+            print("%s options.continueFreq        = %s " % (DEBUG_SLURM, options.continueFreq))
+            print("%s options.verbose             = %s " % (DEBUG_SLURM, options.verbose))
+            print("%s options.debug               = %s " % (DEBUG_SLURM, options.debug))
+            print("%s options.info                = %s " % (DEBUG_SLURM, options.info))
+            print("%s options.hideOutput          = %s " % (DEBUG_SLURM, options.hideOutput))
+            print("%s options.keep                = %s " % (DEBUG_SLURM, options.keep))
+            print("%s options.logUsage            = %s " % (DEBUG_SLURM, options.logUsage))
+            print("%s options.okInvalid           = %s " % (DEBUG_SLURM, options.okInvalid))
+            print("%s options.oneFailure          = %s " % (DEBUG_SLURM, options.oneFailure))
+            print("%s options.sequential          = %s " % (DEBUG_SLURM, options.sequential))
+            print("%s options.nosrun              = %s " % (DEBUG_SLURM, options.nosrun))
+            print("%s options.checkForAtsProc     = %s " % (DEBUG_SLURM, options.checkForAtsProc))
+            print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
+            print("%s options.skip                = %s " % (DEBUG_SLURM, options.skip))
+            print("%s options.exclusive           = %s " % (DEBUG_SLURM, options.exclusive))
+            print("%s options.mpibind             = %s " % (DEBUG_SLURM, options.mpibind))
+            print("%s options.combineOutErr       = %s " % (DEBUG_SLURM, options.combineOutErr))
+            print("%s options.allInteractive      = %s " % (DEBUG_SLURM, options.allInteractive))
+            print("%s options.filter              = %s " % (DEBUG_SLURM, options.filter))
+            print("%s options.glue                = %s " % (DEBUG_SLURM, options.glue))
 
         if options.npMax > 0:
             self.npMax = options.npMax
@@ -190,10 +191,11 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         #print "DEBUG self.test_nn = %d " % self.toss_nn
 
         if SlurmProcessorScheduled.debugClass:
-            print "DEBUG examineOptions leaving self.npMax = %d " % self.npMax
-            print "DEBUG examineOptions leaving self.npMaxH = %d " % self.npMaxH
-            print "DEBUG examineOptions leaving self.numberMaxProcessors = %d " % self.numberMaxProcessors
-            print "DEBUG examineOptions leaving self.numberTestsRunningMax = %d " % self.numberTestsRunningMax
+            DEBUG_OPTIONS = "DEBUG examineOptions leaving"
+            print("%s self.npMax = %d " % (DEBUG_OPTIONS, self.npMax))
+            print("%s self.npMaxH = %d " % (DEBUG_OPTIONS, self.npMaxH))
+            print("%s self.numberMaxProcessors = %d " % (DEBUG_OPTIONS, self.numberMaxProcessors))
+            print("%s self.numberTestsRunningMax = %d " % (DEBUG_OPTIONS, self.numberTestsRunningMax))
 
     def addOptions(self, parser):
         """Add options needed on this machine."""
@@ -257,7 +259,8 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
                     test.nn = test.num_nodes
                     if configuration.options.verbose:
-                        print "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." % (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt)
+                        print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
+                              (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt))
 
     def calculateCommandList(self, test):
         """Prepare for run of executable using a suitable command. First we get the plain command
@@ -399,7 +402,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             elif self.numNodes > 0:
                 self.slurm_nnodes = self.numNodes
             else:
-                print "ERROR 'nn' specified but neither SLURM_NNODES nor self.numNodes is set."
+                print("ERROR 'nn' specified but neither SLURM_NNODES nor self.numNodes is set.")
                 sys.exit(1)
 
             if     "SLURM_JOB_CPUS_PER_NODE" in os.environ.keys():
@@ -409,7 +412,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             elif self.npMax > 0:
                 self.slurm_cpus_on_node = self.npMax
             else:
-                print "ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set."
+                print("ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set.")
                 sys.exit(1)
 
             tasks_per_node        = np / num_nodes
@@ -422,13 +425,13 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #  Bump up the tasks per node by 1 as at least 1 node will have extra tasks.
                 tasks_per_node +=1
 
-                print test
-                print "ATS Warning: np=%i nn=%i" % (np, num_nodes)
-                print "             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes)
-                print "             %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo)
-                print " "
-                print "             %s " % test.name
-                print " "
+                print(test)
+                print("ATS Warning: np=%i nn=%i" % (np, num_nodes))
+                print("             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes))
+                print("             %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo))
+                print(" ")
+                print("             %s " % test.name)
+                print(" ")
 
             # print "DEBUG slurmProcessorScheduled 000 user set nt = %d" % num_threads
             if test.cpus_per_task > -1:
@@ -478,25 +481,26 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             if self.slurmSeesATSProcessAsUsingACore:
                 if cpus_per_task > 1:
                     if (np * cpus_per_task) >= self.numberMaxProcessors:
-                        print "ATS WARNING: Test %s May Hang! " % test.name
-                        print "             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task)
-                        print "             This allocation has %d max processors " % self.numberMaxProcessors
-                        print "             Slurm may see your shell as utilizing a process and never"
-                        print "             schedule this job to run, resulting in a hang."
-                        print "ATS ADVICE:  Consider setting cpus_per_task to %d " % (cpus_per_task - 1)
+                        print("ATS WARNING: Test %s May Hang! " % test.name)
+                        print("             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task))
+                        print("             This allocation has %d max processors " % self.numberMaxProcessors)
+                        print("             Slurm may see your shell as utilizing a process and never")
+                        print("             schedule this job to run, resulting in a hang.")
+                        print("ATS ADVICE:  Consider setting cpus_per_task to %d " % (cpus_per_task - 1))
                 else:
                     if np >= self.numberMaxProcessors:
-                        print "ATS WARNING: Test %s May Hang! " % test.name
-                        print "             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task)
-                        print "             This allocation has %d max processors on %d nodes " % (self.numberMaxProcessors, self.numNodes)
-                        print "             Slurm may see your shell as utilizing a process and never"
-                        print "             schedule this job to run, resulting in a hang."
-                        print "ATS ADVICE:  Consider allocating %d nodes for testing" % (self.numNodes + 1)
+                        print("ATS WARNING: Test %s May Hang! " % test.name)
+                        print("             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task))
+                        print("             This allocation has %d max processors on %d nodes " % (self.numberMaxProcessors, self.numNodes))
+                        print("             Slurm may see your shell as utilizing a process and never")
+                        print("             schedule this job to run, resulting in a hang.")
+                        print("ATS ADVICE:  Consider allocating %d nodes for
+                        testing" % (self.numNodes + 1))
 
             if self.runningWithinSalloc == False:
 
                 if SlurmProcessorScheduled.debugClass:
-                    print "SAD DEBUG SRUN100 "
+                    print("SAD DEBUG SRUN100 ")
 
                 return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                     "-p", self.partition,
@@ -510,7 +514,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #print "SAD DEBUG runningWithinSalloc is True"
 
                 if SlurmProcessorScheduled.debugClass:
-                    print "SAD DEBUG SRUN200 "
+                    print("SAD DEBUG SRUN200 ")
 
                 # If the user has pre-allocated a node in such a manner that their shell or their ats script counts
                 # as a job step, then srun has severe troubles with the --nodes=1 type option.  It will attempt to put
@@ -589,7 +593,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 if self.distribution == 'unset':
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN300 "
+                        print("SAD DEBUG SRUN300 ")
 
                     test.numNodesToUse = minNodes
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
@@ -603,7 +607,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 else:
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN350 "
+                        print("SAD DEBUG SRUN350 ")
 
                     test.numNodesToUse = minNodes
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
@@ -627,7 +631,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 if self.distribution == 'unset':
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN400 "
+                        print("SAD DEBUG SRUN400 ")
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
                             ex_or_sh,
@@ -638,7 +642,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 else:
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN450 "
+                        print("SAD DEBUG SRUN450 ")
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
                             "--distribution=%s" % distribution,
@@ -729,20 +733,20 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
             if self.slurmSeesATSProcessAsUsingACore:
                 if cpus_per_task > 1:
                     if (np * cpus_per_task) >= self.numberMaxProcessors:
-                        print "ATS WARNING: Test %s May Hang! " % test.name
-                        print "             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task)
-                        print "             This allocation has %d max processors " % self.numberMaxProcessors
-                        print "             Slurm may see your shell as utilizing a process and never"
-                        print "             schedule this job to run, resulting in a hang."
-                        print "ATS ADVICE:  Consider setting cpus_per_task to %d " % (cpus_per_task - 1)
+                        print("ATS WARNING: Test %s May Hang! " % test.name)
+                        print("             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task))
+                        print("             This allocation has %d max processors " % self.numberMaxProcessors)
+                        print("             Slurm may see your shell as utilizing a process and never")
+                        print("             schedule this job to run, resulting in a hang.")
+                        print("ATS ADVICE:  Consider setting cpus_per_task to %d " % (cpus_per_task - 1))
                 else:
                     if np >= self.numberMaxProcessors:
-                        print "ATS WARNING: Test %s May Hang! " % test.name
-                        print "             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task)
-                        print "             This allocation has %d max processors on %d nodes " % (self.numberMaxProcessors, self.numNodes)
-                        print "             Slurm may see your shell as utilizing a process and never"
-                        print "             schedule this job to run, resulting in a hang."
-                        print "ATS ADVICE:  Consider allocating %d nodes for testing" % (self.numNodes + 1)
+                        print("ATS WARNING: Test %s May Hang! " % test.name)
+                        print("             User requested %d MPI Processes and %d cpus_per_task" % (np, cpus_per_task))
+                        print("             This allocation has %d max processors on %d nodes " % (self.numberMaxProcessors, self.numNodes))
+                        print("             Slurm may see your shell as utilizing a process and never")
+                        print("             schedule this job to run, resulting in a hang.")
+                        print("ATS ADVICE:  Consider allocating %d nodes for testing" % (self.numNodes + 1))
 
             if test.cpus_per_task > 0:
                 #
@@ -752,7 +756,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if self.exclusive == True and not "SLURM_JOBID" in os.environ.keys():
                     test.numNodesToUse = minNodes
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN600 "
+                        print("SAD DEBUG SRUN600 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
@@ -770,7 +774,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 elif self.distribution == 'unset':
 
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN700 "
+                        print("SAD DEBUG SRUN700 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
@@ -782,7 +786,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 elif distribution == 'cyclic':
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN800 "
+                        print("SAD DEBUG SRUN800 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
@@ -797,7 +801,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 #
                 else:
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN900 "
+                        print("SAD DEBUG SRUN900 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
@@ -810,7 +814,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if self.exclusive == True and not "SLURM_JOBID" in os.environ.keys():
                     test.numNodesToUse = minNodes
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN600 "
+                        print("SAD DEBUG SRUN600 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                         ex_or_sh,
@@ -822,7 +826,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 elif self.distribution == 'unset':
 
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN700 "
+                        print("SAD DEBUG SRUN700 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
@@ -830,7 +834,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                             "-n", str(np) ] + commandList
                 elif distribution == 'cyclic':
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN800 "
+                        print("SAD DEBUG SRUN800 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
@@ -839,7 +843,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                             "-n", str(np) ] + commandList
                 else:
                     if SlurmProcessorScheduled.debugClass:
-                        print "SAD DEBUG SRUN900 "
+                        print("SAD DEBUG SRUN900 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             ex_or_sh,
@@ -868,18 +872,18 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         def printDebug(self, numberNodesRemaining, num_nodes, np):
             #if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
             if SlurmProcessorScheduled.debugClass:
-                print "DEBUG canRunNow ================================================================================================"
-                print "DEBUG canRunNow self.numNodes                    =%d" % (self.numNodes)
-                print "DEBUG canRunNow self.numberNodesExclusivelyUsed  =%d" % (self.numberNodesExclusivelyUsed)
-                print "DEBUG canRunNow self.npMax                       =%d" % (self.npMax)
-                print "DEBUG canRunNow numberNodesRemaining             =%d" % (numberNodesRemaining)
-                print "DEBUG canRunNow num_nodes                        =%d" % (num_nodes)
-                print "DEBUG canRunNow self.numProcsAvailable           =%d" % (self.numProcsAvailable)
-                print "DEBUG canRunNow self.numberMaxProcessors         =%d" % (self.numberMaxProcessors)
-                print "DEBUG canRunNow np                               =%d" % (np)
-                print "DEBUG canRunNow self.numberTestsRunningMax       =%d" % (self.numberTestsRunningMax)
+                print("DEBUG canRunNow ================================================================================================")
+                print("DEBUG canRunNow self.numNodes                    =%d" % (self.numNodes))
+                print("DEBUG canRunNow self.numberNodesExclusivelyUsed  =%d" % (self.numberNodesExclusivelyUsed))
+                print("DEBUG canRunNow self.npMax                       =%d" % (self.npMax))
+                print("DEBUG canRunNow numberNodesRemaining             =%d" % (numberNodesRemaining))
+                print("DEBUG canRunNow num_nodes                        =%d" % (num_nodes))
+                print("DEBUG canRunNow self.numProcsAvailable           =%d" % (self.numProcsAvailable))
+                print("DEBUG canRunNow self.numberMaxProcessors         =%d" % (self.numberMaxProcessors))
+                print("DEBUG canRunNow np                               =%d" % (np))
+                print("DEBUG canRunNow self.numberTestsRunningMax       =%d" % (self.numberTestsRunningMax))
                 sequential = test.options.get('sequential', False)
-                print "DEBUG canRunNow sequential                       =", sequential
+                print("DEBUG canRunNow sequential                       =", sequential)
 
         # Get the number of processors needed and the number of nodes needed for this test
         # if specified.  Get the number of nodes remaining for exclusive use.
@@ -905,7 +909,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                         SlurmProcessorScheduled.canRunNow_saved_string = string
                         printDebug(self, numberNodesRemaining, num_nodes, np)
                         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print "DEBUG canRunNow returning FALSE based on sequential option: numProcsAvailable = %d < numberMaxProcessors = %d" % (self.numProcsAvailable, self.numberMaxProcessors)
+                            print("DEBUG canRunNow returning FALSE based on sequential option: numProcsAvailable = %d < numberMaxProcessors = %d" % (self.numProcsAvailable, self.numberMaxProcessors))
 
                 return False
 
@@ -923,11 +927,11 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if numberNodesRemaining >= num_nodes and my_numProcsAvailable >= np:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
                         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print "DEBUG canRunNow returning TRUE  based on node avail: %d is  >= %d and proc avail : %d is  >= %d" % (numberNodesRemaining, num_nodes, my_numProcsAvailable, np)
+                            print("DEBUG canRunNow returning TRUE  based on node avail: %d is  >= %d and proc avail : %d is  >= %d" % (numberNodesRemaining, num_nodes, my_numProcsAvailable, np))
                     else:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
                         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print "DEBUG canRunNow returning FALSE based on node avail: %d not >= %d or proc avail : %d not >= %d" % (numberNodesRemaining, num_nodes, my_numProcsAvailable, np)
+                            print("DEBUG canRunNow returning FALSE based on node avail: %d not >= %d or proc avail : %d not >= %d" % (numberNodesRemaining, num_nodes, my_numProcsAvailable, np))
 
             return numberNodesRemaining >= num_nodes and my_numProcsAvailable >= np
 
@@ -939,11 +943,11 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if self.numProcsAvailable >= np:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
                         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print "DEBUG canRunNow returning TRUE  based on proc avail: %d is  >= %d " % (self.numProcsAvailable, np)
+                            print("DEBUG canRunNow returning TRUE  based on proc avail: %d is  >= %d " % (self.numProcsAvailable, np))
                     else:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
                         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print "DEBUG canRunNow returning FALSE based on proc avail: %d not >= %d " % (self.numProcsAvailable, np)
+                            print("DEBUG canRunNow returning FALSE based on proc avail: %d not >= %d " % (self.numProcsAvailable, np))
 
             return self.numProcsAvailable >= np
 
@@ -953,7 +957,7 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         self.numProcsAvailable -= (np * test.cpus_per_task)
         test.cpus_per_task_for_noteEnd = test.cpus_per_task
         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-            print "DEBUG noteLaunch decreased self.numProcsAvailable by (%d x %d) to %d " % (np,  test.cpus_per_task, self.numProcsAvailable)
+            print("DEBUG noteLaunch decreased self.numProcsAvailable by (%d x %d) to %d " % (np,  test.cpus_per_task, self.numProcsAvailable))
 
     def noteEnd(self, test):
         """A test has finished running. """
@@ -965,12 +969,12 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
 
         self.numProcsAvailable += (my_np * test.cpus_per_task_for_noteEnd)
         if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-            print "DEBUG noteEnd increased self.numProcsAvailable by (%d x %d) to %d " % (my_np, test.cpus_per_task_for_noteEnd, self.numProcsAvailable)
+            print("DEBUG noteEnd increased self.numProcsAvailable by (%d x %d) to %d " % (my_np, test.cpus_per_task_for_noteEnd, self.numProcsAvailable))
 
         msg = '%s #%4d %s,  nn=%d, np=%d, nt=%d, ngpu=0 %s' % \
             ("Stop ", test.serialNumber, test.name, my_nn, my_np, my_nt, time.asctime())
 
-        print msg
+        print(msg)
 
     def periodicReport(self):
         "Report on current status of tasks"
@@ -1005,13 +1009,13 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                 if SlurmProcessorScheduled.canRunNow_debugClass:
                     if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
                         SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                        print "DEBUG remainingCapacity returning %d nodes available (A)" % 0
+                        print("DEBUG remainingCapacity returning %d nodes available (A)" % 0)
                 return 0
             else:
                 if SlurmProcessorScheduled.canRunNow_debugClass:
                     if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
                         SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                        print "DEBUG remainingCapacity returning %d nodes available (A)" % numberNodesRemaining
+                        print("DEBUG remainingCapacity returning %d nodes available (A)" % numberNodesRemaining)
                 return numberNodesRemaining
         else:
             if numberNodesRemaining < 1:
@@ -1022,13 +1026,13 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.canRunNow_debugClass:
                         if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
                             SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print "DEBUG remainingCapacity returning %d nodes available (B)" % 0
+                            print("DEBUG remainingCapacity returning %d nodes available (B)" % 0)
                     return 0
                 else:
                     if SlurmProcessorScheduled.canRunNow_debugClass:
                         if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
                             SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print "DEBUG remainingCapacity returning %d nodes available (B)" % numberNodesRemaining
+                            print("DEBUG remainingCapacity returning %d nodes available (B)" % numberNodesRemaining)
                     return numberNodesRemaining
             else:
                 if self.numProcsAvailable != SlurmProcessorScheduled.remainingCapacity_numProcsReported:
@@ -1038,13 +1042,13 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
                     if SlurmProcessorScheduled.canRunNow_debugClass:
                         if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
                             SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print "DEBUG remainingCapacity returning %d numProcsAvailable available (C)"%  0
+                            print("DEBUG remainingCapacity returning %d numProcsAvailable available (C)" % 0)
                     return 0
                 else:
                     if SlurmProcessorScheduled.canRunNow_debugClass:
                         if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
                             SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print "DEBUG remainingCapacity returning %d numProcsAvailable available (C)" % self.numProcsAvailable
+                            print("DEBUG remainingCapacity returning %d numProcsAvailable available (C)" % self.numProcsAvailable)
                     return self.numProcsAvailable
 
 # ################################################################################################################### #

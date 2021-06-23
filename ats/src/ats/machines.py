@@ -1,5 +1,6 @@
 """Definition of class Machine for overriding.
 """
+from __future__ import print_function
 import subprocess, sys, os, time, shlex
 from atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
      CREATED, SKIPPED, HALTED, EXPECTED, statuses, AttributeDict, AtsError
@@ -153,22 +154,22 @@ testEnded will call your bookkeeping method noteEnd.
                 for line in lines:
                     if slurm_error == False:
                         if "Slurmd could not set up environment for batch job" in line:
-                            print "ATS Halting test %s. Detected slurm launch failure : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected slurm launch failure : %s " % (test.name, line))
                             slurm_error = True
                         elif "srun: error: Unable to create job step" in line:
-                            print "ATS Halting test %s. Detected slurm error : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected slurm error : %s " % (test.name, line))
                             slurm_error = True
                         elif "Error opening remote shared memory object in shm_open" in line:
-                            print "ATS Halting test %s. Detected MPI shared memory failure : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected MPI shared memory failure : %s " % (test.name, line))
                             slurm_error = True
                         elif "PSM could not set up shared memory segment" in line:
-                            print "ATS Halting test %s. Detected MPI shared memory failure : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected MPI shared memory failure : %s " % (test.name, line))
                             slurm_error = True
                         elif "Attempting to use an MPI routine before initializing MPICH" in line:
-                            print "ATS Halting test %s. Detected MPI Error : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected MPI Error : %s " % (test.name, line))
                             slurm_error = True
                         elif "Bus error)" in line:
-                            print "ATS Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line))
                             slurm_error = True
 
                 if slurm_error:
@@ -199,18 +200,18 @@ testEnded will call your bookkeeping method noteEnd.
                 for line in lines:
                     if lsf_error == False:
                         if "Terminated while pending" in line:
-                            print "ATS Detected LSF Job Start Error %s. Detected LSF launch failure : %s " % (test.name, line)
+                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                         elif "JSM daemon timed" in line:
-                            print "ATS Detected LSF Job Start Error %s. Detected LSF launch failure : %s " % (test.name, line)
+                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                             #time.sleep(10)      # See if sleeiping helps the JSM daemon recover
                         elif "Error initializing RM" in line:
-                            print "ATS Detected LSF Job Start Error %s. Detected LSF launch failure : %s " % (test.name, line)
+                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                             #time.sleep(10)      # See if sleeiping helps the JSM daemon recover
                         elif "Bus error)" in line:
-                            print "ATS Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line)
+                            print("ATS Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line))
                             lsf_error = True
 
                 if not lsf_error:
@@ -220,20 +221,20 @@ testEnded will call your bookkeeping method noteEnd.
                     for line in lines:
                         if lsf_error == False:
                             if "Error: Locate pipe file" in line:
-                                print "ATS Detected LSF Job Start Error %s. Detected LSF launch failure : %s " % (test.name, line)
+                                print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                                 lsf_error = True
                             elif "Could not read jskill" in line:
-                                print "ATS Detected LSF Job Scheduler Error %s. : %s " % (test.name, line)
+                                print("ATS Detected LSF Job Scheduler Error %s.  : %s " % (test.name, line))
                                 lsf_error = True
                             elif "Error initializing RM" in line:
-                                print "ATS Detected LSF Job Start Error %s. Detected LSF launch failure : %s " % (test.name, line)
+                                print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                                 lsf_error = True
 
 
                 #sys.exit(-1) SAD ambyr
                 #print "DEBUG getStatus 420 statusCode is %d " % test.statusCode
                 if lsf_error:
-                    print "ATS LSF Development: LSFE Detected statusCode is %d " % test.statusCode
+                    print("ATS LSF Development: LSFE Detected statusCode is %d " % test.statusCode)
                     test.statusCode=2
                     test.setEndDateTime()
                     status = LSFERROR
@@ -246,8 +247,8 @@ testEnded will call your bookkeeping method noteEnd.
         if test.stdOutLocGet() == 'both':
             outhandle, errhandle = test.fileHandleGet()
             for line in test.child.stdout:
-                print line,
-                print>>outhandle, line,
+                print(line)
+                print(line, file=outhandle)
 
         self.testEnded(test, status)
 
@@ -263,7 +264,7 @@ testEnded will call your bookkeeping method noteEnd.
 call noteEnd for machine-specific part.
 """
         if MachineCore.debugClass:
-            print "DEBUG MachineCore.testEnded invoked cwd= %s " % (os.getcwd())
+            print("DEBUG MachineCore.testEnded invoked cwd= %s " % (os.getcwd()))
 
         globalPostrunScript_outname = test.globalPostrunScript_outname
         globalPostrunScript         = test.options.get('globalPostrunScript', None)
@@ -282,7 +283,7 @@ call noteEnd for machine-specific part.
 
         self.numberTestsRunning -= 1
         if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
-            print "DEBUG MachineCore.testEnded decreased self.numberTestsRunning by 1 to %d " % (self.numberTestsRunning)
+            print("DEBUG MachineCore.testEnded decreased self.numberTestsRunning by 1 to %d " % self.numberTestsRunning)
 
         #if num_nodes' in test.__dict__:
         #    num_nodes = test.__dict__.get('num_nodes')
@@ -293,8 +294,8 @@ call noteEnd for machine-specific part.
         if test.numNodesToUse > 0:
             self.numberNodesExclusivelyUsed -= test.numNodesToUse
             if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
-                print "DEBUG MachineCore.testEnded decreased self.numberNodesExclusivelyUsed by %d to %d (max is %d)" % \
-                    (test.numNodesToUse, self.numberNodesExclusivelyUsed, self.numNodes)
+                print("DEBUG MachineCore.testEnded decreased self.numberNodesExclusivelyUsed by %d to %d (max is %d)" %
+                      (test.numNodesToUse, self.numberNodesExclusivelyUsed, self.numNodes))
 
         test.set(status, test.elapsedTime())
            #note test.status is not necessarily status after this!
@@ -347,15 +348,15 @@ call noteEnd for machine-specific part.
         if configuration.options.ompNumThreads > 0:
             # Priority 1 setting, ats command line
             if configuration.options.verbose:
-                print "ATS launch setting OMP_NUM_THREADS %d as user specified --ompNumThreads=%d" % \
-                    (configuration.options.ompNumThreads, configuration.options.ompNumThreads)
+                print("ATS launch setting OMP_NUM_THREADS %d as user specified --ompNumThreads=%d" %
+                      (configuration.options.ompNumThreads, configuration.options.ompNumThreads))
             os.environ['OMP_NUM_THREADS'] = str(configuration.options.ompNumThreads)
         else:
             # Priority 2  setting, within an ATS test line
             omp_num_threads = test.options.get('nt', -1)
             if (omp_num_threads > 0):
                 if configuration.options.verbose:
-                    print "ATS launch setting OMP_NUM_THREADS %d based on test 'nt'option" % omp_num_threads
+                    print("ATS launch setting OMP_NUM_THREADS %d based on test 'nt'option" % omp_num_threads)
                 os.environ['OMP_NUM_THREADS'] = str(omp_num_threads)
             else:
                 # Priority 3 setting, the user has already set OMP_NUM_THREADS in their environment
@@ -366,7 +367,7 @@ call noteEnd for machine-specific part.
                 # Priority 4 setting, set it to 1 if it is not othewise set
                 else:
                     if configuration.options.verbose:
-                        print "ATS launch setting OMP_NUM_THREADS 1 by default for as it was not specified for the test."
+                        print("ATS launch setting OMP_NUM_THREADS 1 by default for as it was not specified for the test.")
                         # print "    This should allow for threaded applications to run with non threaded tests with a single thread."
                     os.environ['OMP_NUM_THREADS'] = str(1)
 
@@ -375,7 +376,7 @@ call noteEnd for machine-specific part.
         if configuration.SYS_TYPE.startswith('toss'):
             if MachineCore.printExperimentalNotice:
                 MachineCore.printExperimentalNotice = False
-                print "ATS Experimental: setting KMP_AFFINITY to %s on Toss" % configuration.options.kmpAffinity
+                print("ATS Experimental: setting KMP_AFFINITY to %s on Toss" % configuration.options.kmpAffinity)
             os.environ['KMP_AFFINITY'] = configuration.options.kmpAffinity
 
         # Turn off shared memory mpi collective operations on toss and chaos
@@ -434,7 +435,8 @@ call noteEnd for machine-specific part.
             if not os.path.isdir( directory ) :
 
                 if MachineCore.debugClass:
-                    print "MachineCore.launch \n\tcwd=%s \n\tdir=%s \n\tdeck_directory=%s" % (os.getcwd(), directory, deck_directory)
+                    print("MachineCore.launch \n\tcwd=%s \n\tdir=%s \n\tdeck_directory=%s" %
+                          (os.getcwd(), directory, deck_directory))
 
                 log("ATS machines.py Creating sandbox directory : %s" % directory, echo=True)
                 copytree(deck_directory, directory, ignore=ignore_patterns('*.logs', 'html', '.svn', '*sandbox*'))
@@ -464,35 +466,35 @@ call noteEnd for machine-specific part.
         results = test.getResults()
 
         commandLine = self.__results('commandLine', '', results, test.options)
-        print >>test.outhandle, magic, 'commandLine =', commandLine
+        print("%scommandLine =%s" % (magic, commandLine), file=test.outhandle))
 
         if hasattr(test, 'rs_filename'):
             if os.path.isfile(test.rs_filename):
                 myfile = open(test.rs_filename, mode='r')
                 all_of_it = myfile.read()
                 myfile.close()
-                print >>test.outhandle, magic, 'jsrun_rs =\n', all_of_it
+                print("%sjsrun_rs =\n%s" % (magic, all_of_it), file=test.outhandle)
 
         directory = self.__results('directory', '', results, test.options)
-        print >>test.outhandle, magic, 'directory =', directory
+        print("%sdirectory =%s" % (magic, directory), file=test.outhandle)
 
         executable = self.__results('executable', '', results, test.options)
-        print >>test.outhandle, magic, 'executable =', executable
+        print("%sexecutable =%s" % (magic, executable), file=test.outhandle)
 
         name = self.__results('name', '', results, test.options)
-        print >>test.outhandle, magic, 'name =', name
+        print("%sname =%s" % (magic, name), file=test.outhandle)
 
         clas = self.__results('clas', '', results, test.options)
-        print >>test.outhandle, magic, 'clas =', clas
+        print("%sclas =%s" % (magic, clas), file=test.outhandle)
 
         np = self.__results('np', 1, results, test.options)
-        print >>test.outhandle, magic, 'np =', np
+        print("%snp =%s" % (magic, np), file=test.outhandle)
 
         script = self.__results('script', '', results, test.options)
-        print >>test.outhandle, magic, 'script =', script
+        print("%sscript =%s" % (magic, script), file=test.outhandle)
 
         testpath = self.__results('testpath', '', results, test.options)
-        print >>test.outhandle, magic, 'testpath =', testpath, '\n'
+        print("%stestpath =%s\n" % (magic, testpath), file=test.outhandle)
 
         test.outhandle.flush()
         os.fsync(test.outhandle.fileno())
@@ -502,7 +504,7 @@ call noteEnd for machine-specific part.
 The subprocess part of launch. Also the part that might fail.
 """
         if MachineCore.debugClass:
-            print "DEBUG MachineCore._launch invoked cwd= %s " % (os.getcwd())
+            print("DEBUG MachineCore._launch invoked cwd= %s " % os.getcwd())
             #print self
             #print test
             #print test.options
@@ -548,7 +550,7 @@ The subprocess part of launch. Also the part that might fail.
                 # env="ANIMAL=duck, CITY=Seattle, PLANET=Venus"
                 #
                 if MachineCore.debugClass:
-                    print "DEBUG MachineCore._launch env specified =  %s " % Eadd
+                    print("DEBUG MachineCore._launch env specified =  %s " % Eadd)
                 E = os.environ.copy()
                 E.update(Eadd)
 
@@ -571,13 +573,13 @@ The subprocess part of launch. Also the part that might fail.
                 if configuration.options.sleepBeforeSrun > 0:
                     if MachineCore.printSleepBeforeSrunNotice:
                         MachineCore.printSleepBeforeSrunNotice = False
-                        print "ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun
+                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
                     time.sleep(configuration.options.sleepBeforeSrun)
             else:
                 if configuration.options.sleepBeforeSrun > 0:
                     if MachineCore.printSleepBeforeSrunNotice:
                         MachineCore.printSleepBeforeSrunNotice = False
-                        print "ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun
+                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
                     time.sleep(configuration.options.sleepBeforeSrun)
 
 
@@ -604,7 +606,7 @@ The subprocess part of launch. Also the part that might fail.
 
             elif testStdout == 'terminal':
                 if MachineCore.debugClass:
-                    print "DEBUG MachineCore._launch Invoking Popen 2 %s " % test.commandList
+                    print("DEBUG MachineCore._launch Invoking Popen 2 %s " % test.commandList)
 
 
                 if stdin_file is None:
@@ -620,7 +622,7 @@ The subprocess part of launch. Also the part that might fail.
                 self.log_prepend(test, test.outhandle)
 
                 if MachineCore.debugClass:
-                    print "DEBUG MachineCore._launch Invoking Popen 3 %s " % test.commandList
+                    print("DEBUG MachineCore._launch Invoking Popen 3 %s " % test.commandList)
 
                 if stdin_file is None:
                     test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = subprocess.PIPE, stderr=subprocess.STDOUT, env=E)
@@ -632,13 +634,13 @@ The subprocess part of launch. Also the part that might fail.
             self.running.append(test)
             self.numberTestsRunning += 1
             if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
-                print "DEBUG MachineCore.testEnded increased self.numberTestsRunning by 1 to %d " % (self.numberTestsRunning)
+                print("DEBUG MachineCore.testEnded increased self.numberTestsRunning by 1 to %d " % self.numberTestsRunning)
 
             if test.numNodesToUse > 0:
                 self.numberNodesExclusivelyUsed += test.numNodesToUse
                 if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
-                    print "DEBUG MachineCore._launch__ increased self.numberNodesExclusivelyUsed by %d to %d (max is %d)" % \
-                        (test.numNodesToUse, self.numberNodesExclusivelyUsed, self.numNodes)
+                    print("DEBUG MachineCore._launch__ increased self.numberNodesExclusivelyUsed by %d to %d (max is %d)" %
+                          (test.numNodesToUse, self.numberNodesExclusivelyUsed, self.numNodes))
 
             return True
 
@@ -654,7 +656,7 @@ The subprocess part of launch. Also the part that might fail.
            Return True if able to start the test.
         """
         if MachineCore.debugClass:
-            print "DEBUG MachineCore.startRun invoked"
+            print("DEBUG MachineCore.startRun invoked")
         self.runOrder += 1
         test.runOrder = self.runOrder
         return self.launch(test)
