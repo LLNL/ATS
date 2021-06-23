@@ -466,7 +466,7 @@ call noteEnd for machine-specific part.
         results = test.getResults()
 
         commandLine = self.__results('commandLine', '', results, test.options)
-        print("%scommandLine =%s" % (magic, commandLine), file=test.outhandle))
+        print("%scommandLine =%s" % (magic, commandLine), file=test.outhandle)
 
         if hasattr(test, 'rs_filename'):
             if os.path.isfile(test.rs_filename):
