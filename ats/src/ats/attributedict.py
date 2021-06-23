@@ -1,3 +1,4 @@
+from __future__ import print_function
 from cStringIO import StringIO
 
 class AttributeDict (dict):
@@ -31,12 +32,12 @@ class AttributeDict (dict):
 
     def __repr__(self):
         out = StringIO()
-        print >>out, "AttributeDict("
+        print("AttributeDict(", file=out)
         keys = self.keys()
         keys.sort()
         for key in keys:
-            print >>out, "  ", key, " = ", repr(self[key]), ","
-        print >>out, ")"
+            print("  %s = %r," % (key, self[key]), file=out)
+        print(")", file=out)
         s = out.getvalue()
         out.close()
         return s
@@ -50,6 +51,7 @@ class AttributeDict (dict):
             if key.startswith('_'):
                 next
             print >>out, key, " = ", str(self[key])
+            print("%s = %s," % (key, self[key]), file=out)
         s = out.getvalue()
         out.close()
         return s
@@ -61,4 +63,4 @@ if __name__ == "__main__":
     d.c = 3
     assert d['c'] == 3
     del d.b
-    print d
+    print(d)

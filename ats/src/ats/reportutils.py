@@ -6,14 +6,14 @@ def findAtsrFile(testDir):
     # input: path to the test directory
     # output: path to the atsr.py file in the form of a glob list.
     #  If multiple files are found, the glob list is sorted then returned.
-    print "looking at ", testDir
+    print("looking at %s" % testDir)
     import glob
     globList = glob.glob(testDir + '/*.logs/atsr.py')
     if len(globList)>0:
         globList.sort()
         #debug
         for g in globList:
-            print g
+            print(g)
         #end debug
         return globList
     else:
@@ -30,12 +30,12 @@ def getStateFromFile(atsrFile):
     # to our list using the filename as it's key
     d = {}
     if os.path.exists(atsrFile):
-        print "Taking state from ",atsrFile
+        print("Taking state from %s" % atsrFile)
         execfile(atsrFile, d)
         try:
             state = d['state']
         except KeyError as e:
-            print "This is a bad atsr.py file.  Skipping. %s" %atsrFile
+            print("This is a bad atsr.py file.  Skipping. %s" % atsrFile)
             return None
         # These attributes are not found in older (~2011) atsr.py files.
         # When loading the database from an archive, this was causing failures.
@@ -44,7 +44,7 @@ def getStateFromFile(atsrFile):
         if d.has_key("atsMachineName"):
             state['atsMachineName'] = d['machineName']   # Not sure how useful this will be, but it's available.
     else:
-        print "Path does not exist.  Can't get the state for:",atsrFile
+        print("Path does not exist.  Can't get the state for: %s" % atsrFile)
         return None
     return state
 

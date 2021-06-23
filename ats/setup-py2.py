@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys, os, shutil, glob
 from distutils.core import setup
 execfile('src/ats/version.py')
@@ -11,19 +12,20 @@ execfile('src/ats/version.py')
 codename = 'ats'
 f = open(codename, 'w')
 driverscript = """#!%s/bin/python
+from __future__ import print_function
 import sys
 
 try:
     import ats
 except ImportError:
-    print >>sys.stderr, "ats module cannot be imported; check Python path."
-    print >>sys.stderr, sys.path
+    print("ats module cannot be imported; check Python path.", file=sys.stderr)
+    print(sys.path, file=sys.stderr)
     raise SystemExit, 1
 
 result = ats.manager.main()
 sys.exit(result)
 """ % sys.exec_prefix
-print >>f, driverscript
+print(driverscript, file=f)
 f.close()
 os.chmod(codename, 7*64 + 7*8 + 5)
 
@@ -42,7 +44,7 @@ return_code = ats.manager._summary3()
 
 sys.exit(return_code)
 """ % sys.exec_prefix
-print >>f, driverscript
+print(driverscript, file=f)
 f.close()
 os.chmod(codename3, 7*64 + 7*8 + 5)
 

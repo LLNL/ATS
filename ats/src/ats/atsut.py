@@ -100,4 +100,4 @@ def is_valid_executable (path):
     return is_valid_file(path) and os.access(path, os.X_OK)
 
 if __name__ == "__main__":
-    print locals()
+    print(locals())

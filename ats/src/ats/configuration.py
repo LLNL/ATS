@@ -389,7 +389,7 @@ def init(clas = '', adder = None, examiner=None):
     init_debugClass = False
 
     if init_debugClass:
-        print "DEBUG init entered clas=%s " % (clas)
+        print("DEBUG init entered clas=%s " % (clas))
 
     # get the machine and possible batch facility
 #    machineDirs = [MACHINE_DIR]
@@ -410,11 +410,11 @@ def init(clas = '', adder = None, examiner=None):
     bspecFoundIn = ''
 
     if init_debugClass:
-        print "DEBUG init 100"
-        print machineDirs
-        print machineList
-        print MACHINE_TYPE
-        print "DEBUG init 200"
+        print("DEBUG init 100")
+        print(machineDirs)
+        print(machineList)
+        print(MACHINE_TYPE)
+        print("DEBUG init 200")
 
     for full_path in machineList:
         moduleName = ''
@@ -426,7 +426,8 @@ def init(clas = '', adder = None, examiner=None):
                 items = line[5:-1].split()
                 machineName, moduleName, machineClass, npMaxH = items
                 if init_debugClass:
-                    print "DEBUG init machineName=%s moduleName=%s machineClass=%s npMaxH=%s" % (machineName, moduleName, machineClass, npMaxH)
+                    print("DEBUG init machineName=%s moduleName=%s machineClass=%s npMaxH=%s" %
+                          (machineName, moduleName, machineClass, npMaxH))
 
                 # print "DEBUG init MACHINE_TYPE=%s machineName=%s moduleName=%s machineClass=%s npMaxH=%s" % (MACHINE_TYPE, machineName, moduleName, machineClass, npMaxH)
 
@@ -434,7 +435,7 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     specFoundIn = full_path
-                    print "from atsMachines.%s import %s as Machine" % (moduleName, machineClass)
+                    print("from atsMachines.%s import %s as Machine" % (moduleName, machineClass))
                     exec('from atsMachines.%s import %s as Machine' % (moduleName, machineClass))
                     machine = Machine(machineName, int(npMaxH))
 

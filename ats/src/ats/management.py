@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, re, sys, time, tempfile, traceback, socket
 import configuration, version
 from atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
@@ -456,41 +457,41 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
         passed = [test.name for test in tlist if (test.status is PASSED and test not in ncs)]
         bad = self.badlist
 
-        print ""
-        print "ATS SUMMARY3 Complete Test Summary"
+        print("")
+        print("ATS SUMMARY3 Complete Test Summary")
 
         total_failures = 0
 
         #if invalid:
-        print "   INVALID:  %d %s" % (len(invalid) + len(bad), ', '.join(bad + invalid))
+        print("   INVALID:  %d %s" % (len(invalid) + len(bad), ', '.join(bad + invalid)))
         total_failures = total_failures + len(invalid) +len(bad)
         #if batched:
-        print "   BATCHED:  %d" % len(batched)
+        print("   BATCHED:  %d" % len(batched))
         #if filtered:
-        print "   FILTERED: %d" % len(filtered)
+        print("   FILTERED: %d" % len(filtered))
         #if skipped:
-        print "   SKIPPED:  %d" % len(skipped)
+        print("   SKIPPED:  %d" % len(skipped))
         #if failed:
-        print "   FAILED:   %d" % len(failed)
+        print("   FAILED:   %d" % len(failed))
         total_failures = total_failures + len(failed)
         #if timedout:
-        print "   TIMEDOUT: %d" % len(timedout)
+        print("   TIMEDOUT: %d" % len(timedout))
         total_failures = total_failures + len(timedout)
         #if halted:
-        print "   HALTED:   %d" % len(halted)
+        print("   HALTED:   %d" % len(halted))
         total_failures = total_failures + len(halted)
         #if lsferror:
-        print "   LSFERROR: %d" % len(lsferror)
+        print("   LSFERROR: %d" % len(lsferror))
         #if expected:
-        print "   EXPECTED: %d" % len(expected)
+        print("   EXPECTED: %d" % len(expected))
         #if running:
-        print "   RUNNING:  %d" % len(running)
+        print("   RUNNING:  %d" % len(running))
         #if passed:
-        print "   PASSED:   %d" % len(passed)
+        print("   PASSED:   %d" % len(passed))
         #if ncs:
-        print "   NCS:      %d" % len(ncs)
+        print("   NCS:      %d" % len(ncs))
 
-        print "\n   ATS returning %d total failure" % total_failures
+        print("\n   ATS returning %d total failure" % total_failures)
         return total_failures
 
 
@@ -949,13 +950,13 @@ to allow user a chance to add options and examine results of option parsing.
         # In this scheme, the job is rerun but previously passed jobs are
         # marked passed and batched jobs are marked SKIPPED.
         fc = open(self.continuationFileName, 'w')
-        print >>fc, """
+        print("""
 import ats
 testlist = ats.manager.testlist
 PASSED = ats.PASSED
 EXPECTED = ats.EXPECTED
 BATCHED = ats.BATCHED
-"""
+""", file=fc)
 
         # The goal here is to mark passed things that need not be rerun.
         # Sometimes something passed but a child did not, which could be a
@@ -965,8 +966,8 @@ BATCHED = ats.BATCHED
         remaining = {}
         for t in self.testlist:
             if t not in interactiveTests:
-                print >>fc, "testlist[%d].set(SKIPPED, 'was %s') # %s" % \
-                     (t.serialNumber -1, t.status.name, t.name)
+                print("testlist[%d].set(SKIPPED, 'was %s') # %s" %
+                      (t.serialNumber - 1, t.status.name, t.name), file=fc)
             else:
                 remaining[t.serialNumber] = t
 
@@ -981,8 +982,8 @@ BATCHED = ats.BATCHED
                     break
             else:
                 for v in brothers:
-                    print >>fc, "testlist[%d].set(%s, 'Previously ran.') # %s" % \
-                                 (v.serialNumber-1, v.status.name, v.name)
+                    print("testlist[%d].set(%s, 'Previously ran.') # %s"
+                          (v.serialNumber - 1, v.status.name, v.name), file=fc)
 
         fc.close()
 
@@ -1127,13 +1128,13 @@ dependents_serial contain the serial numbers of the relevant tests.
     def printResults(self, file=sys.stdout):
         "Print state to file, formatting items with repr"
 # import * is bad style but helps with robustness with respect to ats changes:
-        print >>file, """from ats import *"""
-        print >>file, "state = ",
-        print >>file, repr(self.getResults())
-        print >>file, "logDirectory = ", repr(log.directory)
-        print >>file, "machineName = ", repr(self.machine.name)
+        print("""from ats import *""", file=file)
+        print("state = ", file=file)
+        print(repr(self.getResults()), file=file)
+        print("logDirectory = %r" % log.directory, file=file)
+        print("machineName = %r" % self.machine.name, file=file)
 # now print the trailer
-        print >>file, """
+        print("""
 # now fix up test objects
 # First we need an object that prints like a test to avoid recursion.
 
@@ -1166,7 +1167,7 @@ for t in state.testlist:
 
 # clean up
 del i, t
-"""
+""", file=file)
 
 # --------- END OF AtsManager --------------
 

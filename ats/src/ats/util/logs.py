@@ -143,12 +143,12 @@ def demoLogRecord(logger):
         def filter (self, record):
             sortedDict=record.__dict__.items()
             sortedDict.sort()
-            print ("record.__dict__ = %s" % str(sortedDict).replace ("('", "\n    ('") )
+            print("record.__dict__ = %s" % str(sortedDict).replace("('", "\n ('") )
             return True
     logger.debug('LogRecord dict below, with added context = "BAR".')
-    print ("Adding filter")
+    print("Adding filter")
     logger.addFilter(DictFilter())
-    print ("Done adding filter")
+    print("Done adding filter")
     logger.debug('This log call caused the filter to put out the dict above.', extra=dict(context="BAR"))
 
 def demoLoggerAdapter(logger):

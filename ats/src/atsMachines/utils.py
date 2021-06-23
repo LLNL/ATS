@@ -45,7 +45,7 @@ def getAllHostnames():
         cmd= "hostname"
 
     if debug() >= utilDebugLevel():
-        print "in getAllHostnames() ---- running command:  ", cmd
+        print("in getAllHostnames() ---- running command:  %s" % cmd)
     allHostname= []
     try:
         import subprocess
@@ -68,13 +68,13 @@ def getAllHostnames():
 
 
         if debug() >= utilDebugLevel():
-            print "DEBUG: before sort ", allHostname
+            print("DEBUG: before sort %s" % allHostname)
         sort_nicely(allHostname)
         if debug() >= utilDebugLevel():
-            print "DEBUG: after sort ", allHostname
+            print("DEBUG: after sort %s" % allHostname)
 
     except:
-        print "Unexpected error in utils.py getAllHostnames:", sys.exc_info()[0]
+        print("Unexpected error in utils.py getAllHostnames:%s" % sys.exc_info()[0])
         return allHostname
     return allHostname
 
@@ -141,7 +141,7 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
         # Find all the combinations
         #-------------------------------------------
         if debug() >= utilDebugLevel():
-            print "DEBUG: in utils::getUnusedNode() -- numNodesToUse= " , numNodesToUse
+            print("DEBUG: in utils::getUnusedNode() -- numNodesToUse= %s" % numNodesToUse)
 
         comboList= []
 
@@ -158,8 +158,8 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
                 comboList.append(tempCombo)
 
         if debug() >= utilDebugLevel():
-            print "DEBUG: in utils::getUnusedNode() -- desiredAmount= " , desiredAmount
-            print "DEBUG: in utils::getUnusedNode() -- comboList= " , comboList
+            print("DEBUG: in utils::getUnusedNode() -- desiredAmount= %s" % desiredAmount)
+            print("DEBUG: in utils::getUnusedNode() -- comboList= %s" % comboList)
 
         #-------------------------------sum all the combo
         allSavedStep= []
@@ -172,13 +172,13 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
                     savedStep= astep    # note the first step
                 totalAvail= totalAvail + nodeAvailDic[ stepNodeDic[str(astep)] ]
                 if debug() >= utilDebugLevel():
-                    print "eachCombo= ", eachCombo, "astep=", astep, "totalAvail=", totalAvail
+                    print("eachCombo= %s astep=%s totalAvail=%s" % (eachCombo, astep, totalAvail))
                 sys.stdout.flush()
                 if totalAvail >= desiredAmount:
                     if savedStep != inOldStep:     # Do not submit to the same node twice in a row
                         if debug() >= utilDebugLevel():
-                            print "returned savedStep= ", savedStep
-                            print "returned numNodesToUse= ", numNodesToUse
+                            print("returned savedStep= %s" % savedStep)
+                            print("returned numNodesToUse= %s" % numNodesToUse)
                         return nodeAvailDic, savedStep, numNodesToUse
                     else:
                         allSavedStep.append(savedStep)
@@ -186,9 +186,9 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
 
         if len(allSavedStep) > 0:
             if debug() >= utilDebugLevel():
-                print " ---- allSavedStep= ", allSavedStep
-                print " ---- returned savedStep= ", savedStep
-                print " ---- returned numNodesToUse= ", numNodesToUse
+                print(" ---- allSavedStep= %s" % allSavedStep)
+                print(" ---- returned savedStep= %s" % savedStep)
+                print(" ---- returned numNodesToUse= %s" % numNodesToUse)
             return nodeAvailDic, allSavedStep[0], numNodesToUse
 
         stepNum = 0
@@ -372,7 +372,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
     if (len(stdout_value)==0):
 
         if debug() >= utilDebugLevel():
-            print "DEBUG: in utils::getNodeAndStepIdAssociatedWithStepNumberLinux() -- whoami "
+            print("DEBUG: in utils::getNodeAndStepIdAssociatedWithStepNumberLinux() -- whoami ")
         userName= os.environ['LOGNAME']
     else:
         theLines = stdout_value.split('\n')
@@ -412,8 +412,8 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
                 nameList.append(splitVals[1])
 
     if debug() >= utilDebugLevel():
-        print "stepList= ", stepList
-        print "nameList= ", nameList
+        print("stepList= %s" % stepList)
+        print("nameList= %s" % nameList)
 
     #--------------------------------------------------
     # For the step number, determine the node assoicated with it.
@@ -442,7 +442,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
 
         if debug() >= utilDebugLevel():
             for aline in theLines:
-                print "LINES READ: ", aline
+                print("LINES READ: %s" % aline)
 
         nodeToCheck= ""
         newStep= '0'
@@ -469,8 +469,8 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
             stepIdToCheck= newStep.split(".")[0]
 
         if debug() >= utilDebugLevel():
-            print "nodeStepDic= ", nodeStepDic
-            print "stepIdToCheck= ", stepIdToCheck,
+            print("nodeStepDic= %s" % nodeStepDic)
+            print("stepIdToCheck= %s" % stepIdToCheck)
 
         if (len(nodeStepDic) == inMaxStep ):
             break
@@ -543,7 +543,7 @@ def getNumberOfProcessorsPerNode(useNode=None):
     except KeyboardInterrupt:
         raise
     except:
-        print "Unexpected error in getNumberOfProcsPerNode:", sys.exc_info()
+        print("Unexpected error in getNumberOfProcsPerNode:%s" % sys.exc_info())
         return 0
 
 
