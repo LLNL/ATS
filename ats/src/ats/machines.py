@@ -780,6 +780,7 @@ is hard upper limit.
         self.numberTestsRunning = 0
         self.numberNodesExclusivelyUsed = 0
         self.numberTestsRunningMax = max(1, abs(npMaxH))
+        self.numNodes = -1
         self.npMaxH= npMaxH    # allow the machine modules to access this value
         self.hardLimit = (npMaxH > 0)
         self.naptime = 0.2 #number of seconds to sleep between checks on running tests.
