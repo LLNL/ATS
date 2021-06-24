@@ -13,7 +13,7 @@ class LCMachineCore (machines.Machine):
     def kill(self, test):
         "Final cleanup if any."
 
-        for killTimes in xrange(0,1):
+        for killTimes in range(0,1):
 
             if self.lastSqueueResult is None or ( (time.time() - self.lastTimeSqueueCalled) > 60):   # in seconds
                 self.lastSqueueResult= utils.getAllSlurmStepIds()

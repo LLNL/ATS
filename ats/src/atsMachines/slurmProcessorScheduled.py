@@ -235,14 +235,14 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         if configuration.options.ompNumThreads > 0:
             test.nt = configuration.options.ompNumThreads
         else:
-            if test.options.has_key('nt'):
+            if 'nt' in test.options:
                 test.nt = test.options.get('nt', 1)
 
         test.cpus_per_task = -1
         if configuration.options.cpusPerTask > -1:
             test.cpus_per_task = configuration.options.cpusPerTask
         else:
-            if test.options.has_key('cpus_per_task'):
+            if 'cpus_per_task' in test.options:
                 test.cpus_per_task = test.options.get('cpus_per_task', 1)
 
         # Command line option toss_nn over-rides what is in the deck.
@@ -494,8 +494,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("             This allocation has %d max processors on %d nodes " % (self.numberMaxProcessors, self.numNodes))
                         print("             Slurm may see your shell as utilizing a process and never")
                         print("             schedule this job to run, resulting in a hang.")
-                        print("ATS ADVICE:  Consider allocating %d nodes for
-                        testing" % (self.numNodes + 1))
+                        print("ATS ADVICE:  Consider allocating %d nodes for testing" % (self.numNodes + 1))
 
             if self.runningWithinSalloc == False:
 

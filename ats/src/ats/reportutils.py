@@ -39,9 +39,9 @@ def getStateFromFile(atsrFile):
             return None
         # These attributes are not found in older (~2011) atsr.py files.
         # When loading the database from an archive, this was causing failures.
-        if d.has_key("logDirectory"):
+        if "logDirectory" in d:
             state['logDirectory'] = d['logDirectory'] # We want access to the run's logs, but they're not stored as part of the test object
-        if d.has_key("atsMachineName"):
+        if "atsMachineName" in d:
             state['atsMachineName'] = d['machineName']   # Not sure how useful this will be, but it's available.
     else:
         print("Path does not exist.  Can't get the state for: %s" % atsrFile)
@@ -171,6 +171,6 @@ def elapsedTime( test ):
     try:
         e = test.endTime
         s = test.startTime
-    except AttributeError, foo:
+    except AttributeError as foo:
         return (0)
     return (e-s)

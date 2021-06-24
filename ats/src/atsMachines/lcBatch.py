@@ -260,7 +260,7 @@ def checkFile(file):
         msg = '%s does not exist or is not accessible'%file
         return -1, msg
 
-    if size == 0L:
+    if size == 0:
         msg = '%s has zero filesize'%file
         return 1, msg
     else:

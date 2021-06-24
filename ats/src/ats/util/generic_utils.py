@@ -48,10 +48,10 @@ def importName( moduleName, name, default_func=None, verbose=False ):
     try:
         my_mod = __import__( moduleName, globals(), locals(), [name] )
         func   =  vars(my_mod)[name]
-    except ImportError, value:
+    except ImportError as value:
         print("Import of function %s from %s failed: %s" % (name, moduleName, value))
-        raise StandardError
-    except KeyError, value:
+        raise Exception
+    except KeyError as value:
         print("KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
         pass
 
@@ -94,16 +94,16 @@ def runCommand( cmd_line, file_name=None, exit=True, verbose=False):
             stdout_pipe.close()
             stderr_pipe.close()
 
-    except CalledProcessError, error:
+    except CalledProcessError as error:
         log('Command failed: error code %d' % error.returncode, echo=True)
         log('Failed Command: %s' % cmd_line, echo=True)
         if exit:
-            raise SystemExit, 1
-    except OSError, error:
+            raise SystemExit(1)
+    except OSError as error:
         log('Command failed with OSError: traceback %s' % error.child_traceback, echo=True)
         log('Failed Command: %s' % cmd_line, echo=True)
         if exit:
-            raise SystemExit, 1
+            raise SystemExit(1)
 
     return ( stdout_txt, stderr_txt )
 
@@ -166,7 +166,7 @@ def execute(cmd_line, file_name=None, verbose=False):
 def listdirs(folder):
     try:
         dir_list = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
-    except OSError, error:
+    except OSError as error:
         log("WARNING - listdirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
@@ -176,7 +176,7 @@ def listDatedDirs(folder):
         dir_list = [d for d in os.listdir(folder) \
                       if re.search('2[0-9][0-9][0-9]_[0-9][0-9]$', d) \
                       if os.path.isdir(os.path.join(folder, d))]
-    except OSError, error:
+    except OSError as error:
         log("WARNING - listDatedDirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
@@ -184,7 +184,7 @@ def listDatedDirs(folder):
 def listfiles(folder):
     try:
         file_list = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d))]
-    except OSError, error:
+    except OSError as error:
         log("WARNING - listfiles: %s" % error.strerror, echo=True)
         file_list = []
     return file_list
@@ -199,7 +199,7 @@ def copyFile(filename, srcdir, destdir, groupID):
         try:
             os.chown( destfile, -1, groupID)
             os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
-        except OSError, error:
+        except OSError as error:
             log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
                 echo=True)
         return destfile
@@ -216,7 +216,7 @@ def copyAndRenameFile(filename, newfilename, srcdir, destdir, groupID):
         try:
             os.chown( destfile, -1, groupID)
             os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
-        except OSError, error:
+        except OSError as error:
             log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
                 echo=True)
         return destfile
@@ -232,35 +232,35 @@ def makeDir( new_dir ):
         try:
             os.mkdir( new_dir )
 
-        except OSError, error:
+        except OSError as error:
             log('Error making %s: %s' %( new_dir, error.strerror), echo=True)
-            raise SystemExit, 1
+            raise SystemExit(1)
 
     elif not os.path.isdir(new_dir):
         log('ERROR: %s exists and is NOT a directory' % new_dir, echo=True)
-        raise SystemExit, 1
+        raise SystemExit(1)
 
 def makeSymLink( path, target ):
     if not os.path.exists(target):
         try:
             os.symlink( path, target )
 
-        except OSError, error:
+        except OSError as error:
             log('Error making link to %s: %s' %( target, error.strerror), echo=True)
-            raise SystemExit, 1
+            raise SystemExit(1)
 
     elif os.path.islink(target):
         try:
             os.unlink( target)
             os.symlink( path, target )
 
-        except OSError, error:
+        except OSError as error:
             log('Error making link to %s: %s' %( target, error.strerror), echo=True)
-            raise SystemExit, 1
+            raise SystemExit(1)
 
     else:
         log('ERROR: %s exists and is NOT a symlink' % target, echo=True)
-        raise SystemExit, 1
+        raise SystemExit(1)
 
 
 

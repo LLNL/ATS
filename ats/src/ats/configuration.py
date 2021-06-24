@@ -532,7 +532,7 @@ def init(clas = '', adder = None, examiner=None):
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     commandList = machine.split(repr(defaultExecutable))
-    if os.environ.has_key('ATSROOT'):
+    if 'ATSROOT' in os.environ:
         ATSROOT = os.environ['ATSROOT']
     else:
         ATSROOT = os.path.dirname(defaultExecutable.path)

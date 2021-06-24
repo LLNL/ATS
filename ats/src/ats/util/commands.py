@@ -7,7 +7,7 @@ __all__=('EFFORT_ONLY_OUTPUT_STREAM','Command')
 
 EFFORT_ONLY_OUTPUT_STREAM = 'This empty output stream is the output of an EffortOnly command.'
 
-class UsageError(StandardError):
+class UsageError(Exception):
     """The user requested something unreasonable.
 
     Usual issue: executable not found.
@@ -47,7 +47,7 @@ class CommandRunner(object):
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE)
                 Output_Stream = p1.communicate()[0]
-            except OSError, e :
+            except OSError as e :
                 if e.errno==2:
                     message = 'Execution of command "%s" failed.  %s.' %\
                                         (args[0], e.strerror)
@@ -93,7 +93,7 @@ def demo_command():
         args = ['bogus_command', '/']
         try:
             command.issueCommand(args)
-        except UsageError, e:
+        except UsageError as e:
             logger.info('Caught expected exception:\n%s\n' % e)
 
         logger.info('Running first command found:\n' + '-'*80)
@@ -107,7 +107,7 @@ def demo_command():
         argList = ['/',]
         try:
             command.issueFirstCommand(commandList, argList)
-        except UsageError, e:
+        except UsageError as e:
             logger.info('Caught expected exception:\n%s\n' % e)
 
     logger.info ('Demo with normal output.\n' + '='*80 + '\n')

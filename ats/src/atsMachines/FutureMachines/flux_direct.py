@@ -68,7 +68,7 @@ def update_test_status(json_response, arg, errnum):
         else:
             # it didn't run ok, don't check anything else
             if configuration.options.oneFailure:
-                raise AtsError, "Test failed in oneFailure mode."
+                raise AtsError("Test failed in oneFailure mode.")
         print("UPDATING TEST STATUS TO %s" % status, file=sys.stderr)
         test_to_update.set(status, test_to_update.elapsedTime())
         arg.noteEnd(test_to_update)
@@ -190,7 +190,7 @@ class FluxDirect (lcMachines.LCMachineCore):
         new_ld_library_path = "/opt/ibm/spectrum_mpi/lib/pami_port:/opt/ibm/spectrum_mpi/lib:/opt/ibm/spectrum_mpi/lib:/opt/mellanox/hcoll/lib"
         if os.environ['LD_LIBRARY_PATH']:
             new_ld_library_path += ":{}".format(os.environ['LD_LIBRARY_PATH'])
-        jobspec['environ'] = {k: v for k, v in jobspec['environ'].iteritems() if k.split('_')[0] not in ('JSM', 'OMPI', 'PMIX', 'ENVIRONMENT')}
+        jobspec['environ'] = {k: v for k, v in jobspec['environ'].items() if k.split('_')[0] not in ('JSM', 'OMPI', 'PMIX', 'ENVIRONMENT')}
         jobspec['environ'].update({"OMPI_MCA_osc": "pt2pt",
                                    "OMPI_MCA_pml": "yalla",
                                    "OMPI_MCA_btl": "self",

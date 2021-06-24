@@ -140,7 +140,7 @@ class AtsTest (object):
             self.options.update(AtsTest.stuck)
             self.options.update(AtsTest.grouped)
             self.options.update(options)
-        except Exception, e:
+        except Exception as e:
             self.set(INVALID, 'Bad options: ' + e)
             return
 
@@ -153,7 +153,7 @@ class AtsTest (object):
         outOpts = ['file', 'terminal', 'both']
         if not self.testStdout in outOpts:
             msg = 'Invalid setting for option testStdout: ' + self.testStdout
-            raise AtsError, msg
+            raise AtsError(msg)
 
 
         if configuration.options.allInteractive:
@@ -265,7 +265,7 @@ class AtsTest (object):
                 self.timelimit = configuration.timelimit
             else:
                 self.timelimit = Duration(tl)
-        except AtsError, msg:
+        except AtsError as msg:
             self.set(INVALID, msg)
             return
 
@@ -401,7 +401,7 @@ class AtsTest (object):
             e = self.endTime
             s = self.startTime
             elapsed = e-s
-        except AttributeError, foo:
+        except AttributeError as foo:
             elapsed = 0.0
 
         if elapsed < 60.0:
@@ -473,7 +473,8 @@ class AtsTest (object):
         "Remove the named sticky options. With no arg, remove all."
         if kw:
             for k in kw:
-                if cls.stuck.has_key(k): del cls.stuck[k]
+                if k in cls.stuck:
+                    del cls.stuck[k]
         else:
             cls.stuck.clear()
     unstick = classmethod(unstick)
@@ -489,7 +490,8 @@ class AtsTest (object):
         "Remove the named tacked options"
         if kw:
             for k in kw:
-                if cls.tacked.has_key(k): del cls.tacked[k]
+                if k in cls.tacked:
+                    del cls.tacked[k]
         else:
             cls.tacked.clear()
     untack = classmethod(untack)
@@ -505,7 +507,8 @@ class AtsTest (object):
         "Remove the named glued options"
         if kw:
             for k in kw:
-                if cls.glued.has_key(k): del cls.glued[k]
+                if k in cls.glued:
+                    del cls.glued[k]
         else:
             cls.glued.clear()
     unglue = classmethod(unglue)
@@ -516,7 +519,7 @@ class AtsTest (object):
         """
         if kw:
             for k in kw:
-                if cls.glued.has_key(k):
+                if k in cls.glued:
                     return cls.glued[k]
                 else:
                     return None
@@ -585,7 +588,7 @@ class AtsTest (object):
         if self.testStdout != 'terminal':
             try:
                 f = open(self.outname, 'r')
-            except IOError, e:
+            except IOError as e:
                 self.notes = ['Missing output file.']
                 log('Missing output file', self.outname, e)
                 return
