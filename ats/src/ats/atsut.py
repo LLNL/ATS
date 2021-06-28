@@ -29,7 +29,7 @@ class _StatusCode:
     def __eq__(self, other):
         if isinstance(other, _StatusCode):
             return self.name == other.name
-        elif isinstance(other, str):
+        elif isinstance(other, (str, unicode)):
             return self.name == other or self.abr == other
         else:
             return False
