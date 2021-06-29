@@ -87,7 +87,7 @@ class MachineCore(object):
             else:   # test has finished
                 if test.status is not PASSED:
                     if configuration.options.oneFailure:
-                        raise AtsError, "Test failed in oneFailure mode."
+                        raise AtsError("Test failed in oneFailure mode.")
         self.running = stillRunning
 
     def remainingCapacity(self):
@@ -360,7 +360,7 @@ call noteEnd for machine-specific part.
                 os.environ['OMP_NUM_THREADS'] = str(omp_num_threads)
             else:
                 # Priority 3 setting, the user has already set OMP_NUM_THREADS in their environment
-                if os.environ.has_key('OMP_NUM_THREADS'):
+                if 'OMP_NUM_THREADS' in os.environ:
                     if configuration.options.verbose:
                         temp_omp= os.getenv("OMP_NUM_THREADS")
                         # print "ATS detected that OMP_NUM_THREADS is already set to %s" % (temp_omp)
@@ -644,7 +644,7 @@ The subprocess part of launch. Also the part that might fail.
 
             return True
 
-        except OSError, e:
+        except OSError as e:
             if test.stdOutLocGet() != 'terminal':
                 test.fileHandleClose()
 
@@ -693,7 +693,7 @@ The subprocess part of launch. Also the part that might fail.
         else:
             if exit:
                 log('%s FATAL RETURN CODE %d Command: %s' % ("ATS", exitCode, cmd_line), echo=True)
-                raise SystemExit, 1
+                raise SystemExit(1)
 
         return exitCode
 
@@ -746,7 +746,7 @@ The subprocess part of launch. Also the part that might fail.
         else:
             if exit:
                 log('%s FATAL RETURN CODE %d Command: %s' % ("ATS", exitCode, cmd_line), echo=True)
-                raise SystemExit, 1
+                raise SystemExit(1)
 
         return exitCode
 

@@ -52,5 +52,5 @@ from log import log, terminal
 from times import Duration
 # make statuses available as their abbreviations, too.
 for key, value in statuses.items():
-    exec "%s = %s" % (value.abr, key)
+    exec("%s = %s" % (value.abr, key))
 del key, value

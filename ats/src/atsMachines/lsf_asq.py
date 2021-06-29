@@ -916,5 +916,5 @@ class lsfMachine (machines.Machine):
                     retcode= subprocess.call("bkill -J " + test.jobname, shell=True)
                     if retcode < 0:
                         log("---- bkill() in lsf_asq.py, command= bkill -J %s failed with return code -%d  ----" %  (test.jobname, retcode), echo=True)
-                except OSError, e:
+                except OSError as e:
                     log("---- bkill() in lsf_asq.py, execution of command failed (bkill -J %s) failed:  %s----" %  (test.jobname, e), echo=True)

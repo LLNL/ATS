@@ -54,7 +54,7 @@ class WinMachine (machines.Machine):
         self.npMax= self.numberTestsRunningMax
 
         if options.numNodes==-1:
-            if os.environ.has_key('NUMBER_OF_PROCESSORS'):
+            if 'NUMBER_OF_PROCESSORS' in os.environ:
                 options.numNodes= int(os.environ['NUMBER_OF_PROCESSORS'])
 
             else:

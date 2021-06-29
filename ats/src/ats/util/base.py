@@ -36,21 +36,19 @@ class NoNewFields(object):
         nameIter = iter(self._fieldNames)
         for value in args:
             try:
-                name = nameIter.next()
+                name = next(nameIter)
                 self.__setattr__(name, value)
             except StopIteration:
-                raise AttributeError, \
-                    'Too many positional args initialzing %s object.  Expected %s, but got %s.' %\
-                    (self.__class__, len(self._fieldNames), len(args))
+                raise AttributeError('Too many positional args initialzing %s object.  Expected %s, but got %s.' %
+                    (self.__class__, len(self._fieldNames), len(args)))
 
     def __setKeywordFields(self, kwargs):
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             self.__setattr__(name, value)
 
     def __setattr__(self, name, value):
         if name not in self.__dict__:
-            raise AttributeError, \
-                'Field "%s" not found in "%s" object.' % (name, self.__class__)
+            raise AttributeError('Field "%s" not found in "%s" object.' % (name, self.__class__))
         else:
             object.__setattr__(self, name, value)
 

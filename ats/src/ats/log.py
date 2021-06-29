@@ -127,7 +127,7 @@ class AtsLog (object):
         except Exception:
             print >>sys.stderr, msg
             print(msg, file=sys.stderr)
-        raise SystemExit, 1
+        raise SystemExit(1)
 
 log = AtsLog(name="ats.log")
 terminal = AtsLog(echo=True, logging=False)

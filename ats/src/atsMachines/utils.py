@@ -115,7 +115,7 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
     maxCount= len(inNodeList)
 
     from operator import itemgetter
-    stepNodeDic= dict([ (v,k) for (k,v) in inNodeStepNumDic.iteritems() ])
+    stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
 
     nodeAvailDic= inNodeAvailTotalDic
 
@@ -215,7 +215,7 @@ def removeFromUsedTotalDicNoSrun(inNodeAvailDic, inNodeStepNumDic, inMaxProcsPer
 
     from operator import itemgetter
 
-    stepNodeDic= dict([ (v,k) for (k,v) in inNodeStepNumDic.iteritems() ])
+    stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
 
     amountLeft= max(inAmountToDelete, 1)
 
@@ -246,7 +246,7 @@ def removeFromUsedTotalDic (inNodeAvailDic, inNodeStepNumDic, inMaxProcsPerNode,
 
     from operator import itemgetter
 
-    stepNodeDic= dict([ (v,k) for (k,v) in inNodeStepNumDic.iteritems() ])
+    stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
 
     amountLeft= max(inAmountToDelete, 1)
 
@@ -386,7 +386,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
     #
     #  unset SQUEUE_FORMAT before using "squeue -s"
     #--------------------------------------------------
-    if os.environ.has_key('SQUEUE_FORMAT'):
+    if 'SQUEUE_FORMAT' in os.environ:
         oldSqueueFormatValue= os.environ['SQUEUE_FORMAT']
         os.unsetenv('SQUEUE_FORMAT')
 
@@ -479,7 +479,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
 
     #  re-set SQUEUE_FORMAT after using "squeue -s"
     #--------------------------------------------------
-    if os.environ.has_key('SQUEUE_FORMAT'):
+    if 'SQUEUE_FORMAT' in os.environ:
         os.environ['SQUEUE_FORMAT']=  oldSqueueFormatValue
 
     if nodeToCheck == '' or newStep== '':
@@ -492,7 +492,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
 def getNumberOfProcessorsPerNode(useNode=None):
     # Assume all nodes on this machine has the same number of processors
 
-    if os.environ.has_key('SYS_TYPE'):
+    if 'SYS_TYPE' in os.environ:
         SYS_TYPE= os.environ['SYS_TYPE']
     else:
         SYS_TYPE= ''
@@ -565,7 +565,7 @@ def getAllSlurmStepIds():
     import getpass, os
 
     envUser= None
-    if not os.environ.has_key('USER'):
+    if 'USER' not in os.environ:
         envUser= getpass.getuser()
     else:
         envUser= os.environ['USER']
@@ -578,7 +578,7 @@ def getAllSlurmStepIds():
 
         theLines = stdOutput.split('\n')
 
-    except OSError, e:
+    except OSError as e:
         theLines= "---- killUsingSlurmStepId, execution of command failed :  %s----" %  (squeueCommand)
 
     return theLines

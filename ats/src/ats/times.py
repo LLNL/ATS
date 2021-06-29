@@ -7,9 +7,9 @@ atsStartTime = time.strftime("%y%m%d%H%M%S",_localtime)
 atsStartTimeLong = time.strftime('%B %d, %Y %H:%M:%S', _localtime)
 
 
-def datestamp (long=0):
+def datestamp(long_format=False):
     "Return formatted date and time. Shorter version is just time."
-    if long:
+    if long_format:
         return time.strftime('%B %d, %Y %H:%M:%S')
     else:
         return time.strftime('%H:%M:%S')
@@ -144,5 +144,5 @@ def timeSpecToSec(spec):
                 s = int(sp)
 
         return (h*3600 + 60 * m + s)
-    except Exception, e:
-        raise AtsError, "Bad time specification: %s" % specIn
+    except Exception as e:
+        raise AtsError("Bad time specification: %s" % specIn)

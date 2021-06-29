@@ -1,5 +1,5 @@
 from __future__ import print_function
-from cStringIO import StringIO
+from StringIO import StringIO
 
 class AttributeDict (dict):
     """A dictionary whose items can be accessed as attributes. Be careful not to
@@ -17,7 +17,7 @@ class AttributeDict (dict):
         try:
             return self[name]
         except KeyError:
-            raise AttributeError, "No attribute %s" % name
+            raise AttributeError("No attribute %s" % name)
 
     def __setattr__(self, name, value):
         "Convert an attribute set into a key set."
@@ -28,7 +28,7 @@ class AttributeDict (dict):
         try:
             del self[name]
         except KeyError:
-            raise AttributeError, 'No attribute %s' % name
+            raise AttributeError('No attribute %s' % name)
 
     def __repr__(self):
         out = StringIO()

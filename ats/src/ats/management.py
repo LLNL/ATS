@@ -53,7 +53,7 @@ Attributes:
 
     def restart(self):
         "Reinitialize basic data structures."
-        self.started = datestamp(long=1)
+        self.started = datestamp(long_format=True)
         self.collectTimeEnded = self.started
         self.filters = []
         self.testlist = []
@@ -80,13 +80,13 @@ Attributes:
             try:
                 f = str(f)
             except Exception:
-                raise AtsError, "filter must be convertible to string"
+                raise AtsError("filter must be convertible to string")
             if not f:
                 continue
             try:
                 r = eval(f, {}, {})
             except SyntaxError:
-                raise AtsError, 'Mal-formed filter, %s' % repr(f)
+                raise AtsError('Mal-formed filter, %s' % repr(f))
             except KeyboardInterrupt:
                 raise
             except Exception:
@@ -98,7 +98,7 @@ Attributes:
         """Compute the environment in which filters for test will be
             evaluated."""
         if not isinstance(test, AtsTest):
-            raise AtsError, 'filterenv argument must be a test instance.'
+            raise AtsError('filterenv argument must be a test instance.')
         fe = {}
         for f in _filterwith:
             exec(f, fe)
@@ -127,7 +127,7 @@ Attributes:
                     return f
             except KeyboardInterrupt:
                 raise
-            except Exception, e:
+            except Exception as e:
                 if debug():
                     log('In filter %s:'% repr(f), e)
                 return f
@@ -158,17 +158,16 @@ Attributes:
     def undefine(*args):
         "Remove one or more symbols for input files."
         for x in args:
-            if testEnvironment.has_key(x):
+            if x in testEnvironment:
                 del testEnvironment[x]
 
     def get(self, name):
         """Return the definition of name from the test environment.
         """
-        if testEnvironment.has_key(name):
+        if name in testEnvironment:
             return testEnvironment.get(name)
 
-        raise AtsError, \
-            "Could not find name %s in vocabulary." % name
+        raise AtsError("Could not find name %s in vocabulary." % name)
 
     alreadysourced = []
 
@@ -204,12 +203,12 @@ Attributes:
             try:
                 f = open(t1)
                 break
-            except IOError, e:
+            except IOError as e:
                 pass
         else:
             log("Error opening input file:", t1, echo=True)
             self.badlist.append(t1)
-            raise AtsError, "Could not open input file %s" % path
+            raise AtsError("Could not open input file %s" % path)
         t = abspath(t1)
         directory, filename = os.path.split(t1)
         name, e = os.path.splitext(filename)
@@ -297,7 +296,7 @@ Attributes:
         if self.testlist:
             log("""
 =========================================================
-ATS RESULTS %s""" % datestamp(long=1), echo = True)
+ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
             log('-------------------------------------------------',
                 echo = True)
             self.report()
@@ -305,7 +304,7 @@ ATS RESULTS %s""" % datestamp(long=1), echo = True)
                 echo = True)
         if not configuration.options.skip:
             log("""
-ATS SUMMARY %s""" % datestamp(long=1), echo = True)
+ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
             self.summary(log)
             self._summary2(log)
 
@@ -315,7 +314,7 @@ ATS SUMMARY %s""" % datestamp(long=1), echo = True)
         log.echo = True
         log("ATS WALL TIME", wallTime())
         log("ATS COLLECTION END", self.collectTimeEnded)
-        log('ATS END', datestamp(long=1))
+        log('ATS END', datestamp(long_format=True))
         log('ATS MACHINE TYPE', configuration.MACHINE_TYPE)
         if configuration.batchmachine is not None:
             log('ATS BATCH TYPE', configuration.BATCH_TYPE)
@@ -547,7 +546,7 @@ See manual for discussion of these arguments.
 
             # 2019-06-28 Sad added filter on the number of nodes requested for the test vs allocated for testing
 
-            if testobj.options.has_key('nn'):
+            if 'nn' in testobj.options:
                 my_nn = testobj.options.get('nn')
             else:
                 my_nn = -1
@@ -669,7 +668,7 @@ We immediately make sure each input file exists and is readable.
                             configuration.options.allInteractive)):
             for t in batchTests:
                 log( t, "BATCH sorting error.", echo=True)
-            raise ValueError, 'batch test(s) should not exist'
+            raise ValueError('batch test(s) should not exist')
 
         return interactiveTests, batchTests
 
@@ -741,7 +740,7 @@ to allow user a chance to add options and examine results of option parsing.
             self.batchmachine = None
         self.verbose = configuration.options.verbose or debug()
         log.echo = self.verbose
-        self.started = datestamp(long=1)
+        self.started = datestamp(long_format=True)
         self.continuationFileName = ''
         self.atsRunPath = os.getcwd()
         for a in configuration.options.filter:
@@ -810,14 +809,14 @@ to allow user a chance to add options and examine results of option parsing.
             log("ATS error while collecting tests.", echo=True)
             log(traceback.format_exc(), echo=True)
             errorOccurred = True
-            self.collectTimeEnded = datestamp(long=1)
+            self.collectTimeEnded = datestamp(long_format=True)
 
         except KeyboardInterrupt:
             log("Keyboard interrupt while collecting tests, terminating.",
                 echo=True)
             errorOccurred = True
 
-        self.collectTimeEnded = datestamp(long=1)
+        self.collectTimeEnded = datestamp(long_format=True)
         if errorOccurred:
             return
 
@@ -1032,7 +1031,7 @@ BATCHED = ats.BATCHED
         r = AttributeDict(
             started = self.started,
             options = self.options,
-            savedTime = datestamp(long=1),
+            savedTime = datestamp(long_format=True),
             collectTimeEnded = self.collectTimeEnded,
             badlist = self.badlist,
             filters = self.filters,
@@ -1218,11 +1217,11 @@ def filterdefs (text=None):
             for f in _filterwith:
                 exec(f, d)
             exec(text, d)
-        except SyntaxError, e:
-            raise AtsError, e
+        except SyntaxError as e:
+            raise AtsError(e)
         except KeyboardInterrupt:
             raise
-        except Exception, e:
+        except Exception as e:
             pass
         if debug():
             log('filterdefs:')
