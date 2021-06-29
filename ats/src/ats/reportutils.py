@@ -107,30 +107,38 @@ def cleanErrorMessage( msg ):
     return  msg.replace('<','').replace('>','').replace('&','&amp;')
 
 
-def writeFailedCodeTestCase( f, test, err_path):
+def writeFailedCodeTestCase(f, test, err_path):
     '''Writes a test failure to junit file including ats log and error files for the failure.
     '''
-    ## f is xml output filename
-    ## test is the test object
-    ## err_path is the path to the ats logs directory
+    # f is xml output filename
+    # test is the test object
+    # err_path is the path to the ats logs directory
     cname = test.name.replace('&','and')
     testname = cleanTestCaseName(test)
-    f.write('    <testcase status="run" time="%.3f" classname="%s" name="%s" >\n' % (elapsedTime(test), cname, testname) )
-    # Write error message:
-    # Invalid chars in the .err logs cause parse errors in Bamboo (xml parse errors - not Bamboo errors)
-    #  so we need to handle xml special chars before writing
-    logferr = open(glob.glob(err_path+'/*'+str(test.serialNumber)+'*.log.err')[0],'r')
-    rawmsg = logferr.read() # not readlines() - there are standard xml escapes to fix, we don't want to iterate over the whole message.
-    msg = "***** ats log.err file: *****\nTesting branch installation\n"
-    msg += cleanErrorMessage( rawmsg )
-    msg += "***** END ats log.err file: *****\n\n"
-    logferr.close()
-    logf = open(glob.glob(err_path+'/*'+str(test.serialNumber)+'*.log')[0],'r')
-    rawmsg = logf.read()
-    msg += "***** ats .log file: *****\n running from clone code \n"
-    msg += cleanErrorMessage( rawmsg )
-    msg += "***** END ats log.err file: *****\n"
-    logf.close()
+    f.write('    <testcase status="run" time="%.3f" classname="%s" name="%s" >\n' % (elapsedTime(test), cname, testname))
+
+    # Write error message: Invalid chars in the .err logs cause parse errors in Bamboo (xml parse
+    # errors - not Bamboo errors) so we need to handle xml special chars before writing handle the
+    # case where a combined log file is written
+    msg = ""
+    err_files = glob.glob(os.path.join(err_path, '*' + str(test.serialNumber) + '*.log.err'))
+    if len(err_files) > 0:
+        with open(err_files[0], 'r') as logferr:
+            # not readlines() - there are standard xml escapes to fix, we don't want to iterate over
+            # the whole message.
+            rawmsg = logferr.read()
+            msg += "***** ats log.err file: *****\nTesting branch installation\n"
+            msg += cleanErrorMessage(rawmsg)
+            msg += "***** END ats log.err file: *****\n\n"
+
+    log_files = glob.glob(os.path.join(err_path, '*' + str(test.serialNumber) + '*.log'))
+    if len(log_files) > 0:
+        with open(log_files[0], 'r') as logf:
+            rawmsg = logf.read()
+            msg += "***** ats log file: *****\n running from clone code \n"
+            msg += cleanErrorMessage(rawmsg)
+            msg += "***** END ats log file: *****\n"
+
     f.write('      <failure type="%s"> %s </failure>\n' % (test.status, msg))
     f.write('    </testcase>\n')
 
