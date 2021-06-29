@@ -1,5 +1,5 @@
 from __future__ import print_function
-from io import StringIO
+from StringIO import StringIO
 
 class AttributeDict (dict):
     """A dictionary whose items can be accessed as attributes. Be careful not to
