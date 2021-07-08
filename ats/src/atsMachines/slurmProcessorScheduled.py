@@ -19,7 +19,7 @@ from ats import configuration
 from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, statuses
 import utils, math
 import lcMachines
-import sys, os, time
+import sys, os, time, subprocess
 
 
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
@@ -35,8 +35,20 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
     checkForAtsProcNumRemovedProcs = 0
     debugClass = False
     canRunNow_debugClass = False
+    slurm_version_str=""
+    slurm_version_int=0
 
     def init (self):
+
+        # Identify the slurm version so ATS may account for differences
+        # in slurm behavior
+        tstr = subprocess.check_output(['srun', '--version'])
+        tarray=tstr.split() 
+        SlurmProcessorScheduled.slurm_version_str=tarray[1]
+        log('SLURM VERSION STRING', SlurmProcessorScheduled.slurm_version_str)
+        tarray=SlurmProcessorScheduled.slurm_version_str.split('.')
+        SlurmProcessorScheduled.slurm_version_int=(int(tarray[0]) * 1000) + (int(tarray[1]) * 100) + (int(tarray[2]))
+        log('SLURM VERSION NUMBER', SlurmProcessorScheduled.slurm_version_int)
 
         self.runningWithinSalloc = True
 
@@ -286,25 +298,39 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         #
         # --exclusive is the default, but it can be switched via the --share ats argument
         #
+        ex_or_sh = '--comment="noexclusive"'
+        exact = '--comment="noexact"'
         if self.exclusive == True:
-            ex_or_sh = "--exclusive"
-        else:
-            ex_or_sh = "--share"
+            if SlurmProcessorScheduled.slurm_version_int >= 21100:
+                ex_or_sh = "--overlap"      
+                # ex_or_sh = "--exclusive=user" 
+                # exact = "--exact"
+                # exact = "--cpu_bind=cores"
+            else:
+                ex_or_sh = "--exclusive"
+                # ex_or_sh = "--exclusive=user"
 
         temp_uname = os.uname()
         host = temp_uname[1]
 
-        the_mpi_type='-v'
+        the_mpi_type='--comment="nompitype"'
         if host.startswith('rznevaxxx'):
             the_mpi_type='--mpi=pmi2'
 
+        unbuffered='--comment="nounbuffered"'
+        if configuration.options.unbuffered:
+            unbuffered='--unbuffered'
 
         if MY_SYS_TYPE.startswith('toss'):
             # none means to not spcify mpibind at all
             if self.mpibind == "none":
                 mpibind = "--epilog=none"
             else:
-                mpibind = "--mpibind=%s" % self.mpibind
+                if SlurmProcessorScheduled.slurm_version_int >= 21100:
+                    # mpibind = "--mpibind=%s" % 'on' 
+                    mpibind = "--mpibind=%s" % self.mpibind
+                else:
+                    mpibind = "--mpibind=%s" % self.mpibind
         else:
             mpibind = "--epilog=none"
 
@@ -503,7 +529,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
                 return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                     "-p", self.partition,
-                    ex_or_sh,
+                    ex_or_sh, exact, unbuffered,
                     mpibind,
                     "--distribution=%s" % distribution,
                     "--nodes=%i-%i" % (num_nodes, num_nodes),
@@ -535,8 +561,16 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 #my_nodes="--nodes=%i" % (num_nodes) SAD TESTING
                 my_nodes="--epilog=none"
                 if (self.strict_nn == False):
-                    if self.slurmSeesATSProcessAsUsingACore == True:
-                        my_nodes="--nodes=%i-%i" % (num_nodes, self.numNodes)
+                    my_nodes="--nodes=%i-%i" % (num_nodes, self.numNodes)
+        
+                    # SAD Note 2021-07-08: 
+                    # the above --nodes=%i-%i used to be protected with this line.
+                    # Does not look like it is necessary now.  But don't want to lose
+                    # the documentation here of what we had been using, especially with 
+                    # the recent updates to slurm.
+                    # 
+                    # if self.slurmSeesATSProcessAsUsingACore == True:
+                    #   my_nodes="--nodes=%i-%i" % (num_nodes, self.numNodes)
 
                 #
                 # Exclusive command without distribution specified
@@ -545,7 +579,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
                     if self.distribution == 'unset':
                         return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             my_nodes,
                             "--cpus-per-task=%i" % cpus_per_task,
@@ -553,7 +587,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         ] + commandList
                     else:
                         return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             my_nodes,
                             "--distribution=%s" % distribution,
@@ -563,14 +597,14 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 else:
                     if self.distribution == 'unset':
                         return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             my_nodes,
                             "--ntasks=%i" % np \
                         ] + commandList
                     else:
                         return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             my_nodes,
                             "--distribution=%s" % distribution,
@@ -596,7 +630,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
                     test.numNodesToUse = minNodes
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "-N%i-%i" % (minNodes, minNodes),
                             "-n", str(np),
@@ -610,7 +644,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
                     test.numNodesToUse = minNodes
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "--distribution=%s" % distribution,
                             "-N%i-%i" % (minNodes, minNodes),
@@ -633,7 +667,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN400 ")
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             "-n", str(np),
                             "-p", self.partition] + commandList
                 #
@@ -645,7 +679,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
                             mpibind,
                             "--distribution=%s" % distribution,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             "-n", str(np),
                             "-p", self.partition] + commandList
 
@@ -758,7 +792,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN600 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                        ex_or_sh,
+                        ex_or_sh, exact, unbuffered,
                         mpibind,
                         "--distribution=%s" % distribution,
                         "-N%i" % (minNodes),
@@ -776,7 +810,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN700 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "--cpus-per-task=%i" % test.cpus_per_task,
                             "-n", str(np) ] + commandList
@@ -788,7 +822,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN800 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "--distribution=%s" % distribution,
                             "--cpus-per-task=%i" % test.cpus_per_task,
@@ -803,7 +837,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN900 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "--distribution=%s" % distribution,
                             "-N%i-%i" % (minNodes, self.numNodes),
@@ -816,7 +850,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN600 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                        ex_or_sh,
+                        ex_or_sh, exact, unbuffered,
                         mpibind,
                         "--distribution=%s" % distribution,
                         "-N%i" % (minNodes),
@@ -828,7 +862,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN700 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "-n", str(np) ] + commandList
                 elif distribution == 'cyclic':
@@ -836,7 +870,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN800 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "--distribution=%s" % distribution,
                             "-n", str(np) ] + commandList
@@ -845,7 +879,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                         print("SAD DEBUG SRUN900 ")
 
                     return ["srun", the_mpi_type, "--label", "-J", test.jobname,
-                            ex_or_sh,
+                            ex_or_sh, exact, unbuffered,
                             mpibind,
                             "--distribution=%s" % distribution,
                             "-N%i-%i" % (minNodes, self.numNodes),

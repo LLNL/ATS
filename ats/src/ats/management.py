@@ -965,7 +965,7 @@ BATCHED = ats.BATCHED
         remaining = {}
         for t in self.testlist:
             if t not in interactiveTests:
-                print("testlist[%d].set(SKIPPED, 'was %s') # %s" %
+                print("testlist[%d].set(SKIPPED, 'was %s') # %s" % \
                       (t.serialNumber - 1, t.status.name, t.name), file=fc)
             else:
                 remaining[t.serialNumber] = t
@@ -981,7 +981,7 @@ BATCHED = ats.BATCHED
                     break
             else:
                 for v in brothers:
-                    print("testlist[%d].set(%s, 'Previously ran.') # %s"
+                    print("testlist[%d].set(%s, 'Previously ran.') # %s" % \
                           (v.serialNumber - 1, v.status.name, v.name), file=fc)
 
         fc.close()
