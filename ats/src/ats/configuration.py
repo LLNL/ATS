@@ -55,6 +55,7 @@ def addOptions(parser):
     parser.set_defaults(
         allInteractive=False,
         combineOutErr=False,
+        unbuffered=False,
         strict_nn=False,
         mpi_um=False,
         bypassSerialMachineCheck=False,
@@ -142,6 +143,9 @@ def addOptions(parser):
 
     # Toss specific options
     if SYS_TYPE.startswith('toss'):
+        parser.add_option('--unbuffered', action='store_true', dest='unbuffered',
+            help='Toss3 option: Pass srun the --unbuffered option.')
+
         parser.add_option('--mpibind', action='store', type='string', dest='mpibind',
             help='Toss3 option: Specify slurm --mpibind plugin options to use. By default, ATS specifies --mpibind=off on Toss 3 systems, but projects may want other options.  Common options are none, on, off.  srun --mpibind=help will show further options.')
 
