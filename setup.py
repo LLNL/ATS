@@ -17,9 +17,9 @@ setup(
     version=get_version(),
     description="Automated Testing System",
     install_requires=['numpy <= 1.16.5'],
-    package_dir={'': 'src'},
+    package_dir={'': 'ats/src'},
     packages=find_packages(
-        where='src',
+        where='ats/src',
     ),
     entry_points={
         'console_scripts': [
