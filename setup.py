@@ -25,8 +25,8 @@ setup(
         'console_scripts': [
             'ats=ats.bin._ats:main',
             'ats3=ats.bin._ats3:main',
-            'atslite1=atslite.bin._atslite1:main',
-            'atslite3=atslite.bin._atslite3:main'
+            'atslite1=atslite1:main',
+            'atslite3=atslite3:main'
         ]
     }
 )
