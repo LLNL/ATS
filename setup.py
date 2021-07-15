@@ -21,6 +21,7 @@ setup(
     packages=find_packages(
         where='ats/src',
     ),
+    scripts=['ats/src/ats/bin/atslite1.py', 'ats/src/ats/bin/atslite3.py'],
     entry_points={
         'console_scripts': [
             'ats=ats.bin._ats:main',
