@@ -1,25 +1,15 @@
-#!/usr/apps/ats/7.0.1/bin/python
+#!/usr/bin/env python
 
 import os
 import sys
 from subprocess import Popen
 sys.dont_write_bytecode = True
 
-# -------------------------------------------------------------------------------------------------
-# Access library of common modules shared in ATS by many projects.
-# -------------------------------------------------------------------------------------------------
-tempstr = sys.executable
-ats_root_dir = tempstr.replace('bin/python', '')
-
+import ats
 from ats.util.generic_utils  import execute, clean_old_sandboxes, clean_old_ats_log_dirs, \
                       set_machine_type_based_on_sys_type, get_interactive_partition
 
-# -------------------------------------------------------------------------------------------------
-# Based on the above python in line 1, verify that ats is installed there and set path
-# to that ats
-# -------------------------------------------------------------------------------------------------
-myats = os.path.join(ats_root_dir, 'bin/ats')
-
+myats = os.path.join(ats.__path__[0].split('lib')[0], 'bin', 'ats')
 if os.path.exists(myats):
     print "Most excellent! Found %s" % (myats)
 else:
