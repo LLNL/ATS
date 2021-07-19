@@ -1,0 +1,26 @@
+name: Test ATS
+
+on:
+  # push:
+  #   branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  hello_ats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: '2.7'
+      - name: Install dependencies
+        run: |
+          python -m pip install
+          pip install .
+          which ats ats3 atslite1 atslite3
