@@ -114,7 +114,8 @@ def main():
             interactive_partition = val
             print("INFO: atslite1 will use partition %s" % interactive_partition)
 
-    myats = os.path.join(sys.exec_prefix, 'bin', 'ats')
+    import ats
+    myats = os.path.join(ats.__path__[0].split('lib')[0], 'bin', 'ats')
     cmd = myats + " --verbose " + ' '.join(sys.argv[1:])
 
     create_test_ats_py = "%s/%s" % (os.getcwd(),"create_test_ats.py")
