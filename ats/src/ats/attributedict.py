@@ -30,7 +30,7 @@ class AttributeDict(dict):
     def __repr__(self):
         _repr = "AttributeDict(\n"
         for key in sorted(self.keys()):
-            _repr += " %s = %r,\n" % (key, self[key])
+            _repr += "   %s  =  %r ,\n" % (key, self[key])
         _repr += ")"
         return _repr
 
