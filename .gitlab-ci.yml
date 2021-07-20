@@ -1,3 +1,6 @@
+include:
+  - local: .gitlab/runners.yml
+
 stages:
   - test
 
@@ -21,13 +24,7 @@ default:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 hello_ATS_TOSS:
-  extends: .hello_ATS
-  tags:
-    - shell
-    - quartz
+  extends: [.hello_ATS, .run_quartz_shell]
 
 hello_ATS_BLUEOS:
-  extends: .hello_ATS
-  tags:
-    - shell
-    - lassen
+  extends: [.hello_ATS, .run_lassen_shell]

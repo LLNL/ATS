@@ -1,0 +1,31 @@
+._batch:
+  tags: &batch batch
+
+._shell:
+  tags: &shell shell
+
+._lassen:
+  tags: &lassen lassen
+
+._quartz:
+  tags: &quartz quartz
+
+.run_lassen_batch:
+  tags:
+    - *lassen
+    - *batch
+
+.run_lassen_shell:
+  tags:
+    - *lassen
+    - *shell
+
+.run_quartz_batch:
+  tags:
+    - *quartz
+    - *batch
+
+.run_quartz_shell:
+  tags:
+    - *quartz
+    - *shell
