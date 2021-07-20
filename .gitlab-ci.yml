@@ -1,0 +1,31 @@
+stages:
+  - test
+
+default:
+  interruptible: true
+
+.hello_ATS:
+  stage: test
+  script:
+    - python2 -m pip install .
+    - cd test/HelloATS
+    - mpicc hello_ats.c
+    - atslite1
+    - cd $SYS_TYPE*.logs
+    - >
+      $CI_PROJECT_PATH/.gitlab/assert_ats_results.awk -v
+      PASSED=12 FAILED=22 SKIPPED=10 ats.log
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+hello_ATS_TOSS:
+  extends: .hello_ATS
+  tags:
+    - shell
+    - quartz
+
+hello_ATS_BLUEOS:
+  extends: .hello_ATS
+  tags:
+    - shell
+    - lassen
