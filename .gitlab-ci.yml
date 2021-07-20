@@ -7,14 +7,16 @@ default:
 .hello_ATS:
   stage: test
   script:
-    - python2 -m pip install .
+    - python2 -m virtualenv --python=python2.7 TEST_VENV
+    - source TEST_VENV/bin/activate
+    - pip install .
     - cd test/HelloATS
     - mpicc hello_ats.c
     - atslite1
-    - cd $SYS_TYPE*.logs
+    - cd $OLDPWD
     - >
-      $CI_PROJECT_PATH/.gitlab/assert_ats_results.awk -v
-      PASSED=12 FAILED=22 SKIPPED=10 ats.log
+      .gitlab/assert_ats_results.awk -v PASSED=22 FAILED=12 SKIPPED=10
+      test/HelloATS/$SYS_TYPE*.logs/ats.log
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
