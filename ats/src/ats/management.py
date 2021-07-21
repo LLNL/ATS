@@ -1128,7 +1128,7 @@ dependents_serial contain the serial numbers of the relevant tests.
         "Print state to file, formatting items with repr"
 # import * is bad style but helps with robustness with respect to ats changes:
         print("""from ats import *""", file=file)
-        print("state = ", file=file)
+        print("state =  ", file=file, end='')
         print(repr(self.getResults()), file=file)
         print("logDirectory = %r" % log.directory, file=file)
         print("machineName = %r" % self.machine.name, file=file)
