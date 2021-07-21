@@ -1,5 +1,4 @@
 # ATS
-# ATS
 
 ## Description
 
