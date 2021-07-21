@@ -27,7 +27,7 @@ def get_test_lines_generator():
     # Duplicate items in nprocs: [1, 2, ..., 64] --> [1, 1, 2, 2, ..., 64, 64]
     nprocs = sorted(2 * [1, 2, 3, 4, 5, 6, 7, 8, 16, 31, 64])
 
-    test_line = "t%d=test  (executable='a.out', clas='%s', " \
+    test_line = "t%d=test  (executable='./a.out', clas='%s', " \
                 "label='a.out_%d', np=%d, sandbox=False)\n"
     return (test_line % (test_num, arg_, test_num, num_proc)
             for test_num, arg_, num_proc in zip(range(1, 44, 2), clas, nprocs))
