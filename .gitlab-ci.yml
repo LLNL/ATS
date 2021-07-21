@@ -20,8 +20,6 @@ default:
     - >
       .gitlab/assert_ats_results.awk -v PASSED=22 FAILED=12 SKIPPED=10
       test/HelloATS/$SYS_TYPE*.logs/ats.log
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 hello_ATS_TOSS:
   extends: [.hello_ATS, .run_quartz_shell]
