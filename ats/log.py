@@ -1,7 +1,6 @@
 from __future__ import print_function
 import sys, os
-from atsut import abspath, AtsError, debug
-import configuration
+from ats.atsut import abspath, AtsError, debug
 
 class AtsLog (object):
     "Log and stderr echo facility"
@@ -71,6 +70,7 @@ class AtsLog (object):
         #
         # 2017-12-07 SAD try to keep the terminal sane on blueos (rzmanta)
         #
+        from ats import configuration
         if configuration.SYS_TYPE.startswith('blueos'):
             #print ("DEBUg stty sane")
             os.system("stty sane")

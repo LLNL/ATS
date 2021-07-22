@@ -1,14 +1,14 @@
 from __future__ import print_function
 import os, re, sys, time, tempfile, traceback, socket
-import configuration, version
-from atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
+from ats import configuration, version
+from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
                   RUNNING, FILTERED, CREATED, TIMEDOUT, HALTED, EXPECTED,\
                   abspath, AtsError, is_valid_file, debug, statuses, \
                   AttributeDict
-from times import datestamp, Duration, wallTime, wallTimeSecs, \
+from ats.times import datestamp, Duration, wallTime, wallTimeSecs, \
                   atsStartTimeLong
-from tests import AtsTest
-from log import log, terminal
+from ats.tests import AtsTest
+from ats.log import log, terminal
 
 def standardIntrospection(line):
     "Standard magic detector for input."
@@ -1092,7 +1092,7 @@ dependents_serial contain the serial numbers of the relevant tests.
         if not os.path.isabs(filename):
             filename = os.path.join(logdir, filename)
         log("Saving junit xml to ", filename, echo=True)
-        from reportutils import writePassedTestCase, writeFailedCodeTestCase, writeStatusTestCase
+        from ats.reportutils import writePassedTestCase, writeFailedCodeTestCase, writeStatusTestCase
         passed =   [test for test in self.testlist if (test.status is PASSED)]
         failed =   [test for test in self.testlist if (test.status is FAILED)]
         timedout = [test for test in self.testlist if (test.status is TIMEDOUT)]

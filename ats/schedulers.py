@@ -1,8 +1,8 @@
 """Defines standard scheduler for interactive jobs."""
 from itertools import chain
 import time
-from atsut import AttributeDict, debug, CREATED, EXPECTED, PASSED, RUNNING 
-from log import AtsLog, log
+from ats.atsut import AttributeDict, debug, CREATED, EXPECTED, PASSED, RUNNING 
+from ats.log import AtsLog, log
 
 def comparePriorities (t1, t2):
     "Input is two tests or groups; return comparison based on totalPriority."
@@ -23,7 +23,7 @@ class StandardScheduler (object):
         """Give each test a final totalPriority.  onCollected routines may change."""
 # have to delay looking at the machine / configuration to avoid import race
         global machine, configuration
-        import configuration
+        from ats import configuration
         machine = configuration.machine
         self.verbose = configuration.options.verbose or debug() or \
                        configuration.options.skip
