@@ -9,13 +9,13 @@ The log object is created by importing log, but it can't write to a file
 until we process the options and get the desired properties.
 """
 import os, sys, socket
-import version, atsut
 from optparse import OptionParser
-from atsut import debug, AttributeDict, abspath
-from log import log, terminal
-from times import atsStartTime, Duration
-import machines
-import executables
+from ats import version, atsut
+from ats.atsut import debug, AttributeDict, abspath
+from ats.log import log, terminal
+from ats.times import atsStartTime, Duration
+from ats import machines
+from ats import executables
 
 SYS_TYPE    = os.environ.get("SYS_TYPE", sys.platform)
 my_host     = os.environ.get("HOST", "unset")
@@ -30,7 +30,7 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 #    if my_host.startswith('tt') or my_host.startswith('tr'):
 #        SYS_TYPE = "trinity_knl"
 
-import atsMachines
+from ats import atsMachines
 MACHINE_DIR = atsMachines.__path__
 #MACHINE_DIR = abspath(os.environ.get('MACHINE_DIR',
 #                             os.path.join(sys.prefix, 'atsMachines')))
@@ -439,8 +439,8 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     specFoundIn = full_path
-                    print("from atsMachines.%s import %s as Machine" % (moduleName, machineClass))
-                    exec('from atsMachines.%s import %s as Machine' % (moduleName, machineClass))
+                    print("from ats.atsMachines.%s import %s as Machine" % (moduleName, machineClass))
+                    exec('from ats.atsMachines.%s import %s as Machine' % (moduleName, machineClass))
                     machine = Machine(machineName, int(npMaxH))
 
             elif line.startswith('#BATS:') and not batchmachine:
@@ -451,7 +451,7 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     bspecFoundIn = full_path
-                    exec('from atsMachines.%s import %s as BMachine' % (moduleName, machineClass))
+                    exec('from ats.atsMachines.%s import %s as BMachine' % (moduleName, machineClass))
                     batchmachine = BMachine(moduleName, int(npMaxH))
 
         f.close()

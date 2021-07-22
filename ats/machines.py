@@ -2,10 +2,9 @@
 """
 from __future__ import print_function
 import subprocess, sys, os, time, shlex
-from atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
+from ats.atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
      CREATED, SKIPPED, HALTED, EXPECTED, statuses, AttributeDict, AtsError
-import configuration
-from log    import log, terminal, AtsLog
+from ats.log import log, terminal, AtsLog
 from shutil import copytree, ignore_patterns
 
 def comparePriorities (t1, t2):
@@ -41,6 +40,7 @@ class MachineCore(object):
 
     def examineBasicOptions(self, options):
         "Examine options from command line, possibly override command line choices."
+        from ats import configuration
         if configuration.options.sequential:
             self.numberTestsRunningMax = 1
         elif self.hardLimit:
@@ -54,6 +54,7 @@ class MachineCore(object):
         """ Check the time elapsed since test's start time.  If greater
         then the timelimit, return true, else return false.  test's
         end time is set if time elapsed exceeds time limit """
+        from ats import configuration
         timeNow= time.time()
         timePassed= timeNow - test.startTime
         cut = configuration.cuttime
@@ -78,6 +79,7 @@ class MachineCore(object):
         """Find those tests still running. getStatus checks for timeout.
         """
         # print "DEBUG checkRunning 100\n"
+        from ats import configuration
         time.sleep(self.naptime)
         stillRunning = []
         for test in self.running:
@@ -106,6 +108,7 @@ call self.testEnded(test, status). You may add a message as a third arg,
 which will be shown in the test's final report.
 testEnded will call your bookkeeping method noteEnd.
 """
+        from ats import configuration
         test.child.poll()
         #print test.child.returncode
         if test.child.returncode is None:
@@ -263,6 +266,7 @@ testEnded will call your bookkeeping method noteEnd.
         """Do book-keeping when a job has exited;
 call noteEnd for machine-specific part.
 """
+        from ats import configuration
         if MachineCore.debugClass:
             print("DEBUG MachineCore.testEnded invoked cwd= %s " % (os.getcwd()))
 
@@ -321,6 +325,7 @@ call noteEnd for machine-specific part.
            Return True if able to do so.
            Call noteLaunch if launch succeeded."""
 
+        from ats import configuration
         #print test.__dict__
         ##print self.__dict__
 
@@ -512,6 +517,7 @@ The subprocess part of launch. Also the part that might fail.
             #print self.__dict__
 
 
+        from ats import configuration
         # See if user specified a file to use as stdin to the test problem.
         stdin_file                  = test.options.get('stdin', None)
         globalPrerunScript_outname  = test.globalPrerunScript_outname
@@ -786,7 +792,7 @@ is hard upper limit.
         self.naptime = 0.2 #number of seconds to sleep between checks on running tests.
         self.running = []
         self.runOrder = 0
-        import schedulers
+        from ats import schedulers
         self.scheduler = schedulers.StandardScheduler()
         self.init()
 

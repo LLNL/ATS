@@ -1,5 +1,5 @@
 import os, sys
-from attributedict import AttributeDict
+from ats.attributedict import AttributeDict
 
 statuses = AttributeDict()
 
