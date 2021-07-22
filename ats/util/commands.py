@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-import logs
+from ats.util import logs
 
 __all__=('EFFORT_ONLY_OUTPUT_STREAM','Command')
 

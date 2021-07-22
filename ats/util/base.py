@@ -8,7 +8,7 @@ Various base classes
 
 __all__ = ['NoNewFields', 'DebugFields']
 
-import logs
+from ats.util import logs
 import pprint
 
 #-----------------------------------------------------------------------------
