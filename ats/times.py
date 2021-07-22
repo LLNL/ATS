@@ -1,6 +1,6 @@
 "times: everything to do with timing"
 import os, time, traceback
-from atsut import AtsError
+from ats.atsut import AtsError
 _times_at_start = os.times()
 _localtime = time.localtime()
 atsStartTime = time.strftime("%y%m%d%H%M%S",_localtime)

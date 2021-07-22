@@ -1,1 +1,1 @@
-ats/src/ats/version.py
+ats/version.py

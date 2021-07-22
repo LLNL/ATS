@@ -1,12 +1,12 @@
 import os, sys, time, re
-import configuration
-from log import log
-from atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, RUNNING,\
+from ats import configuration
+from ats.log import log
+from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, RUNNING,\
                   CREATED, FILTERED, TIMEDOUT, HALTED, LSFERROR, EXPECTED, statuses, \
                   is_valid_file, debug, AtsError, abspath, AttributeDict
 
-from times import hms, datestamp, curDateTime, Duration
-from executables import Executable
+from ats.times import hms, datestamp, curDateTime, Duration
+from ats.executables import Executable
 
 class AtsTestGroup (list):
     "A group of tests."
