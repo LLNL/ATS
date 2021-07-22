@@ -1,7 +1,7 @@
 import os
 glue(independent=True)
 glue(keep=True)
-my_checker = '/usr/apps/ats/7.0.1/lib/python2.7/site-packages/atsASC/Kripke/ats_check_log.py'
+my_checker = '/usr/apps/ats/7.0.6/lib/python2.7/site-packages/atsASC/Kripke/ats_check_log.py'
 
 
 t1=test  (executable = './a.out', clas = ' 6 30  200', np=2, nt=10, ngpu=1)
