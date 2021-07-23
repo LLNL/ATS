@@ -141,7 +141,7 @@ def demoLogRecord(logger):
     print("")
     class DictFilter(logging.Filter):
         def filter (self, record):
-            sortedDict=record.__dict__.items()
+            sortedDict=list(record.__dict__.items())
             sortedDict.sort()
             print("record.__dict__ = %s" % str(sortedDict).replace("('", "\n ('") )
             return True

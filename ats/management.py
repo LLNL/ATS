@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os, re, sys, time, tempfile, traceback, socket
 from ats import configuration, version
 from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
@@ -142,7 +141,7 @@ Attributes:
         log("Test environment symbols:", logging=logging, echo=echo)
         log.indent()
         if not words:
-            words = testEnvironment.keys()
+            words = list(testEnvironment.keys())
             words.sort()
         for key in words:
             try:

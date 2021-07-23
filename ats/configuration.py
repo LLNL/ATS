@@ -374,7 +374,7 @@ def documentConfiguration():
     log('ATS version:', version.version)
     log('Options:')
     log.indent()
-    olist = options.keys()
+    olist = list(options.keys())
     olist.sort()
     for k in olist:
         log(k + ":", repr(getattr(options, k)))

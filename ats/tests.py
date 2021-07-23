@@ -379,7 +379,7 @@ class AtsTest (object):
     def __repr__(self):
         return "Test #%d %s %s" %(self.serialNumber, self.name, self.status)
 
-    def __nonzero__ (self):
+    def __bool__ (self):
         "It is not proper to test the truth of a test."
         self.set(FAILED, 'if test(...) not allowed.')
         log(self, echo=True)

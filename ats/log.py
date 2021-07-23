@@ -1,4 +1,3 @@
-from __future__ import print_function
 import sys, os
 from ats.atsut import abspath, AtsError, debug
 

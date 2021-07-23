@@ -31,7 +31,8 @@ def getStateFromFile(atsrFile):
     d = {}
     if os.path.exists(atsrFile):
         print("Taking state from %s" % atsrFile)
-        execfile(atsrFile, d)
+        exec(compile(open('src/ats/version.py', "rb").read(),
+             'src/ats/version.py', 'exec'))
         try:
             state = d['state']
         except KeyError as e:

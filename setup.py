@@ -16,7 +16,7 @@ setup(
     url="https://github.com/LLNL/ATS",
     version=get_version(),
     description="Automated Testing System",
-    install_requires=['numpy <= 1.16.5'],
+    install_requires=['numpy'],
     packages=['ats', 'ats.bin', 'ats.atsMachines', 'ats.util'],
     entry_points={
         'console_scripts': [

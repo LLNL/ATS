@@ -1,6 +1,5 @@
 """Definition of class Machine for overriding.
 """
-from __future__ import print_function
 import subprocess, sys, os, time, shlex
 from ats.atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
      CREATED, SKIPPED, HALTED, EXPECTED, statuses, AttributeDict, AtsError

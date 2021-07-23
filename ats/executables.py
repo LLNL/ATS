@@ -6,7 +6,7 @@ class Executable(object):
     def __init__ (self, value):
         # NOTE: import done at __init__ to workaround circular dependency.
         from ats.configuration import machine
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             self.commandList = machine.split(value)
         else:
             self.commandList = value[:]
