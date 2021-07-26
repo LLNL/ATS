@@ -7,24 +7,8 @@ import shlex
 import shutil
 import stat
 
+from ats import log
 from subprocess import Popen, PIPE, CalledProcessError, STDOUT
-
-try:
-
-    from ats import log
-
-except ImportError:
-    format = """
-  WARNING: log cannot be imported from ats module in generic_utils.py,
-           while executing script %s.
-           Using built in version of log.
-  """
-    # sys.stderr.write(format % sys.argv[0])
-    def log( message, echo=False):
-        if echo:
-            sys.stdout.write( message + '\n' )
-
-
 
 # Define module variables to hold names of ASC and project modules
 # for dynamic loading of module members.
@@ -46,6 +30,7 @@ def importName( moduleName, name, default_func=None, verbose=False ):
         print("Loading %s from %s." % (name, moduleName))
     func = default_func
     try:
+        print("WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
         my_mod = __import__( moduleName, globals(), locals(), [name] )
         func   =  vars(my_mod)[name]
     except ImportError as value:

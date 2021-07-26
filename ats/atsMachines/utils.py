@@ -114,7 +114,6 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
 
     maxCount= len(inNodeList)
 
-    from operator import itemgetter
     stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
 
     nodeAvailDic= inNodeAvailTotalDic
@@ -213,8 +212,6 @@ def removeFromUsedTotalDicNoSrun(inNodeAvailDic, inNodeStepNumDic, inMaxProcsPer
     #print "SAD DEBUG removeFromUsedTotalDicNoSrun Begin inNodeAvailDic follows"
     #print inNodeAvailDic
 
-    from operator import itemgetter
-
     stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
 
     amountLeft= max(inAmountToDelete, 1)
@@ -243,8 +240,6 @@ def removeFromUsedTotalDicNoSrun(inNodeAvailDic, inNodeStepNumDic, inMaxProcsPer
 #
 #------------------------------------------------------------------------------
 def removeFromUsedTotalDic (inNodeAvailDic, inNodeStepNumDic, inMaxProcsPerNode, inFirstStep, inAmountToDelete, inNumberOfNodesNeeded, inNumNodesToUse, inSrunRelativeNode, inStepId, inNodeList):
-
-    from operator import itemgetter
 
     stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
 

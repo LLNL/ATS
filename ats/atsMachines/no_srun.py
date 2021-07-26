@@ -7,10 +7,10 @@
 
 
 import sys
-import utils
 from ats import machines, debug, atsut
 from ats import log, terminal
 from ats import configuration
+from ats.atsMachines import utils
 from ats.atsut import RUNNING, TIMEDOUT
 
 class noSrunMachine (machines.Machine):

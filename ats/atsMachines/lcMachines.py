@@ -1,6 +1,6 @@
 import time
 from ats import debug, log, machines
-import utils
+from ats.atsMachines import utils
 
 class LCMachineCore (machines.Machine):
 

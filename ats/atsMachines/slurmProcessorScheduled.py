@@ -11,14 +11,15 @@
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64
 
 import inspect
+import math
+import sys, os, time, subprocess
 
 from ats import machines, debug, atsut
 from ats import log, terminal
 from ats import configuration
 from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, statuses
-import utils, math
-import lcMachines
-import sys, os, time, subprocess
+from ats.atsMachines import utils
+from ats.atsMachines import lcMachines
 
 
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)

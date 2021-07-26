@@ -7,7 +7,8 @@ from ats import log, terminal
 from ats import configuration
 from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, LSFERROR, statuses
 
-import utils, math
+from ats.atsMachines import utils
+import math
 import sys, os, time
 from subprocess import check_output
 
