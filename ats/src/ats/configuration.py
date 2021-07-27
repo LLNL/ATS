@@ -450,8 +450,8 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     specFoundIn = full_path
-                    print("from atsMachines.%s import %s as Machine" % (moduleName, machineClass))
-                    exec('from atsMachines.%s import %s as Machine' % (moduleName, machineClass))
+                    print("from %s import %s as Machine" % (moduleName, machineClass))
+                    exec('from %s import %s as Machine' % (moduleName, machineClass))
                     machine = Machine(machineName, int(npMaxH))
 
             elif line.startswith('#BATS:') and not batchmachine:
@@ -462,7 +462,7 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     bspecFoundIn = full_path
-                    exec('from atsMachines.%s import %s as BMachine' % (moduleName, machineClass))
+                    exec('from %s import %s as BMachine' % (moduleName, machineClass))
                     batchmachine = BMachine(moduleName, int(npMaxH))
 
         f.close()
