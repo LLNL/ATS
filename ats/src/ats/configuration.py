@@ -31,9 +31,13 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 #        SYS_TYPE = "trinity_knl"
 
 import atsMachines
-MACHINE_DIR = atsMachines.__path__
-#MACHINE_DIR = abspath(os.environ.get('MACHINE_DIR',
-#                             os.path.join(sys.prefix, 'atsMachines')))
+
+if "MACHINE_DIR" in os.environ.keys():
+    MACHINE_DIR = []
+    MACHINE_DIR.append(abspath(os.environ.get('MACHINE_DIR')))
+else:
+    MACHINE_DIR = atsMachines.__path__
+
 MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
 if MACHINE_OVERRIDE_DIR:
     MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
@@ -396,7 +400,6 @@ def init(clas = '', adder = None, examiner=None):
         print("DEBUG init entered clas=%s " % (clas))
 
     # get the machine and possible batch facility
-#    machineDirs = [MACHINE_DIR]
     machineDirs = MACHINE_DIR
 
     if MACHINE_OVERRIDE_DIR:
@@ -404,9 +407,17 @@ def init(clas = '', adder = None, examiner=None):
 
     machineList = []
     for machineDir in machineDirs:
-        machineList.extend(
-            [os.path.join(machineDir,x) for x in os.listdir(machineDir)
-             if x.endswith('.py') and not x.endswith('__init__.py')])
+       log('machineDir', machineDir)
+       machineList.extend([os.path.join(machineDir,x) for x in os.listdir(machineDir) if x.endswith('.py') and not x.endswith('__init__.py')])
+       #    machineList = [os.path.join(machineDir,x) for x in os.listdir(machineDir) if x.endswith('.py')] + machineList
+       sys.path.insert(0, machineDir)
+
+    #machineList = []
+    #for machineDir in machineDirs:
+    #    print("DEBUG machineDir=%s " % (machineDir))
+    #    machineList.extend(
+    #        [os.path.join(machineDir,x) for x in os.listdir(machineDir)
+    #         if x.endswith('.py') and not x.endswith('__init__.py')])
 
     machine = None
     batchmachine = None
