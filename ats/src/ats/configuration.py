@@ -26,21 +26,25 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 #print my_host
 #print my_hostname
 
-#if SYS_TYPE is None or SYS_TYPE.startswith('linux'):
-#    if my_host.startswith('tt') or my_host.startswith('tr'):
-#        SYS_TYPE = "trinity_knl"
-
 import atsMachines
 
-if "MACHINE_DIR" in os.environ.keys():
-    MACHINE_DIR = []
+# Set MACHINE_DIR by priority
+#
+# 1) MACHINE_OVERRIDE_DIR env var.
+# 2) MACHINE_DIR env var
+# 3) atsMachines.__path__
+
+MACHINE_DIR = []
+if "MACHINE_OVERRIDE_DIR" in os.environ.keys():
+    MACHINE_DIR.append(abspath(os.environ.get('MACHINE_OVERRIDE_DIR')))
+elif "MACHINE_DIR" in os.environ.keys():
     MACHINE_DIR.append(abspath(os.environ.get('MACHINE_DIR')))
 else:
     MACHINE_DIR = atsMachines.__path__
 
-MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
-if MACHINE_OVERRIDE_DIR:
-    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
+#MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
+#if MACHINE_OVERRIDE_DIR:
+#    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
 
 MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
@@ -402,8 +406,9 @@ def init(clas = '', adder = None, examiner=None):
     # get the machine and possible batch facility
     machineDirs = MACHINE_DIR
 
-    if MACHINE_OVERRIDE_DIR:
-        machineDirs.append(MACHINE_OVERRIDE_DIR)
+    # delete, not needed, handled above
+    #if MACHINE_OVERRIDE_DIR:
+    #    machineDirs.append(MACHINE_OVERRIDE_DIR)
 
     machineList = []
     for machineDir in machineDirs:
