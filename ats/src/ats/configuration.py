@@ -37,7 +37,8 @@ import atsMachines
 MACHINE_DIR = []
 if "MACHINE_OVERRIDE_DIR" in os.environ.keys():
     MACHINE_DIR.append(abspath(os.environ.get('MACHINE_OVERRIDE_DIR')))
-elif "MACHINE_DIR" in os.environ.keys():
+
+if "MACHINE_DIR" in os.environ.keys():
     MACHINE_DIR.append(abspath(os.environ.get('MACHINE_DIR')))
 else:
     MACHINE_DIR = atsMachines.__path__
@@ -135,10 +136,10 @@ def addOptions(parser):
         help='Strictly observe test "nn" options, this may result in reduced througput or even slurm srun hangs.')
 
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Adds LSF option --smpiargs="-gpu" to enable CUDA aware MPI with unified or device memory. Synonym with --smpi_gpu option')
+        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')
 
     parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Adds LSF option --smpiargs="-gpu" to enable CUDA aware MPI with unified or device memory. Synonym with --m_gpu option')
+        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --m_gpu')
 
     parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck',
         help='Bypass check which prohibits ATS from running on serial machines such as rztrona or borax.')
