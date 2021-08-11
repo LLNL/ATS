@@ -40,8 +40,13 @@ if "MACHINE_OVERRIDE_DIR" in os.environ.keys():
 
 if "MACHINE_DIR" in os.environ.keys():
     MACHINE_DIR.append(abspath(os.environ.get('MACHINE_DIR')))
-else:
-    MACHINE_DIR = atsMachines.__path__
+
+MACHINE_DIR.append(atsMachines.__path__[0])
+
+#print "DEBUG 100"
+#print MACHINE_DIR
+#print "DEBUG 200"
+
 
 #MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
 #if MACHINE_OVERRIDE_DIR:
@@ -415,7 +420,6 @@ def init(clas = '', adder = None, examiner=None):
     for machineDir in machineDirs:
        log('machineDir', machineDir)
        machineList.extend([os.path.join(machineDir,x) for x in os.listdir(machineDir) if x.endswith('.py') and not x.endswith('__init__.py')])
-       #    machineList = [os.path.join(machineDir,x) for x in os.listdir(machineDir) if x.endswith('.py')] + machineList
        sys.path.insert(0, machineDir)
 
     #machineList = []
