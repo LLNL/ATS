@@ -173,6 +173,12 @@ class lsfMachine (machines.Machine):
         self.bindToBoard = options.bindToBoard
         self.bindToNone = options.bindToNone
 
+        #if self.lrun_pack and self.lrun_pack == False:
+        #    print("DBG 101 self.lrun_pack = False")
+        #if self.lrun_pack and self.lrun_pack == True:
+        #    print("DBG 102 self.lrun_pack = True")
+            
+
         # If user specified a path to mpibind, then
         # set mpibind to True as well.
         if self.mpibind_executable != "unset":
@@ -285,7 +291,10 @@ class lsfMachine (machines.Machine):
         # multiple nodes (hosts)
         if ((test.np * test.nt) > self.npMax):
             if test.num_nodes < 1:
-                if test.lrun_pack == False:
+                if self.lrun_pack and self.lrun_pack == True:
+                    if lsfMachine.debugClass:
+                        print("ATS test %s detected lrun_pack option.  Will not implicitly set nn (num_nodes). Will rely on lrun to do the right thing" % (test.name))
+                else:
                     test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
                     test.nn = test.num_nodes
                     if configuration.options.verbose:
