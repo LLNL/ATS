@@ -147,6 +147,7 @@ class lsfMachine (machines.Machine):
         self.mpibind_executable = options.mpibind_executable
         self.old_defaults     = options.blueos_old_defaults
         self.lrun_jsrun_args  = options.blueos_lrun_jsrun_args
+        self.lrun_jsrun_smpi_args = options.lrun_jsrun_smpi_args
         self.mpibind          = options.blueos_mpibind
         self.exclusive        = options.jsrun_exclusive
         self.jsrun_exclusive  = options.jsrun_exclusive
