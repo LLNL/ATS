@@ -358,9 +358,9 @@ class lsfMachine (machines.Machine):
         # with MPI that it should be enabled.
         # This can be overriden by specifying one or more --lrun_jsrun_smpi_arg arguments.
         if test.lrun_jsrun_smpi_args:
-           str_smpi = "--smpiargs='" + " ".join(test.lrun_jsrun_smpi_args) + "'"
+           str_smpi = "--smpiargs=" + " ".join(test.lrun_jsrun_smpi_args)
         else:
-           str_smpi = "--smpiargs='-gpu'"
+           str_smpi = "--smpiargs=-gpu"
 
         str_lrun_jsrun_args = "unset"
 
