@@ -688,7 +688,8 @@ class lsfMachine (machines.Machine):
         # then we can not run yet, as LSF will simply submit cancel the
         # pending job
         if self.runningWithinBsub == False:
-            my_output = check_output("lsfjobs | grep `whoami` | wc -l", shell=True);
+            my_output = check_output("lsfjobs | grep `whoami` | wc -l",
+                                     shell=True, text=True);
             my_num_lsf_jobs_running = int(my_output)
 
             if nosrun == False:

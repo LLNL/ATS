@@ -8,12 +8,29 @@ from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, RUNNING,\
 from ats.times import hms, datestamp, curDateTime, Duration
 from ats.executables import Executable
 
-class AtsTestGroup (list):
+class AtsTestGroup(list):
     "A group of tests."
     def __init__ (self, number):
-        list.__init__([])
         self.number = number
         self.isBlocking = False
+
+    def __ge__(self, other):
+        return self.number >= other.number
+
+    def __gt__(self, other):
+        return self.number > other.number
+
+    def __le__(self, other):
+        return self.number <= other.number
+
+    def __lt__(self, other):
+        return self.number < other.number
+
+    def __eq__(self, other):
+        return self.number == other.number
+
+    def __ne__(self, other):
+        return self.number != other.number
 
     def isFinished(self):
         "Any left to run?"
@@ -300,6 +317,24 @@ class AtsTest (object):
                 self.set(BATCHED, problem)
                 self.notes.append(\
                     "Changed to batch since unable to run interactively on this machine.")
+
+    def __ge__(self, other):
+        return self.totalPriority >= other.totalPriority
+
+    def __gt__(self, other):
+        return self.totalPriority > other.totalPriority
+
+    def __le__(self, other):
+        return self.totalPriority <= other.totalPriority
+
+    def __lt__(self, other):
+        return self.totalPriority < other.totalPriority
+
+    def __eq__(self, other):
+        return self.totalPriority == other.totalPriority
+
+    def __ne__(self, other):
+        return self.totalPriority != other.totalPriority
 
     def __invert__ (self):
         """Responds to the ~ operator by setting the expected status FAILED,

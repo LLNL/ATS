@@ -254,7 +254,7 @@ Attributes:
             log.indent()
             os.chdir(directory)
             try:
-                execfile(t1, testenv)
+                exec(compile(open(t1, "rb").read(), t1, 'exec'), testenv)
                 if debug(): log('Finished ', t1, datestamp())
                 result = 1
             except KeyboardInterrupt:
@@ -970,7 +970,7 @@ BATCHED = ats.BATCHED
                 remaining[t.serialNumber] = t
 
         while remaining:
-            sns = remaining.keys()
+            sns = list(remaining.keys())
             u = remaining[sns[0]]
             brothers = [v for v in remaining.values() if areBrothers(u, v)]
             for v in brothers:

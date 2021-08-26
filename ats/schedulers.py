@@ -45,7 +45,8 @@ class StandardScheduler (object):
                 t.group.totalPriority = t.totalPriority
             else:
                 t.group.totalPriority = max(t.group.totalPriority, t.totalPriority)
-        self.groups.sort(comparePriorities)
+        self.groups.sort()
+        # self.groups.sort(comparePriorities)
 
         self.schedule("   Total", "    Test", "Serial", " Group", "Test")
         self.schedule("Priority", "Priority", "Number", "Number", "Name")

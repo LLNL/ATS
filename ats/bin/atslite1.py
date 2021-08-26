@@ -3,6 +3,7 @@ import sys
 sys.dont_write_bytecode = True
 import os
 import shutil
+import subprocess
 from subprocess import Popen, PIPE
 from ats.util.generic_utils import execute, clean_old_sandboxes, \
                                      clean_old_ats_log_dirs, \
@@ -114,16 +115,15 @@ def main():
             interactive_partition = val
             print("INFO: atslite1 will use partition %s" % interactive_partition)
 
-    import ats
-    myats = os.path.join(ats.__path__[0].split('lib')[0], 'bin', 'ats')
+    myats = os.path.join(sys.exec_prefix, 'bin', 'ats')
     cmd = myats + " --verbose " + ' '.join(sys.argv[1:])
 
-    create_test_ats_py = "%s/%s" % (os.getcwd(),"create_test_ats.py")
+    create_test_ats_py = os.path.join(os.getcwd(), "create_test_ats.py")
 
     # If user did not specify a file, then we will default to test.ats, or attempt to create
     # it if it does not exist using a script the user provides in this directory
-    if (test_ats_file is ""):
-        test_ats_file  = "%s/%s" % (os.getcwd(),"test.ats")
+    if test_ats_file == "":
+        test_ats_file = os.path.join(os.getcwd(), "test.ats")
         cmd = cmd + " " + test_ats_file
 
     if os.path.exists(test_ats_file):
@@ -172,12 +172,7 @@ def main():
 
     print("Executing: %s" % cmd)
 
-    ats_lite_ats = Popen( cmd, shell=True)
-
-    ats_lite_ats.wait()
-
-    sys.exit(0)
-
+    subprocess.run(cmd.split(), text=True)
 
 # -----------------------------------------------------------------------------
 #  Startup

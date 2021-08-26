@@ -9,6 +9,7 @@ The log object is created by importing log, but it can't write to a file
 until we process the options and get the desired properties.
 """
 import os, sys, socket
+import importlib
 from optparse import OptionParser
 from ats import version, atsut
 from ats.atsut import debug, AttributeDict, abspath
@@ -381,6 +382,20 @@ def documentConfiguration():
     log.dedent()
     log.dedent()
 
+def get_machine_factory(module_name, machine_class,
+                        machine_package='ats.atsMachines'):
+    """
+    Get factory of type "machine_class" found in "module_name".
+
+    Programmatically import and return definition of machine_class from
+    module_name. "machine_package" tells Python where module_name can be found if
+    not in the project's root directory.
+    """
+    machine_module = importlib.import_module(f'.{module_name}',
+                                             package=machine_package)
+    machine_factory = getattr(machine_module, machine_class)
+    return machine_factory
+
 def init(clas = '', adder = None, examiner=None):
     """Called by manager.init(class, adder, examiner)
        Initialize configuration and process command-line options; create log,
@@ -439,9 +454,11 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     specFoundIn = full_path
-                    print("from ats.atsMachines.%s import %s as Machine" % (moduleName, machineClass))
-                    exec('from ats.atsMachines.%s import %s as Machine' % (moduleName, machineClass))
-                    machine = Machine(machineName, int(npMaxH))
+                    print(f"from ats.atsMachines.{moduleName} "
+                          f"import {machineClass} as Machine")
+                    machine_factory = get_machine_factory(moduleName,
+                                                          machineClass)
+                    machine = machine_factory(machineName, int(npMaxH))
 
             elif line.startswith('#BATS:') and not batchmachine:
                 items = line[6:-1].split()
@@ -451,9 +468,9 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     bspecFoundIn = full_path
-                    exec('from ats.atsMachines.%s import %s as BMachine' % (moduleName, machineClass))
-                    batchmachine = BMachine(moduleName, int(npMaxH))
-
+                    machine_factory = get_machine_factory(moduleName,
+                                                          machineClass)
+                    batchmachine = machine_factory(moduleName, int(npMaxH))
         f.close()
 
         if machine and batchmachine:
