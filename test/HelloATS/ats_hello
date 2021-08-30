@@ -1,19 +1,17 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
 import os
 import sys
-from subprocess import Popen
-sys.dont_write_bytecode = True
+import subprocess
 
 import ats
-from ats.util.generic_utils  import execute, clean_old_sandboxes, clean_old_ats_log_dirs, \
+from ats.util.generic_utils import execute, clean_old_sandboxes, clean_old_ats_log_dirs, \
                       set_machine_type_based_on_sys_type, get_interactive_partition
 
-myats = os.path.join(ats.__path__[0].split('lib')[0], 'bin', 'ats')
+myats = os.path.join(sys.exec_prefix, 'bin', 'ats')
 if os.path.exists(myats):
-    print "Most excellent! Found %s" % (myats)
+    print(f"Most excellent! Found {myats}")
 else:
-    sys.exit("Bummer! %s does not exist" % (myats))
+    sys.exit(f"Bummer! {myats} does not exist")
 
 # -------------------------------------------------------------------------------------------------
 # Get the sys_type
@@ -31,7 +29,7 @@ lsb_batch_jid = os.getenv("LSB_BATCH_JID")
 test_ats_file = ""
 exclusive_found = False
 for index, arg in enumerate(sys.argv):
-    print arg
+    print(arg)
     if arg.find('=') >= 0:
         (key, val) = arg.split('=', 1)
         sys.argv[index] = key + '="' + val + '"'
@@ -60,7 +58,7 @@ for index, arg in enumerate(sys.argv):
         if val.isdigit():
             numNodes = int(val)
         else:
-            print "Error '%s' is invalid" % arg
+            print(f"Error '{arg}' is invalid")
             sys.exit(-1)
         if   'chaos' in sys_type:
             del sys.argv[index]
@@ -88,14 +86,14 @@ if __name__ == "__main__":
 
     # If user did not specify a file, then we will default to test.ats, or attempt to create
     # it if it does not exist using a script the user provides in this directory
-    if test_ats_file is "":
+    if test_ats_file == "":
         test_ats_file = os.path.join(os.getcwd(), "test.ats")
         cmd = cmd + " " + test_ats_file
 
     if os.path.exists(test_ats_file):
-        print "Found %s." % (test_ats_file)
+        print(f"Found {test_ats_file}.")
     elif os.path.exists(create_test_ats_py):
-        print "Found %s." % (create_test_ats_py)
+        print(f"Found {create_test_ats_py}.")
         return_code = execute(create_test_ats_py, None, True)
         if return_code != 0:
             sys.exit(1)
@@ -109,21 +107,12 @@ if __name__ == "__main__":
         if lsb_batch_jid is None:
             cmd = 'bsub --private-launch -nnodes %d -Is -XF -W 120 -core_isolation 2 -q %s %s' % (numNodes, interactive_partition, cmd)
     elif exclusive_found is True:
-        print "Running script on login node -- each test will have a separate srun allocation"
+        print("Running script on login node -- each test will have a separate srun allocation")
         cmd = "%s --numNodes=%d" % (cmd, numNodes)
     elif slurm_job_id is None:
         cmd = 'salloc -N %d -p %s --exclusive %s' % (numNodes, interactive_partition, cmd)
     if numNodes == 1:
         cmd += ' --bypassSerialMachineCheck'
 
-    print "Executing: %s" % cmd
-
-    ats_hello_ats = Popen(cmd, shell=True)
-
-    ats_hello_ats.wait()
-
-    sys.exit(0)
-
-# -------------------------------------------------------------------------------------------------
-# END OF FILE
-# -------------------------------------------------------------------------------------------------
+    print(f"Executing: {cmd}")
+    subprocess.run(cmd.split(), text=True)
