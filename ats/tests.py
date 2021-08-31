@@ -10,9 +10,12 @@ from ats.executables import Executable
 
 class AtsTestGroup(list):
     "A group of tests."
-    def __init__ (self, number):
+    def __init__(self, number):
         self.number = number
         self.isBlocking = False
+
+    def __hash__(self):
+        return hash(self.number)
 
     def __ge__(self, other):
         return self.number >= other.number
@@ -317,6 +320,9 @@ class AtsTest (object):
                 self.set(BATCHED, problem)
                 self.notes.append(\
                     "Changed to batch since unable to run interactively on this machine.")
+
+    def __hash__(self):
+        return hash(self.totalPriority)
 
     def __ge__(self, other):
         return self.totalPriority >= other.totalPriority

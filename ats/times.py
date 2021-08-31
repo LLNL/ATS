@@ -62,6 +62,9 @@ Example::
     def __init__ (self, value=0):
         self.value = timeSpecToSec(value)
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __gt__(self, other):
         if isinstance(other, Duration):
             return self.value > other.value
