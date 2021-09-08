@@ -147,7 +147,6 @@ class lsfMachine (machines.Machine):
         self.mpibind_executable = options.mpibind_executable
         self.old_defaults     = options.blueos_old_defaults
         self.lrun_jsrun_args  = options.blueos_lrun_jsrun_args
-        self.lrun_jsrun_smpi_args = options.lrun_jsrun_smpi_args
         self.mpibind          = options.blueos_mpibind
         self.exclusive        = options.jsrun_exclusive
         self.jsrun_exclusive  = options.jsrun_exclusive
@@ -247,8 +246,6 @@ class lsfMachine (machines.Machine):
         parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
             default = 1,
             help="Number of nodes to use")
-        parser.add_option("--lrun_jsrun_smpi_arg", action="append", type="string", dest='lrun_jsrun_smpi_args',
-            help="Spectrum MPI arguments to pass to jsrun")
         pass
 
     def getResults(self):
@@ -324,7 +321,6 @@ class lsfMachine (machines.Machine):
         test.lrun            = self.lrun
         test.lrun_pack       = self.lrun_pack
         test.lrun_jsrun_args = self.lrun_jsrun_args
-        test.lrun_jsrun_smpi_args = self.lrun_jsrun_smpi_args
         test.ompProcBind     = self.ompProcBind
         test.mpi_um          = self.mpi_um
 
@@ -354,13 +350,9 @@ class lsfMachine (machines.Machine):
         # The input deck setting has priority.  Fall back to ATS command line option.
         test.ngpu  = test.options.get('ngpu', -1)
 
-        # By default run with --smpiargs=-gpu.  So many projects use cudaMallocManaged memory
+        # Always run with --smpiargs=-gpu.  So many projects use cudaMallocManaged memory
         # with MPI that it should be enabled.
-        # This can be overriden by specifying one or more --lrun_jsrun_smpi_arg arguments.
-        if test.lrun_jsrun_smpi_args:
-           str_smpi = "--smpiargs=" + " ".join(test.lrun_jsrun_smpi_args)
-        else:
-           str_smpi = "--smpiargs=-gpu"
+        str_smpi = "--smpiargs=\"-gpu\""
 
         str_lrun_jsrun_args = "unset"
 
@@ -373,6 +365,9 @@ class lsfMachine (machines.Machine):
         str_mpibind = "/usr/tce/bin/mpibind"
         if self.mpibind_executable != "unset":
             str_mpibind = self.mpibind_executable
+
+        #if test.mpi_um == True:
+        #    str_smpi = "--smpiargs=\"-gpu\""
 
         if configuration.options.blueos_ngpu and configuration.options.blueos_ngpu >= 0:
             test.ngpu = configuration.options.blueos_ngpu

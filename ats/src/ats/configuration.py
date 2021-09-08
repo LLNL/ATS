@@ -121,6 +121,7 @@ def addOptions(parser):
         sleepBeforeSrun=sleepBeforeSrunDefault,
         sequential=False,
         nosrun=False,
+        salloc=False,
         showGroupStartOnly=False,
         checkForAtsProc=False,
         skip=False,
@@ -341,6 +342,9 @@ statement at the start of the input.""")
     parser.add_option('--nosrun', action='store_true', dest='nosrun',
         help='Run the code without srun.')
 
+    parser.add_option('--salloc', action='store_true', dest='salloc',
+        help='Run the code with salloc rather than srun.')
+
     parser.add_option('--showGroupStartOnly', action='store_true', dest='showGroupStartOnly',
         help='Only show start of first test in group, not subsequent steps.')
 
@@ -522,7 +526,8 @@ def init(clas = '', adder = None, examiner=None):
         globalPrerunScript = options.globalPrerunScript,
         globalPostrunScript = options.globalPostrunScript,
         sequential = options.sequential,
-        nosrun = options.nosrun
+        nosrun = options.nosrun,
+        salloc = options.salloc
         )
 
 # let the machine(s) modify the results or act upon them in other ways.
