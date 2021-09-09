@@ -10,7 +10,8 @@ default:
 .hello_ATS:
   stage: test
   script:
-    - python3 -m virtualenv --python=$(which python3.8) TEST_VENV
+    - ml python/3.8
+    - python3 -m virtualenv --python=python3.8 TEST_VENV
     - source TEST_VENV/bin/activate
     - pip install .
     - cd test/HelloATS
