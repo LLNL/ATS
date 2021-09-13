@@ -1,4 +1,4 @@
-#!/usr/apps/ats/7.0.6/bin/python
+#!/usr/apps/ats/7.1.0/bin/python
 
 import sys
 sys.dont_write_bytecode = True
