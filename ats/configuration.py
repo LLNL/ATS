@@ -26,17 +26,33 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 #print my_host
 #print my_hostname
 
-#if SYS_TYPE is None or SYS_TYPE.startswith('linux'):
-#    if my_host.startswith('tt') or my_host.startswith('tr'):
-#        SYS_TYPE = "trinity_knl"
 
-from ats import atsMachines
-MACHINE_DIR = atsMachines.__path__
-#MACHINE_DIR = abspath(os.environ.get('MACHINE_DIR',
-#                             os.path.join(sys.prefix, 'atsMachines')))
-MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
-if MACHINE_OVERRIDE_DIR:
-    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
+# Set MACHINE_DIR by priority
+#
+# 1) MACHINE_OVERRIDE_DIR env var.
+# 2) MACHINE_DIR env var
+# 3) atsMachines.__path__
+#
+#  HACK: MACHINE_DIR and MACHINE__OVERRIDE_DIR used until discussion with dependent projects 
+
+import atsMachines
+MACHINE_DIR = []
+if "MACHINE_OVERRIDE_DIR" in os.environ.keys():
+    MACHINE_DIR.append(abspath(os.environ.get('MACHINE_OVERRIDE_DIR')))
+
+if "MACHINE_DIR" in os.environ.keys():
+    MACHINE_DIR.append(abspath(os.environ.get('MACHINE_DIR')))
+
+MACHINE_DIR.append(atsMachines.__path__[0])
+
+#print "DEBUG 100"
+#print MACHINE_DIR
+#print "DEBUG 200"
+
+
+#MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
+#if MACHINE_OVERRIDE_DIR:
+#    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
 
 MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
@@ -107,6 +123,7 @@ def addOptions(parser):
         sleepBeforeSrun=sleepBeforeSrunDefault,
         sequential=False,
         nosrun=False,
+        salloc=False,
         showGroupStartOnly=False,
         checkForAtsProc=False,
         skip=False,
@@ -127,10 +144,10 @@ def addOptions(parser):
         help='Strictly observe test "nn" options, this may result in reduced througput or even slurm srun hangs.')
 
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Adds LSF option --smpiargs="-gpu" to enable CUDA aware MPI with unified or device memory. Synonym with --smpi_gpu option')
+        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')
 
     parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Adds LSF option --smpiargs="-gpu" to enable CUDA aware MPI with unified or device memory. Synonym with --m_gpu option')
+        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --m_gpu')
 
     parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck',
         help='Bypass check which prohibits ATS from running on serial machines such as rztrona or borax.')
@@ -327,6 +344,9 @@ statement at the start of the input.""")
     parser.add_option('--nosrun', action='store_true', dest='nosrun',
         help='Run the code without srun.')
 
+    parser.add_option('--salloc', action='store_true', dest='salloc',
+        help='Run the code with salloc rather than srun.')
+
     parser.add_option('--showGroupStartOnly', action='store_true', dest='showGroupStartOnly',
         help='Only show start of first test in group, not subsequent steps.')
 
@@ -396,17 +416,24 @@ def init(clas = '', adder = None, examiner=None):
         print("DEBUG init entered clas=%s " % (clas))
 
     # get the machine and possible batch facility
-#    machineDirs = [MACHINE_DIR]
     machineDirs = MACHINE_DIR
 
-    if MACHINE_OVERRIDE_DIR:
-        machineDirs.append(MACHINE_OVERRIDE_DIR)
+    # delete, not needed, handled above
+    #if MACHINE_OVERRIDE_DIR:
+    #    machineDirs.append(MACHINE_OVERRIDE_DIR)
 
     machineList = []
     for machineDir in machineDirs:
-        machineList.extend(
-            [os.path.join(machineDir,x) for x in os.listdir(machineDir)
-             if x.endswith('.py') and not x.endswith('__init__.py')])
+       log('machineDir', machineDir)
+       machineList.extend([os.path.join(machineDir,x) for x in os.listdir(machineDir) if x.endswith('.py') and not x.endswith('__init__.py')])
+       sys.path.insert(0, machineDir)
+
+    #machineList = []
+    #for machineDir in machineDirs:
+    #    print("DEBUG machineDir=%s " % (machineDir))
+    #    machineList.extend(
+    #        [os.path.join(machineDir,x) for x in os.listdir(machineDir)
+    #         if x.endswith('.py') and not x.endswith('__init__.py')])
 
     machine = None
     batchmachine = None
@@ -501,7 +528,8 @@ def init(clas = '', adder = None, examiner=None):
         globalPrerunScript = options.globalPrerunScript,
         globalPostrunScript = options.globalPostrunScript,
         sequential = options.sequential,
-        nosrun = options.nosrun
+        nosrun = options.nosrun,
+        salloc = options.salloc
         )
 
 # let the machine(s) modify the results or act upon them in other ways.
