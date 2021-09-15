@@ -74,6 +74,7 @@ def main():
             print("INFO: atslite1 %s option will be used " % arg)
             del sys.argv[index]
 
+
     for index, arg in enumerate(sys.argv):
         if (arg.find('numNodes') >= 0):
             (key, val) = arg.split('=',1)
@@ -114,8 +115,7 @@ def main():
             interactive_partition = val
             print("INFO: atslite1 will use partition %s" % interactive_partition)
 
-    import ats
-    myats = os.path.join(ats.__path__[0].split('lib')[0], 'bin', 'ats')
+    myats = os.path.join(sys.exec_prefix, 'bin', 'ats')
     cmd = myats + " --verbose " + ' '.join(sys.argv[1:])
 
     create_test_ats_py = "%s/%s" % (os.getcwd(),"create_test_ats.py")
@@ -137,15 +137,12 @@ def main():
         else:
             sys.exit("Bummer! Did not find %s or %s" % (test_ats_file, create_test_ats_py))
 
+
     clean_old_sandboxes()
     clean_old_ats_log_dirs()
 
     if nosub_found is True:
-        print("nosub option -- running ATS directly without salloc or bsub on %s" % sys_type)
-
-    elif 'bgqos' in sys_type:
-        cmd = "%s --numNodes=%d" % (cmd, numNodes)
-        print("Running script on login node -- each test will have a separate srun allocation")
+        print("nosub option -- running ATS directly on login or pre-allocated node on %s" % sys_type)
 
     elif 'lassen' in host:
         if lsb_batch_jid is None:
@@ -164,7 +161,7 @@ def main():
                 cmd = 'bsub -x -n %d -Is -XF -W 120 -G %s %s' % (myNumProcs, my_bank, cmd)
 
     elif exclusive_found is True:
-        print("Running script on login node -- each test will have a separate srun allocation")
+        print("ATS Info: Running script on login node -- each test will have a separate srun allocation")
         cmd = "%s --numNodes=%d" % (cmd, numNodes)
 
     elif slurm_job_id is None:
