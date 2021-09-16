@@ -155,6 +155,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("%s options.oneFailure          = %s " % (DEBUG_SLURM, options.oneFailure))
             print("%s options.sequential          = %s " % (DEBUG_SLURM, options.sequential))
             print("%s options.nosrun              = %s " % (DEBUG_SLURM, options.nosrun))
+            print("%s options.salloc              = %s " % (DEBUG_SLURM, options.salloc))
             print("%s options.checkForAtsProc     = %s " % (DEBUG_SLURM, options.checkForAtsProc))
             print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
             print("%s options.skip                = %s " % (DEBUG_SLURM, options.skip))
@@ -198,6 +199,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         self.exclusive = options.exclusive
         self.mpibind   = options.mpibind
+        self.salloc    = options.salloc
         self.toss_nn   = options.toss_nn
         self.strict_nn = options.strict_nn
         self.timelimit = options.timelimit
@@ -411,13 +413,14 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 #  Bump up the tasks per node by 1 as at least 1 node will have extra tasks.
                 tasks_per_node +=1
 
-                print(test)
-                print("ATS Warning: np=%i nn=%i" % (np, num_nodes))
-                print("             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes))
-                print("             %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo))
-                print(" ")
-                print("             %s " % test.name)
-                print(" ")
+                if self.salloc == False:
+                    print(test)
+                    print("ATS Warning: np=%i nn=%i" % (np, num_nodes))
+                    print("             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes))
+                    print("             %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo))
+                    print(" ")
+                    print("             %s " % test.name)
+                    print(" ")
 
             if test.cpus_per_task > -1:
 
@@ -460,7 +463,16 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             if SlurmProcessorScheduled.debugClass:
                 print("SAD DEBUG SRUN100")
 
-            return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
+            # launch args suggested by Chris Scroeder, where the test case has the args as a test argument
+            if test.options.get('tossrun'):
+                str_args = test.options.get('tossrun')
+                return str_args.split() + commandList
+            # End of Coding suggested by Chris Scroeder
+
+            if self.salloc :
+                return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+            else:
+                return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
                     srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
                     "--ntasks=%i" % np \
                    ] + commandList
@@ -492,7 +504,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         if SlurmProcessorScheduled.debugClass:
             print("SAD DEBUG SRUN800 ")
 
-        return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
+        if self.salloc :
+            return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+        else:
+            return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
                srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
                "--ntasks=%i" % np \
                ] + commandList

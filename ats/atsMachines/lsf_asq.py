@@ -174,6 +174,12 @@ class lsfMachine (machines.Machine):
         self.bindToBoard = options.bindToBoard
         self.bindToNone = options.bindToNone
 
+        #if self.lrun_pack and self.lrun_pack == False:
+        #    print("DBG 101 self.lrun_pack = False")
+        #if self.lrun_pack and self.lrun_pack == True:
+        #    print("DBG 102 self.lrun_pack = True")
+            
+
         # If user specified a path to mpibind, then
         # set mpibind to True as well.
         if self.mpibind_executable != "unset":
@@ -286,11 +292,14 @@ class lsfMachine (machines.Machine):
         # multiple nodes (hosts)
         if ((test.np * test.nt) > self.npMax):
             if test.num_nodes < 1:
-                # if (self.jsrun_nn < 1):
-                test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
-                test.nn = test.num_nodes
-                if configuration.options.verbose:
-                    print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
+                if self.lrun_pack and self.lrun_pack == True:
+                    if lsfMachine.debugClass:
+                        print("ATS test %s detected lrun_pack option.  Will not implicitly set nn (num_nodes). Will rely on lrun to do the right thing" % (test.name))
+                else:
+                    test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
+                    test.nn = test.num_nodes
+                    if configuration.options.verbose:
+                        print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
                           (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt))
 
         if lsfMachine.debugJsrun:
@@ -342,7 +351,9 @@ class lsfMachine (machines.Machine):
         # The input deck setting has priority.  Fall back to ATS command line option.
         test.ngpu  = test.options.get('ngpu', -1)
 
-        str_smpi = "--smpiargs=\"-show\""
+        # Always run with --smpiargs=-gpu.  So many projects use cudaMallocManaged memory
+        # with MPI that it should be enabled.
+        str_smpi = "--smpiargs=\"-gpu\""
 
         str_lrun_jsrun_args = "unset"
 
@@ -356,8 +367,8 @@ class lsfMachine (machines.Machine):
         if self.mpibind_executable != "unset":
             str_mpibind = self.mpibind_executable
 
-        if test.mpi_um == True:
-            str_smpi = "--smpiargs=\"-gpu\""
+        #if test.mpi_um == True:
+        #    str_smpi = "--smpiargs=\"-gpu\""
 
         if configuration.options.blueos_ngpu and configuration.options.blueos_ngpu >= 0:
             test.ngpu = configuration.options.blueos_ngpu
@@ -434,12 +445,14 @@ class lsfMachine (machines.Machine):
                     else:
                         if ( test.num_nodes > 0) :
                             return ["lrun",
+                                    str_smpi,
                                     "-v",
                                     "-N", str(int(test.num_nodes)),
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + commandList
                         else :
                             return ["lrun",
+                                    str_smpi,
                                     "-v",
                                     "-n", str(np)
                                     ] + str_lrun_jsrun_args.split() + commandList
@@ -544,6 +557,7 @@ class lsfMachine (machines.Machine):
                         ] + str_lrun_jsrun_args.split() + commandList
                     else:
                         return ["jsrun",
+                            str_smpi,
                             "-U",   test.rs_filename,
                             "--np", str(np),
                         ] + str_lrun_jsrun_args.split() + commandList
@@ -601,6 +615,7 @@ class lsfMachine (machines.Machine):
                     else:
                         if test.cpus_per_task > 1:
                             return ["jsrun",
+                                str_smpi,
                                 "--np", str(np),
                                 "-c", str(test.cpus_per_task),
                                 "-g", str(test.ngpu),
@@ -609,6 +624,7 @@ class lsfMachine (machines.Machine):
 
                         elif test.cpusPerTask > 0:
                             return ["jsrun",
+                                str_smpi,
                                 "--np", str(np),
                                 "-c", str(test.cpusPerTask),
                                 "-g", str(test.ngpu),
@@ -624,6 +640,7 @@ class lsfMachine (machines.Machine):
                             #] + str_lrun_jsrun_args.split() + commandList
 
                             return ["jsrun",
+                                str_smpi,
                                 "-n", "1",
                                 "-r", "1",
                                 "-a", str(np),
