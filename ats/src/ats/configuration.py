@@ -62,9 +62,9 @@ def addOptions(parser):
 * default dest is long option name else short option name
 """
     if SYS_TYPE.startswith('toss'):
-        sleepBeforeSrunDefault=0
+        sleepBeforeRunDefault=0.0
     else:
-        sleepBeforeSrunDefault=0
+        sleepBeforeRunDefault=0.0
 
     parser.set_defaults(
         allInteractive=False,
@@ -118,7 +118,7 @@ def addOptions(parser):
         ompNumThreads=0,
         cpusPerTask=-1,
         ompDisplayEnv=False,
-        sleepBeforeSrun=sleepBeforeSrunDefault,
+        sleepBeforeRun=sleepBeforeRunDefault,
         sequential=False,
         nosrun=False,
         salloc=False,
@@ -260,8 +260,11 @@ def addOptions(parser):
 #        parser.add_option('--mpibind', action='store_true', dest='blueos_mpibind',
 #            help='Blueos option: Run the application under the mpibind executable. This is necessary to access GPU device on Power8 (rzmanta) using mpirun. Default to off.')
 #
-    parser.add_option('--sleepBeforeSrun', dest='sleepBeforeSrun', type='int',
-        help='Number of seconds to sleep before each srun. Default is 0 on all systems.')
+    parser.add_option('--sleepBeforeRun', dest='sleepBeforeRun', type='float',
+        help='Number of seconds to sleep before each run. Default is 0.0 on all systems.')
+
+    parser.add_option('--sleepBeforeSrun', dest='sleepBeforeRun', type='float',
+        help='Deprecated.  Renamed to sleepBeforeRun  Will treat as sleepBeforeRun');
 
     parser.add_option('--continueFreq', dest='continueFreq', type='float',
         help="""Frequency in minutes to write a continuation file. The default

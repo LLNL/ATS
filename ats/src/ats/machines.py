@@ -563,25 +563,26 @@ The subprocess part of launch. Also the part that might fail.
                 #print "DEBUG MachineCore._launch 020 "
                 testStdin = open(test.directory + '/' + stdin_file)
 
+
             # 2016-09-01
             # Starting jobs too fast confuses slurm and MPI.  Short wait between each job submittal
             # This showsd up with my atsHello test program
             # Default sleep is 1 on toss, 0 on other systems, may be set by user on command line
+            #
             # 2016-12-02
             # Default sleep is now 0 on all systems.
-            if hasattr(test, 'runningWithinSalloc'):
-                if configuration.options.sleepBeforeSrun > 0:
+            #
+            # 2021-Sep-21  
+            # Per project request.  If nosrun is on, do not sleep (as we are not using MPI in that scenario)
+            #
+            nosrun  = test.options.get('nosrun', False)
+            if nosrun == False:
+                if configuration.options.sleepBeforeRun > 0.0:
                     if MachineCore.printSleepBeforeSrunNotice:
                         MachineCore.printSleepBeforeSrunNotice = False
-                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
-                    time.sleep(configuration.options.sleepBeforeSrun)
-            else:
-                if configuration.options.sleepBeforeSrun > 0:
-                    if MachineCore.printSleepBeforeSrunNotice:
-                        MachineCore.printSleepBeforeSrunNotice = False
-                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
-                    time.sleep(configuration.options.sleepBeforeSrun)
-
+                        print("ATS Info: MachineCore._launch Will sleep %f seconds before each srun " % configuration.options.sleepBeforeRun)
+                    # print("ATS SAD DEBUG 010: MachineCore._launch sleeping %f seconds beforesrun " % configuration.options.sleepBeforeRun)
+                    time.sleep(configuration.options.sleepBeforeRun)
 
             if testStdout == 'file':
                 # Get the file handles for standard out and standard error
