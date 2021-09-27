@@ -1,9 +1,7 @@
-#!/usr/apps/ats/7.1.0/bin/python
-import sys
-sys.dont_write_bytecode = True
 import os
 import shutil
 import subprocess
+import sys
 from subprocess import Popen, PIPE
 from ats.util.generic_utils import execute, clean_old_sandboxes, \
                                      clean_old_ats_log_dirs, \
