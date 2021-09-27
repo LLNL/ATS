@@ -36,7 +36,7 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 #
 #  HACK: MACHINE_DIR and MACHINE__OVERRIDE_DIR used until discussion with dependent projects 
 
-import atsMachines
+from ats import atsMachines
 MACHINE_DIR = []
 if "MACHINE_OVERRIDE_DIR" in os.environ.keys():
     MACHINE_DIR.append(abspath(os.environ.get('MACHINE_OVERRIDE_DIR')))
