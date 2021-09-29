@@ -483,8 +483,13 @@ def init(clas = '', adder = None, examiner=None):
                     specFoundIn = full_path
                     print(f"from ats.atsMachines.{moduleName} "
                           f"import {machineClass} as Machine")
-                    machine_factory = get_machine_factory(moduleName,
-                                                          machineClass)
+                    try:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass)
+                    except ModuleNotFoundError:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass,
+                                                              machine_package='atsMachines')
                     machine = machine_factory(machineName, int(npMaxH))
 
             elif line.startswith('#BATS:') and not batchmachine:
@@ -495,8 +500,13 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     bspecFoundIn = full_path
-                    machine_factory = get_machine_factory(moduleName,
-                                                          machineClass)
+                    try:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass)
+                    except ModuleNotFoundError:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass,
+                                                              machine_package='atsMachines')
                     batchmachine = machine_factory(moduleName, int(npMaxH))
         f.close()
 
