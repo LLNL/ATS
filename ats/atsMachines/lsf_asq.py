@@ -33,7 +33,7 @@ else:
     physical_cores_per_node = 20
     cores_per_socket = 10
 
-from times import hm, Duration, timeSpecToSec
+from ats.times import hm, Duration, timeSpecToSec
 
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
 
