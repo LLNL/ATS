@@ -66,10 +66,10 @@ Append the path to ats/__init__.py to $PYTHONPATH as seen below:
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # bash and zsh users
-export PYTHONPATH=$PYTHONPATH:<CLONE_PATH>/ats/src/
+export PYTHONPATH=$PYTHONPATH:<CLONE_PATH>/ats
 
 # (t)csh users. Note that the colon is commented out
-setenv PYTHONPATH $PYTHONPATH\:<CLONE_PATH>/ats/src/
+setenv PYTHONPATH $PYTHONPATH\:<CLONE_PATH>/ats
 ```
 
 ## Getting Involved
