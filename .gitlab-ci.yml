@@ -25,5 +25,5 @@ default:
 hello_ATS_TOSS:
   extends: [.hello_ATS, .run_quartz_shell]
 
-# hello_ATS_BLUEOS:
-#   extends: [.hello_ATS, .run_lassen_shell]
+hello_ATS_BLUEOS:
+  extends: [.hello_ATS, .run_lassen_shell]
