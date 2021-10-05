@@ -4,8 +4,7 @@ from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
                   RUNNING, FILTERED, CREATED, TIMEDOUT, HALTED, EXPECTED,\
                   abspath, AtsError, is_valid_file, debug, statuses, \
                   AttributeDict
-from ats.times import datestamp, Duration, wallTime, wallTimeSecs, \
-                  atsStartTimeLong
+from ats.times import datestamp, Duration, wallTime, atsStartTimeLong
 from ats.tests import AtsTest
 from ats.log import log, terminal
 

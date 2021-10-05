@@ -1,4 +1,7 @@
-import os,glob
+import glob
+import os
+from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, RUNNING, \
+                      FILTERED, TIMEDOUT
 
 def findAtsrFile(testDir):
     '''Uses glob to find the atsr.py file.

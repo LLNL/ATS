@@ -1,5 +1,5 @@
 import sys, os
-from ats.atsut import abspath, AtsError, debug
+from ats.atsut import abspath
 
 class AtsLog(object):
     "Log and stderr echo facility"
@@ -110,7 +110,6 @@ class AtsLog(object):
         try:
             self('Fatal error:', msg, echo=True)
         except Exception:
-            print >>sys.stderr, msg
             print(msg, file=sys.stderr)
         raise SystemExit(1)
 

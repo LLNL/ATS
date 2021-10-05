@@ -8,10 +8,10 @@ ATSROOT, cuttime, log.
 The log object is created by importing log, but it can't write to a file
 until we process the options and get the desired properties.
 """
-import os, sys, socket
+import os, sys
 import importlib
 from optparse import OptionParser
-from ats import version, atsut
+from ats import version
 from ats.atsut import debug, AttributeDict, abspath
 from ats.log import log, terminal
 from ats.times import atsStartTime, Duration
@@ -590,7 +590,6 @@ def init(clas = '', adder = None, examiner=None):
     timelimit = Duration(options.timelimit)
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
-    commandList = machine.split(repr(defaultExecutable))
     if 'ATSROOT' in os.environ:
         ATSROOT = os.environ['ATSROOT']
     else:

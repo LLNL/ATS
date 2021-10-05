@@ -1,5 +1,5 @@
 "times: everything to do with timing"
-import os, time, traceback
+import os, time
 from ats.atsut import AtsError
 _times_at_start = os.times()
 _localtime = time.localtime()

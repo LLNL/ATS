@@ -1,4 +1,4 @@
-import os, sys
+import os
 from ats.attributedict import AttributeDict
 
 statuses = AttributeDict()
