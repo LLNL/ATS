@@ -7,7 +7,8 @@ from ats import log, terminal
 from ats import configuration
 from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, LSFERROR, statuses
 
-import utils, math
+from ats.atsMachines import utils
+import math
 import sys, os, time
 from subprocess import check_output
 
@@ -32,7 +33,7 @@ else:
     physical_cores_per_node = 20
     cores_per_socket = 10
 
-from times import hm, Duration, timeSpecToSec
+from ats.times import hm, Duration, timeSpecToSec
 
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
 
@@ -704,7 +705,8 @@ class lsfMachine (machines.Machine):
         # then we can not run yet, as LSF will simply submit cancel the
         # pending job
         if self.runningWithinBsub == False:
-            my_output = check_output("lsfjobs | grep `whoami` | wc -l", shell=True);
+            my_output = check_output("lsfjobs | grep `whoami` | wc -l",
+                                     shell=True, text=True);
             my_num_lsf_jobs_running = int(my_output)
 
             if nosrun == False:

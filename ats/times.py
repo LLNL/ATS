@@ -1,5 +1,5 @@
 "times: everything to do with timing"
-import os, time, traceback
+import os, time
 from ats.atsut import AtsError
 _times_at_start = os.times()
 _localtime = time.localtime()
@@ -61,6 +61,9 @@ Example::
 """
     def __init__ (self, value=0):
         self.value = timeSpecToSec(value)
+
+    def __hash__(self):
+        return hash(self.value)
 
     def __gt__(self, other):
         if isinstance(other, Duration):

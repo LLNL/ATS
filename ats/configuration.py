@@ -8,9 +8,10 @@ ATSROOT, cuttime, log.
 The log object is created by importing log, but it can't write to a file
 until we process the options and get the desired properties.
 """
-import os, sys, socket
+import os, sys
+import importlib
 from optparse import OptionParser
-from ats import version, atsut
+from ats import version
 from ats.atsut import debug, AttributeDict, abspath
 from ats.log import log, terminal
 from ats.times import atsStartTime, Duration
@@ -35,7 +36,7 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 #
 #  HACK: MACHINE_DIR and MACHINE__OVERRIDE_DIR used until discussion with dependent projects 
 
-import atsMachines
+from ats import atsMachines
 MACHINE_DIR = []
 if "MACHINE_OVERRIDE_DIR" in os.environ.keys():
     MACHINE_DIR.append(abspath(os.environ.get('MACHINE_OVERRIDE_DIR')))
@@ -394,12 +395,26 @@ def documentConfiguration():
     log('ATS version:', version.version)
     log('Options:')
     log.indent()
-    olist = options.keys()
+    olist = list(options.keys())
     olist.sort()
     for k in olist:
         log(k + ":", repr(getattr(options, k)))
     log.dedent()
     log.dedent()
+
+def get_machine_factory(module_name, machine_class,
+                        machine_package='ats.atsMachines'):
+    """
+    Get factory of type "machine_class" found in "module_name".
+
+    Programmatically import and return definition of machine_class from
+    module_name. "machine_package" tells Python where module_name can be found if
+    not in the project's root directory.
+    """
+    machine_module = importlib.import_module(f'.{module_name}',
+                                             package=machine_package)
+    machine_factory = getattr(machine_module, machine_class)
+    return machine_factory
 
 def init(clas = '', adder = None, examiner=None):
     """Called by manager.init(class, adder, examiner)
@@ -466,9 +481,16 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     specFoundIn = full_path
-                    print("from ats.atsMachines.%s import %s as Machine" % (moduleName, machineClass))
-                    exec('from ats.atsMachines.%s import %s as Machine' % (moduleName, machineClass))
-                    machine = Machine(machineName, int(npMaxH))
+                    print(f"from ats.atsMachines.{moduleName} "
+                          f"import {machineClass} as Machine")
+                    try:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass)
+                    except ModuleNotFoundError:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass,
+                                                              machine_package='atsMachines')
+                    machine = machine_factory(machineName, int(npMaxH))
 
             elif line.startswith('#BATS:') and not batchmachine:
                 items = line[6:-1].split()
@@ -478,9 +500,14 @@ def init(clas = '', adder = None, examiner=None):
                     if moduleName == "SELF":
                         moduleName, junk = os.path.splitext(fname)
                     bspecFoundIn = full_path
-                    exec('from ats.atsMachines.%s import %s as BMachine' % (moduleName, machineClass))
-                    batchmachine = BMachine(moduleName, int(npMaxH))
-
+                    try:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass)
+                    except ModuleNotFoundError:
+                        machine_factory = get_machine_factory(moduleName,
+                                                              machineClass,
+                                                              machine_package='atsMachines')
+                    batchmachine = machine_factory(moduleName, int(npMaxH))
         f.close()
 
         if machine and batchmachine:
@@ -563,7 +590,6 @@ def init(clas = '', adder = None, examiner=None):
     timelimit = Duration(options.timelimit)
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
-    commandList = machine.split(repr(defaultExecutable))
     if 'ATSROOT' in os.environ:
         ATSROOT = os.environ['ATSROOT']
     else:

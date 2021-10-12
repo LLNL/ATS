@@ -1,12 +1,10 @@
-from __future__ import print_function
 import os, re, sys, time, tempfile, traceback, socket
 from ats import configuration, version
 from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
                   RUNNING, FILTERED, CREATED, TIMEDOUT, HALTED, EXPECTED,\
                   abspath, AtsError, is_valid_file, debug, statuses, \
                   AttributeDict
-from ats.times import datestamp, Duration, wallTime, wallTimeSecs, \
-                  atsStartTimeLong
+from ats.times import datestamp, Duration, wallTime, atsStartTimeLong
 from ats.tests import AtsTest
 from ats.log import log, terminal
 
@@ -142,7 +140,7 @@ Attributes:
         log("Test environment symbols:", logging=logging, echo=echo)
         log.indent()
         if not words:
-            words = testEnvironment.keys()
+            words = list(testEnvironment.keys())
             words.sort()
         for key in words:
             try:
@@ -255,7 +253,7 @@ Attributes:
             log.indent()
             os.chdir(directory)
             try:
-                execfile(t1, testenv)
+                exec(compile(open(t1, "rb").read(), t1, 'exec'), testenv)
                 if debug(): log('Finished ', t1, datestamp())
                 result = 1
             except KeyboardInterrupt:
@@ -971,7 +969,7 @@ BATCHED = ats.BATCHED
                 remaining[t.serialNumber] = t
 
         while remaining:
-            sns = remaining.keys()
+            sns = list(remaining.keys())
             u = remaining[sns[0]]
             brothers = [v for v in remaining.values() if areBrothers(u, v)]
             for v in brothers:

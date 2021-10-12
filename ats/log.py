@@ -1,11 +1,10 @@
-from __future__ import print_function
 import sys, os
-from ats.atsut import abspath, AtsError, debug
+from ats.atsut import abspath
 
-class AtsLog (object):
+class AtsLog(object):
     "Log and stderr echo facility"
-    def __init__ (self, directory = '', name='',
-                  echo=True, logging = False, indentation='   '):
+    def __init__(self, directory = '', name='',
+                 echo=True, logging = False, indentation='   '):
         super(AtsLog, self).__init__ ()
         self.reset()
         self.echo=echo
@@ -16,7 +15,7 @@ class AtsLog (object):
         self.set(directory=directory, name = name)
         self.logging = logging
 
-    def set (self, directory = '', name = ''):
+    def set(self, directory = '', name = ''):
         "Set the name and directory of the log file."
         if not directory:
             directory = os.getcwd()
@@ -26,7 +25,7 @@ class AtsLog (object):
         self.shortname = name
         self.name = os.path.join(self.directory, self.shortname)
 
-    def reset (self):
+    def reset(self):
         "Erase indentation history."
         self.__previous = []
 
@@ -61,10 +60,13 @@ class AtsLog (object):
                 print(indentation + line, file=d)
             print('', file=d)
 
-    def write (self, *items, **kw):
+    def write(self, *items, **kw):
         "Write one line, like a print. Keywords echo and logging."
         echo = kw.get('echo', self.echo)
         logging = kw.get('logging', self.logging)
+        if not echo and not logging:
+            return
+
         content = self.leading + ' '.join([str(k) for k in items])
 
         #
@@ -82,50 +84,32 @@ class AtsLog (object):
         else:
             lines = [content]
 
-        first_line = True
-        for line in lines:
-            if logging:
-                d = self._open(self.name, self.mode)
-                self.mode = 'a'
-                if first_line:
-                    print(line, file=d)
-                else:
-                    print("    %s" % line, file=d)
-                d.close()
-
-            if echo:
-                d = sys.stderr
-                d.flush()
-                if first_line:
-                    try:
-                        print(line, file=d)
-                    except:
-                        pass
-                else:
-                    try:
-                        print("    %s" % line, file=d)
-                    except:
-                        pass
-            first_line = False
+        indented_lines = "\n    ".join(lines)
+        if echo:
+            print(indented_lines, file=sys.stderr)
+        if logging:
+            if not os.path.isdir(self.directory):
+                os.makedirs(self.directory)
+            with open(self.name, 'a') as log_file:
+                print(indented_lines, file=log_file)
 
     __call__ = write
 
-    def indent (self):
+    def indent(self):
         self.__previous.append(self.leading)
         self.leading += self.indentation
 
-    def dedent (self):
+    def dedent(self):
         try:
             self.leading = self.__previous.pop()
         except IndexError:
             pass
 
-    def fatal_error (self, msg):
+    def fatal_error(self, msg):
         "Issue message and die."
         try:
             self('Fatal error:', msg, echo=True)
         except Exception:
-            print >>sys.stderr, msg
             print(msg, file=sys.stderr)
         raise SystemExit(1)
 

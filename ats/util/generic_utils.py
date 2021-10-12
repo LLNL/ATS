@@ -7,24 +7,9 @@ import shlex
 import shutil
 import stat
 
+from ats import log
+import subprocess
 from subprocess import Popen, PIPE, CalledProcessError, STDOUT
-
-try:
-
-    from ats import log
-
-except ImportError:
-    format = """
-  WARNING: log cannot be imported from ats module in generic_utils.py,
-           while executing script %s.
-           Using built in version of log.
-  """
-    # sys.stderr.write(format % sys.argv[0])
-    def log( message, echo=False):
-        if echo:
-            sys.stdout.write( message + '\n' )
-
-
 
 # Define module variables to hold names of ASC and project modules
 # for dynamic loading of module members.
@@ -46,6 +31,7 @@ def importName( moduleName, name, default_func=None, verbose=False ):
         print("Loading %s from %s." % (name, moduleName))
     func = default_func
     try:
+        print("WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
         my_mod = __import__( moduleName, globals(), locals(), [name] )
         func   =  vars(my_mod)[name]
     except ImportError as value:
@@ -120,39 +106,23 @@ def execute(cmd_line, file_name=None, verbose=False):
     """
     Function to run a command and display output to screen.
     """
-    log('Execute command line: %s' % cmd_line, echo = verbose)
+    log(f'Execute command line: {cmd_line}', echo=verbose)
+    completed_process = subprocess.run(cmd_line.split(), text=True,
+                                       stdout=PIPE, stderr=STDOUT)
+    if verbose:
+        # Writes to ats.log
+        log(completed_process.stdout, echo=True)
+    if file_name:
+        with open(file_name, 'w') as log_file:
+            log_file.write(f'Command: {cmd_line}\n{completed_process.stdout}')
+            if completed_process.returncode:
+                log_file('Command failed: error code '
+                         f'{completed_process.returncode}')
+    if completed_process.returncode:
+        log(f'Command failed: error code {completed_process.returncode}',
+            echo=True)
 
-    if file_name is not None:
-        execute_ofp = open(file_name, 'w')
-        execute_ofp.write( 'Command: %s' % cmd_line)
-
-    process = Popen(cmd_line, shell=True, stdout=PIPE, stderr=STDOUT)
-
-    # Poll process for new output until finished
-    while True:
-        nextline = process.stdout.readline()
-        if (nextline == '' and process.poll() != None):
-            break
-        if (verbose == True):
-            #sys.stdout.write(nextline)
-            # sys.stdout.flush()
-            log(nextline[:-1], echo=True)
-        if file_name is not None:
-            execute_ofp.write(nextline)
-
-    output = process.communicate()[0]
-    exitCode = process.returncode
-
-    if exitCode:
-        if file_name is not None:
-            execute_ofp.write( 'Command failed: error code %d\n' % exitCode)
-
-        log('Command failed: error code %d' % exitCode, echo=True)
-
-    if file_name is not None:
-        execute_ofp.close()
-
-    return exitCode
+    return completed_process.returncode
 
 
 ####################################################################################

@@ -1,19 +1,41 @@
-import os, sys, time, re
+import os
+import re
+import time
 from ats import configuration
 from ats.log import log
 from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, RUNNING,\
-                  CREATED, FILTERED, TIMEDOUT, HALTED, LSFERROR, EXPECTED, statuses, \
+                  CREATED, FILTERED, TIMEDOUT, HALTED, EXPECTED, \
                   is_valid_file, debug, AtsError, abspath, AttributeDict
 
-from ats.times import hms, datestamp, curDateTime, Duration
+from ats.times import hms, curDateTime, Duration
 from ats.executables import Executable
 
-class AtsTestGroup (list):
+class AtsTestGroup(list):
     "A group of tests."
-    def __init__ (self, number):
-        list.__init__([])
+    def __init__(self, number):
         self.number = number
         self.isBlocking = False
+
+    def __hash__(self):
+        return hash(self.number)
+
+    def __ge__(self, other):
+        return self.number >= other.number
+
+    def __gt__(self, other):
+        return self.number > other.number
+
+    def __le__(self, other):
+        return self.number <= other.number
+
+    def __lt__(self, other):
+        return self.number < other.number
+
+    def __eq__(self, other):
+        return self.number == other.number
+
+    def __ne__(self, other):
+        return self.number != other.number
 
     def isFinished(self):
         "Any left to run?"
@@ -301,6 +323,27 @@ class AtsTest (object):
                 self.notes.append(\
                     "Changed to batch since unable to run interactively on this machine.")
 
+    def __hash__(self):
+        return hash(self.totalPriority)
+
+    def __ge__(self, other):
+        return self.totalPriority >= other.totalPriority
+
+    def __gt__(self, other):
+        return self.totalPriority > other.totalPriority
+
+    def __le__(self, other):
+        return self.totalPriority <= other.totalPriority
+
+    def __lt__(self, other):
+        return self.totalPriority < other.totalPriority
+
+    def __eq__(self, other):
+        return self.totalPriority == other.totalPriority
+
+    def __ne__(self, other):
+        return self.totalPriority != other.totalPriority
+
     def __invert__ (self):
         """Responds to the ~ operator by setting the expected status FAILED,
            returning this test object. Note unusual alteration of an operand.
@@ -379,7 +422,7 @@ class AtsTest (object):
     def __repr__(self):
         return "Test #%d %s %s" %(self.serialNumber, self.name, self.status)
 
-    def __nonzero__ (self):
+    def __bool__ (self):
         "It is not proper to test the truth of a test."
         self.set(FAILED, 'if test(...) not allowed.')
         log(self, echo=True)

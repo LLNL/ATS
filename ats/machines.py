@@ -1,10 +1,9 @@
 """Definition of class Machine for overriding.
 """
-from __future__ import print_function
 import subprocess, sys, os, time, shlex
-from ats.atsut import debug, RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
-     CREATED, SKIPPED, HALTED, EXPECTED, statuses, AttributeDict, AtsError
-from ats.log import log, terminal, AtsLog
+from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
+     SKIPPED, HALTED, AttributeDict, AtsError
+from ats.log import log, terminal
 from shutil import copytree, ignore_patterns
 
 def comparePriorities (t1, t2):

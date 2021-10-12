@@ -7,23 +7,6 @@ across a variety of HPC platforms.
 
 ## Getting Started
 
-These are the Python 2 based 'old style' install instructions.  They depend on
-one having a Python 2 installed in user writable location, and then ATS is
-installed into that location.  This python should include installs of numpy,
-matplotlib, and scipy which are used by ATS. You can contact dawson6@llnl.gov
-if one needs help with this Python install.
-
-Once one has this done, ATS is installed like so:
-
-    git clone git@github.com:LLNL/ATS.git
-    cd ATS
-    /path/to/your/writable/python setup-py2.py install;
-
-When we finish the port to Python 3, a new  installation method will be used,
-which does not depend on a user building Python.
-
-### Getting Started With pip
-
 ATS usage and expectations vary among its user base. This also applies to how
 ATS is installed. Below are a few variations that users may find helpful.
 
@@ -36,13 +19,13 @@ in a shared environment.
 Examaple installation:
 
 ```
-# Create a fresh Python 2.7 executable to be shared.
-python2 -m virtualenv --system-site-packages --python=python2.7 <NEW_ENV_PATH>
+# Create a fresh Python 3.8 (or higher) executable to be shared.
+python3 -m virtualenv --system-site-packages --python=python3.8 <NEW_ENV_PATH>
 
 # Clone ATS
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
-# pip install cloned ATS into fresh shared Python 2.7 executable.
+# pip install cloned ATS into fresh shared Python 3.8 (or higher) executable.
 <NEW_ENV_PATH>/bin/python -m pip install <CLONE_PATH>
 ```
 
@@ -56,7 +39,7 @@ source code directly.
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # pip install cloned ATS into <DESTINATION_PATH>
-python2 -m pip install <CLONE_PATH> --target=<DESTINATION_PATH>
+python3 -m pip install <CLONE_PATH> --target=<DESTINATION_PATH>
 ```
 
 #### Local/user install
@@ -70,7 +53,7 @@ when needed.
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # pip install cloned ATS into <DESTINATION_PATH>
-python2 -m pip install --user <CLONE_PATH>
+python3 -m pip install --user <CLONE_PATH>
 ```
 
 #### Using ATS without installing
@@ -83,10 +66,10 @@ Append the path to ats/__init__.py to $PYTHONPATH as seen below:
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # bash and zsh users
-export PYTHONPATH=$PYTHONPATH:<CLONE_PATH>/ats/src/
+export PYTHONPATH=$PYTHONPATH:<CLONE_PATH>/ats
 
 # (t)csh users. Note that the colon is commented out
-setenv PYTHONPATH $PYTHONPATH\:<CLONE_PATH>/ats/src/
+setenv PYTHONPATH $PYTHONPATH\:<CLONE_PATH>/ats
 ```
 
 ## Getting Involved

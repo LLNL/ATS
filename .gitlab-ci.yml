@@ -10,7 +10,8 @@ default:
 .hello_ATS:
   stage: test
   script:
-    - python2 -m virtualenv --python=python2.7 TEST_VENV
+    - ml python/3.8
+    - python3 -m virtualenv --python=python3.8 TEST_VENV
     - source TEST_VENV/bin/activate
     - pip install .
     - cd test/HelloATS
@@ -24,5 +25,5 @@ default:
 hello_ATS_TOSS:
   extends: [.hello_ATS, .run_quartz_shell]
 
-# hello_ATS_BLUEOS:
-#   extends: [.hello_ATS, .run_lassen_shell]
+#hello_ATS_BLUEOS:
+#  extends: [.hello_ATS, .run_lassen_shell]

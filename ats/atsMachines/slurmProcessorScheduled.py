@@ -11,19 +11,20 @@
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64
 
 import inspect
+import math
+import sys, os, time, subprocess
 
 from ats import machines, debug, atsut
 from ats import log, terminal
 from ats import configuration
 from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, statuses
-import utils, math
-import lcMachines
-import sys, os, time, subprocess
+from ats.atsMachines import utils
+from ats.atsMachines import lcMachines
 
 
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
 
-class SlurmProcessorScheduled (lcMachines.LCMachineCore):
+class SlurmProcessorScheduled(lcMachines.LCMachineCore):
 
     lastMessageLine = 0
     remainingCapacity_numNodesReported = -1
@@ -37,11 +38,11 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
     slurm_version_str=""
     slurm_version_int=0
 
-    def init (self):
+    def init(self):
 
         # Identify the slurm version so ATS may account for differences
         # in slurm behavior
-        tstr = subprocess.check_output(['srun', '--version'])
+        tstr = subprocess.check_output(['srun', '--version'], text=True)
         tarray=tstr.split() 
         SlurmProcessorScheduled.slurm_version_str=tarray[1]
         log('SLURM VERSION STRING', SlurmProcessorScheduled.slurm_version_str)

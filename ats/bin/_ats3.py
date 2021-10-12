@@ -1,4 +1,3 @@
-#!/usr/apps/ats/7.1.0/bin/python
 import sys
 import ats
 

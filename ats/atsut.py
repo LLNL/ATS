@@ -1,4 +1,4 @@
-import os, sys
+import os
 from ats.attributedict import AttributeDict
 
 statuses = AttributeDict()
@@ -29,7 +29,7 @@ class _StatusCode:
     def __eq__(self, other):
         if isinstance(other, _StatusCode):
             return self.name == other.name
-        elif isinstance(other, basestring):
+        elif isinstance(other, str):
             return self.name == other or self.abr == other
         else:
             return False
