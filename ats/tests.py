@@ -324,7 +324,7 @@ class AtsTest (object):
                     "Changed to batch since unable to run interactively on this machine.")
 
     def __hash__(self):
-        return hash(self.totalPriority)
+        return hash(self.serialNumber)
 
     def __ge__(self, other):
         return self.totalPriority >= other.totalPriority
@@ -339,10 +339,10 @@ class AtsTest (object):
         return self.totalPriority < other.totalPriority
 
     def __eq__(self, other):
-        return self.totalPriority == other.totalPriority
+        return self.serialNumber == other.serialNumber
 
     def __ne__(self, other):
-        return self.totalPriority != other.totalPriority
+        return self.serialNumber != other.serialNumber
 
     def __invert__ (self):
         """Responds to the ~ operator by setting the expected status FAILED,
