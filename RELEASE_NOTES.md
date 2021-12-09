@@ -1,5 +1,9 @@
 # ATS Release Notes
 
+## 8.0.0
+
+* Port to Python 3.8
+
 ## 7.1
 
 * xyz
