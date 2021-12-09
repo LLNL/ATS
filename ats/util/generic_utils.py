@@ -74,7 +74,7 @@ def runCommand( cmd_line, file_name=None, exit=True, verbose=False):
             stdout_pipe = PIPE
             stderr_pipe = PIPE
 
-        (stdout_txt, stderr_txt) = Popen(popen_args, stdout=stdout_pipe, stderr=stderr_pipe).communicate()
+        (stdout_txt, stderr_txt) = Popen(popen_args, stdout=stdout_pipe, stderr=stderr_pipe, text=True).communicate()
 
         if file_name is not None:
             stdout_pipe.close()

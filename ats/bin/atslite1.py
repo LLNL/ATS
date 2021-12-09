@@ -2,7 +2,6 @@ import os
 import shutil
 import subprocess
 import sys
-from subprocess import Popen, PIPE
 from ats.util.generic_utils import execute, clean_old_sandboxes, \
                                      clean_old_ats_log_dirs, \
                                      set_machine_type_based_on_sys_type, \

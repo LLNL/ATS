@@ -51,7 +51,7 @@ def getAllHostnames():
         import subprocess
         import getpass
 
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
         stdout_value = proc.communicate()[0]
 
         if (len(stdout_value)==0):
@@ -348,7 +348,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
     # Determine who the user is..
     #--------------------------------------------------
     cmd= "whoami"
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     return taskTotal
 
@@ -361,7 +361,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
     # Determine who the user is..
     #--------------------------------------------------
     cmd= "whoami"
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     stdout_value = proc.communicate()[0]
     if (len(stdout_value)==0):
@@ -386,7 +386,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
         os.unsetenv('SQUEUE_FORMAT')
 
     squeueCmd= "squeue -s -u " + userName
-    proc = subprocess.Popen(squeueCmd, shell=True, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(squeueCmd, shell=True, stdout=subprocess.PIPE, text=True)
     stdout_value = proc.communicate()[0]
 
     if (len(stdout_value)==0):          # no return values
@@ -419,7 +419,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
     for ii in range(inMaxStep):
         # embed the process id into the job name to distinguish between invocation of the ats.
         cmd= "srun -N1 -J %d_%d -n 1 -r %d sleep 5" % ( ii, os.getpid(), ii )
-        sleepProc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        sleepProc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     #--------------------------------------------------
     # "squeue -s -u userName " --- again to check which node corresponds to the step
@@ -428,7 +428,7 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
     # continue issuing the squeueCmd until all the nodes corresponding to the step are found.
     stepIdToCheck= None
     while 1:
-        proc = subprocess.Popen(squeueCmd, shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.Popen(squeueCmd, shell=True, stdout=subprocess.PIPE, text=True)
         stdout_value = proc.communicate()[0]
         if (len(stdout_value)==0):
             return None
@@ -500,7 +500,7 @@ def getNumberOfProcessorsPerNode(useNode=None):
 
             cmd = 'scontrol show node | head -2 '
 
-            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
             stdout_value = proc.communicate()[0]
 
             cmdVal= repr(stdout_value)
@@ -531,7 +531,7 @@ def getNumberOfProcessorsPerNode(useNode=None):
             sshCmd= 'ssh ' + useNode + ' '
             cmdToUse= sshCmd + '"' + catCmd + '"'
 
-        proc= subprocess.Popen(cmdToUse, shell=True, stdout=subprocess.PIPE,)
+        proc = subprocess.Popen(cmdToUse, shell=True, stdout=subprocess.PIPE, text=True)
         stdout_value = proc.communicate()[0]
         numCpu = stdout_value.split()[0]   # another way of getting CPUs
         return  int(numCpu)
@@ -546,7 +546,7 @@ def getNumberOfProcessorsPerNode(useNode=None):
 
 def runThisCommand(cmd):
     import subprocess
-    aProcess= subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    aProcess = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
     aProcess.wait()
     output = aProcess.communicate()[0]
     returnCode= aProcess.returncode
