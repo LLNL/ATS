@@ -600,14 +600,14 @@ The subprocess part of launch. Also the part that might fail.
                 #print "DEBUG MachineCore._launch 050 "
                 #print "DEBUG MachineCore._launch %s " % test.commandList
                 #print E
-                #test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E)
-                    test.child = subprocess.Popen(test.commandList, universal_newlines=True, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E)
+                #test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E, text=True)
+                    test.child = subprocess.Popen(test.commandList, universal_newlines=True, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E, text=True)
                     #test.child.wait()
                 else:
                     #print "DEBUG MachineCore._launch 110 "
                     #print testStdin
                     #print "DEBUG MachineCore._launch 120 test.directory = %s" % test.directory
-                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = outhandle, stderr = errhandle, env=E, stdin=testStdin)
+                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = outhandle, stderr = errhandle, env=E, stdin=testStdin, text=True)
 
             elif testStdout == 'terminal':
                 if MachineCore.debugClass:
@@ -615,9 +615,9 @@ The subprocess part of launch. Also the part that might fail.
 
 
                 if stdin_file is None:
-                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, env=E)
+                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, env=E, text=True)
                 else:
-                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, env=E, stdin=testStdin)
+                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, env=E, stdin=testStdin, text=True)
 
             elif testStdout == 'both':
                 # Get the file handles for standard out and standard error
@@ -630,7 +630,7 @@ The subprocess part of launch. Also the part that might fail.
                     print("DEBUG MachineCore._launch Invoking Popen 3 %s " % test.commandList)
 
                 if stdin_file is None:
-                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = subprocess.PIPE, stderr=subprocess.STDOUT, env=E)
+                    test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = subprocess.PIPE, stderr=subprocess.STDOUT, env=E, text=True)
                 else:
                     test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = subprocess.PIPE, stderr=subprocess.STDOUT, env=E, stdin=testStdin)
 
@@ -674,7 +674,7 @@ The subprocess part of launch. Also the part that might fail.
         if file_name is not None:
             execute_ofp = open(file_name, 'w')
 
-        process = subprocess.Popen(cmd_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        process = subprocess.Popen(cmd_line, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
         # Poll process for new output until finished
         while True:
@@ -727,7 +727,7 @@ The subprocess part of launch. Also the part that might fail.
             " " + '"' + my_directory + '"' + \
             " " + '"' + my_outname + '"' + \
             " " + '"' + my_commandLine + '"', \
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
         # Poll process for new output until finished
         while True:

@@ -45,7 +45,8 @@ class CommandRunner(object):
                     args,
                     env=os.environ,
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
+                    stderr=subprocess.PIPE,
+                    text=True)
                 Output_Stream = p1.communicate()[0]
             except OSError as e :
                 if e.errno==2:

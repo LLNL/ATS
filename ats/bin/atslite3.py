@@ -1,7 +1,7 @@
 import os
 import shutil
 import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen
 from ats.util.generic_utils import execute, clean_old_sandboxes, \
                                      clean_old_ats_log_dirs, \
                                      set_machine_type_based_on_sys_type, \
@@ -167,7 +167,7 @@ def main():
 
     print("Executing: %s" % cmd)
 
-    ats_lite_ats = Popen( cmd, shell=True)
+    ats_lite_ats = Popen(cmd, shell=True, text=True)
 
     ats_lite_ats.wait()
 
