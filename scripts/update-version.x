@@ -1,4 +1,4 @@
-/usr/gapps/ats/scripts/replace 8.0.. 7.0.10 \
+/usr/gapps/ats/scripts/replace 7.0... 7.0.10 \
 setup.cfg \
 ats/bin/_ats.py \
 ats/bin/_ats3.py \
