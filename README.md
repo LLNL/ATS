@@ -16,9 +16,12 @@ A "global" install really means a widely available Python executable with ATS
 modules discoverable in its python path. Useful for multiple different projects
 in a shared environment.
 
-Examaple installation:
+Example installation:
 
 ```
+# Load a python 3.8 module, or otherwise put python 3.8 in your path
+module load python/3.8.2
+
 # Create a fresh Python 3.8 (or higher) executable to be shared.
 python3 -m virtualenv --system-site-packages --python=python3.8 <NEW_ENV_PATH>
 
@@ -35,6 +38,9 @@ A project installation could apply to projects that include ATS in their
 source code directly.
 
 ```
+# Load a python 3.8 module, or otherwise put python 3.8 in your path
+module load python/3.8.2
+
 # Clone ATS
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
@@ -49,6 +55,9 @@ multiple project installs. The user just needs to remember to update their ATS
 when needed.
 
 ```
+# Load a python 3.8 module, or otherwise put python 3.8 in your path
+module load python/3.8.2
+
 # Clone ATS
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
