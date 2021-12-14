@@ -29,7 +29,7 @@ python3 -m virtualenv --system-site-packages --python=python3.8 <NEW_ENV_PATH>
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # pip install cloned ATS into fresh shared Python 3.8 (or higher) executable.
-<NEW_ENV_PATH>/bin/python -m pip install <CLONE_PATH>
+<NEW_ENV_PATH>/bin/python -m pip install <CLONE_PATH>/
 ```
 
 #### Project install
@@ -45,7 +45,7 @@ module load python/3.8.2
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # pip install cloned ATS into <DESTINATION_PATH>
-python3 -m pip install <CLONE_PATH> --target=<DESTINATION_PATH>
+python3 -m pip install <CLONE_PATH>/ --target=<DESTINATION_PATH>
 ```
 
 #### Local/user install
@@ -62,7 +62,7 @@ module load python/3.8.2
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # pip install cloned ATS into <DESTINATION_PATH>
-python3 -m pip install --user <CLONE_PATH>
+python3 -m pip install --user <CLONE_PATH>/
 ```
 
 #### Using ATS without installing
