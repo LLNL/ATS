@@ -1,6 +1,6 @@
 # ATS Release Notes
 
-## 7.0.10
+## 7.0.100
 
 * Port to Python 3.8
 
