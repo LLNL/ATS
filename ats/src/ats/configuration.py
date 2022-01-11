@@ -71,6 +71,7 @@ def addOptions(parser):
         combineOutErr=False,
         unbuffered=False,
         strict_nn=False,
+        useMinNodes=False,
         mpi_um=False,
         bypassSerialMachineCheck=False,
         exclusive=True,
@@ -140,6 +141,9 @@ def addOptions(parser):
 
     parser.add_option('--strict_nn', action='store_true', dest='strict_nn',
         help='Strictly observe test "nn" options, this may result in reduced througput or even slurm srun hangs.')
+
+    parser.add_option('--useMinNodes', action='store_true', dest='useMinNodes',
+        help='Toss 3 option: Pass slurm the minimum number of nodes needed to run the test case.  This is experimental and may reduce throughput or cause hangs..')
 
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
         help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')

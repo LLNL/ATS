@@ -201,6 +201,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         self.salloc    = options.salloc
         self.toss_nn   = options.toss_nn
         self.strict_nn = options.strict_nn
+        self.useMinNodes = options.useMinNodes
         self.timelimit = options.timelimit
 
         if SlurmProcessorScheduled.debugClass:
@@ -385,7 +386,9 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             else:
                 srun_nodes="--nodes=%i-%i" % (num_nodes, num_nodes)
 
-        # ----------------------------------------------------------------------------------------------------------------------------
+        elif self.useMinNodes == True:
+            srun_nodes="--nodes=%i-%i" % (minNodes, minNodes)
+
         # 
         # ----------------------------------------------------------------------------------------------------------------------------
         if num_nodes > 0:
