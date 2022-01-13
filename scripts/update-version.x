@@ -1,4 +1,4 @@
-/usr/gapps/ats/scripts/replace 7.0.. 7.0.7 \
+/usr/gapps/ats/scripts/replace 7.0.. 7.0.5 \
 ats/src/ats/bin/_ats.py \
 ats/src/ats/bin/_ats3.py \
 ats/src/ats/bin/atslite1.py \
