@@ -10,5 +10,5 @@ test/HelloATS/create_test_ats.py \
 test/HelloGPU/READ.ME \
 test/HelloGPU/test.ats \
 
-/usr/gapps/ats/scripts/replace "ATS_PATCH = .." "ATS_PATCH = 100" ats/version.py
+/usr/gapps/ats/scripts/replace "ATS_PATCH = ..." "ATS_PATCH = 100" ats/version.py
 
