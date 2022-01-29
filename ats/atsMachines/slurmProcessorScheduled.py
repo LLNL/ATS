@@ -77,8 +77,8 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
             self.slurmSeesATSProcessAsUsingACore = True
             print("""
 ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
-            ATS Will ignore 'nn' (number of noes) test options and allow processes.
-            to span multiple nodes for better throughput and to help prevent srun hangs
+            ATS Will ignore 'nn' (number of nodes) test options and allow processes
+            to span multiple nodes for better throughput and to help prevent srun hangs.
 
             NOTE: This feature may not fix possible hangs resulting from a single test
                   case which utilizes all allocated cores. Slurm may not see all 
