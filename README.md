@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/ats/badge/?version=main)](https://ats.readthedocs.io/en/main/?badge=main)
+
 # ATS
 
 ## Description
@@ -9,6 +11,8 @@ across a variety of HPC platforms.
 
 ATS usage and expectations vary among its user base. This also applies to how
 ATS is installed. Below are a few variations that users may find helpful.
+
+For more information, please check our [documentation](https://ats.readthedocs.io).
 
 #### "Global" install
 
