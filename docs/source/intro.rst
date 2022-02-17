@@ -185,3 +185,9 @@ If you install ``setuptools`` into your Python, you can get Sphinx with::
 
    easy_install -U Sphinx
 
+.. toctree::
+   :maxdepth: 3
+
+   andyroid
+   ats
+   appendix
