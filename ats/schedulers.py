@@ -27,8 +27,10 @@ class StandardScheduler (object):
         machine = configuration.machine
         self.verbose = configuration.options.verbose or debug() or \
                        configuration.options.skip
-        self.schedule = AtsLog(directory=log.directory, name='atss.log',
-            logging=True, echo=False)
+        self.schedule = AtsLog(directory=log.directory,
+                               name='atss.log',
+                               logging=configuration.options.logUsage,
+                               echo=False)
 
         for t in interactiveTests:
             waitOnMe = [x for x in interactiveTests if t in x.waitUntil]

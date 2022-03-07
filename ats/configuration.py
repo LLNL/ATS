@@ -114,7 +114,7 @@ def addOptions(parser):
         logdir='',
         level=0,
         npMax=0,
-        logUsage=False,
+        logUsage=True,
         okInvalid=False,
         oneFailure=False,
         reportFreq=1,
@@ -315,13 +315,8 @@ statement at the start of the input.""")
         help="Max number of cores per node to utilize. Overrides default ATS detection of cores per node.")
 
     parser.add_option('--noUsageLogging', action='store_false',
-                      dest = 'logUsage',
+                      dest='logUsage',
         help='Turn off logging ATS usage.  (Code and '
-             'test names are never logged.)')
-
-    parser.add_option('--usageLogging', action='store_true',
-                      dest = 'logUsage',
-        help='Turn on logging ATS usage.  (Code and '
              'test names are never logged.)')
 
     parser.add_option('--okInvalid', action='store_true', dest='okInvalid',
