@@ -94,15 +94,6 @@ def addOptions(parser):
         blueos_np=-1,
         toss_nn=-1,
         kmpAffinity='granularity=core',
-        bindToCore=False,
-        bindToSocket=False,
-        bindToHwthread=False,
-        bindToL1cache=False,
-        bindToL2cache=False,
-        bindToL3cache=False,
-        bindToNuma=False,
-        bindToNone=False,
-        bindToBoard=False,
         continueFreq=None,
         cuttime=None,
         debug=False,
@@ -230,39 +221,6 @@ def addOptions(parser):
         parser.add_option('--lrun_ngpu', dest='blueos_ngpu', type='int',
             help='Blueos option: Sets of orver-rides test specific settings of ngpu (number of gpu devices per MPI process)) Maps to lrun -g option. Default is 0. Number of GPU devices for each MPI rank in each test.')
 
-    # Old Power8 MPI run options
-    #if SYS_TYPE == "blueos_3_ppc64le_ib":
-#
-#        parser.add_option('--bind-to-core', action='store_true', dest='bindToCore',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-socket', action='store_true', dest='bindToSocket',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-hwthread', action='store_true',dest='bindToHwthread',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-l1cache', action='store_true', dest='bindToL1cache',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-l2cache', action='store_true', dest='bindToL2cache',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-l3cache', action='store_true', dest='bindToL3cache',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-numa', action='store_true', dest='bindToNuma',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-none', action='store_true', dest='bindToNone',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-board', action='store_true', dest='bindToBoard',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--mpibind', action='store_true', dest='blueos_mpibind',
-#            help='Blueos option: Run the application under the mpibind executable. This is necessary to access GPU device on Power8 (rzmanta) using mpirun. Default to off.')
-#
     parser.add_option('--sleepBeforeSrun', dest='sleepBeforeSrun', type='int',
         help='Number of seconds to sleep before each srun. Default is 0 on all systems.')
 
