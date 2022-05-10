@@ -1,27 +1,27 @@
 import os
-from ats.attributedict import AttributeDict
 
-statuses = AttributeDict()
-
-_StatusCodesAbr = dict(
-   CREATED = "INIT",
-   INVALID = "INVD",
-   PASSED = "PASS",
-   FAILED = "FAIL",
-   SKIPPED = "SKIP",
-   RUNNING = 'EXEC',
-   FILTERED = 'FILT',
-   TIMEDOUT = 'TIME',
-   BATCHED = "BACH",
-   HALTED = "HALT",
-   EXPECTED = "EXPT",
-   LSFERROR = "LSFE",
-)
+statuses = {}
 
 class _StatusCode:
+
+    _StatusCodesAbr = {
+       "CREATED": "INIT",
+       "INVALID": "INVD",
+       "PASSED": "PASS",
+       "FAILED": "FAIL",
+       "SKIPPED": "SKIP",
+       "RUNNING": 'EXEC',
+       "FILTERED": 'FILT',
+       "TIMEDOUT": 'TIME',
+       "BATCHED": "BACH",
+       "HALTED": "HALT",
+       "EXPECTED": "EXPT",
+       "LSFERROR": "LSFE",
+    }
+
     def __init__(self, name):
         self.name = name
-        self.abr = _StatusCodesAbr[name]
+        self.abr = self._StatusCodesAbr[name]
 
     def __str__(self):
         return self.abr

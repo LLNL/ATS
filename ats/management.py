@@ -2,8 +2,7 @@ import os, re, sys, time, tempfile, traceback, socket
 from ats import configuration, version
 from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
                   RUNNING, FILTERED, CREATED, TIMEDOUT, HALTED, EXPECTED,\
-                  abspath, AtsError, is_valid_file, debug, statuses, \
-                  AttributeDict
+                  abspath, AtsError, is_valid_file, debug, statuses
 from ats.times import datestamp, Duration, wallTime, atsStartTimeLong
 from ats.tests import AtsTest
 from ats.log import log, terminal
@@ -300,7 +299,7 @@ ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
             self.report()
             log('-------------------------------------------------',
                 echo = True)
-        if not configuration.options.skip:
+        if not configuration.options["skip"]:
             log("""
 ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
             self.summary(log)
@@ -333,15 +332,15 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
     def report (self):
         "Log a report, showing each test."
         doAll = debug() or \
-               configuration.options.skip or \
-               configuration.options.verbose
+               configuration.options["skip"] or \
+               configuration.options["verbose"]
 
         outputCaptured = False
         for test in self.testlist:
             if test.output:
                 outputCaptured = True
 
-        if outputCaptured and not configuration.options.hideOutput:
+        if outputCaptured and not configuration.options["hideOutput"]:
             log("NOTICE:", "Captured output, see log.", echo=True, logging = False)
 
         for test in self.testlist:
@@ -360,7 +359,7 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
                 log("NOTE:", line, echo=echo)
 
             log.indent()
-            if debug() or configuration.options.skip:
+            if debug() or configuration.options["skip"]:
                 log([t.serialNumber for t in test.waitUntil], echo=False)
             log.dedent()
 
@@ -621,7 +620,7 @@ We immediately make sure each input file exists and is readable.
         if found:
             log('************************************************', echo = True)
             log('NOTE: Invalid tests or files', echo = True)
-            if not configuration.options.okInvalid:
+            if not configuration.options["okInvalid"]:
                 log.fatal_error("Fix invalid tests or rerun with --okInvalid.")
 
 # Make sure that every test has distinct name
@@ -646,9 +645,9 @@ We immediately make sure each input file exists and is readable.
 
         log.leading = ''
         log("------------------ Input complete --------", echo=True)
-        echo =  configuration.options.verbose or \
+        echo =  configuration.options["verbose"] or \
                 debug() or \
-                configuration.options.skip
+                configuration.options["skip"]
         for t in self.testlist:
             log(repr(t), echo=echo)
 
@@ -662,8 +661,8 @@ We immediately make sure each input file exists and is readable.
         batchTests = [t for t in self.testlist if t.status is BATCHED]
 
 # postcondition
-        if (batchTests and (configuration.options.nobatch or \
-                            configuration.options.allInteractive)):
+        if (batchTests and (configuration.options["nobatch"] or \
+                            configuration.options["allInteractive"])):
             for t in batchTests:
                 log( t, "BATCH sorting error.", echo=True)
             raise ValueError('batch test(s) should not exist')
@@ -734,25 +733,25 @@ to allow user a chance to add options and examine results of option parsing.
         self.machine = configuration.machine
         self.batchmachine = configuration.batchmachine
 
-        if configuration.options.nobatch:
+        if configuration.options["nobatch"]:
             self.batchmachine = None
-        self.verbose = configuration.options.verbose or debug()
+        self.verbose = configuration.options["verbose"] or debug()
         log.echo = self.verbose
         self.started = datestamp(long_format=True)
         self.continuationFileName = ''
         self.atsRunPath = os.getcwd()
-        for a in configuration.options.filter:
+        for a in configuration.options["filter"]:
             self.filter(a)
         pat1 = re.compile(r'^([^\'].*)\'$')
         pat2 = re.compile(r'^([^\"].*)\"$')
-        for a in configuration.options.glue:
+        for a in configuration.options["glue"]:
             if pat1.search(a) or pat2.search(a):
                 a1 = a
             else:
                 a1 = a.strip('"').strip("'")
             exec('AtsTest.glue(%s)' % a1)
-        if configuration.options.level:
-            self.filter("level<= %s" % configuration.options.level)
+        if configuration.options["level"]:
+            self.filter("level<= %s" % configuration.options["level"])
 
     def firstBanner(self):
         "Write the opening banner."
@@ -771,17 +770,17 @@ to allow user a chance to add options and examine results of option parsing.
         else:
             log("No batch facility found.", echo=True)
 
-        if not configuration.options.logUsage:
+        if not configuration.options["logUsage"]:
             log('NOT logging usage.')
 
-        if configuration.options.info or debug():
+        if configuration.options["info"] or debug():
             configuration.documentConfiguration()
 
         log.echo = self.verbose
-        if configuration.options.oneFailure:
+        if configuration.options["oneFailure"]:
             log('Will stop after first failure.')
 
-        if configuration.options.allInteractive:
+        if configuration.options["allInteractive"]:
             log('Will run all tests (including any batch tests) as interactive.')
 
         log('Default time limit for each test=',
@@ -791,7 +790,7 @@ to allow user a chance to add options and examine results of option parsing.
         "This is the 'guts' of ATS."
 
         if configuration.SYS_TYPE == "toss_3_x86_64":
-            if configuration.options.bypassSerialMachineCheck == False:
+            if configuration.options["bypassSerialMachineCheck"] == False:
                 log("**********************************************************************************", echo=True)
                 log("*** This is a serial machine --- Do not use ATS on more than 1 node here!      ***", echo=True)
                 log("***                                                                            ***", echo=True)
@@ -848,7 +847,7 @@ to allow user a chance to add options and examine results of option parsing.
         # Phase 2 -- dispatch the batch tests
 
         if self.batchmachine and batchTests:
-            if configuration.options.skip:
+            if configuration.options["skip"]:
                 log("Skipping execution due to --skip")
             else:
                 try:
@@ -991,20 +990,20 @@ BATCHED = ats.BATCHED
         machine = self.machine
         unfinished = machine.scheduler.load(interactiveTests)
 
-        if configuration.options.skip:
+        if configuration.options["skip"]:
             self.machine.scheduler.reportObstacles(echo = True)
             log("In skip mode....!")
         else:
             log("Beginning test executions")
         timeStatusReport = time.time()
-        if configuration.options.continueFreq is not None:
+        if configuration.options["continueFreq"] is not None:
             timeContinuation = time.time()
             # Convert minutes to seconds
-            continuationStep = int(configuration.options.continueFreq * 60)
+            continuationStep = int(configuration.options["continueFreq"]) * 60
         while unfinished:
             timeNow= time.time()
             timePassed= timeNow - timeStatusReport
-            if timePassed >= configuration.options.reportFreq*60:
+            if timePassed >= configuration.options["reportFreq"] * 60:
                 #os.system("stty sane")
                 terminal("ATS REPORT AT ELAPSED TIME", wallTime())
                 # log("ATS REPORT AT ELAPSED TIME", wallTime(), echo=True)
@@ -1014,7 +1013,7 @@ BATCHED = ats.BATCHED
                 machine.scheduler.periodicReport()
             unfinished = machine.scheduler.step()
 
-            if configuration.options.continueFreq is not None:
+            if configuration.options["continueFreq"] is not None:
                 timeNow= time.time()
                 if (timeNow-timeContinuation) >= continuationStep:
                     self.continuationFile(interactiveTests, True)
@@ -1026,34 +1025,34 @@ BATCHED = ats.BATCHED
            manager suitable for postprocessing. After forming a potential
            result r, calls any resultsHooks functions (r, manager)
         """
-        r = AttributeDict(
-            started = self.started,
-            options = self.options,
-            savedTime = datestamp(long_format=True),
-            collectTimeEnded = self.collectTimeEnded,
-            badlist = self.badlist,
-            filters = self.filters,
-            groups = {},
-            onCollectedRoutines = [f.__name__ for f in self.onCollectedRoutines],
-            onPrioritizedRoutines = [f.__name__ for f in self.onPrioritizedRoutines],
-            onExitRoutines = [f.__name__ for f in self.onExitRoutines],
-            onResultsRoutines = [f.__name__ for f in self.onResultsRoutines],
-            )
-        r.testlist = [t.getResults() for t in self.testlist]
+        r = {
+            "started": self.started,
+            "options": self.options,
+            "savedTime": datestamp(long_format=True),
+            "collectTimeEnded": self.collectTimeEnded,
+            "badlist": self.badlist,
+            "filters": self.filters,
+            "groups": {},
+            "onCollectedRoutines": [f.__name__ for f in self.onCollectedRoutines],
+            "onPrioritizedRoutines": [f.__name__ for f in self.onPrioritizedRoutines],
+            "onExitRoutines": [f.__name__ for f in self.onExitRoutines],
+            "onResultsRoutines": [f.__name__ for f in self.onResultsRoutines],
+        }
+        r["testlist"] = [t.getResults() for t in self.testlist]
 
         if not hasattr(self, 'machine'):
             return r # never initialized, nothing else of interest.
 
-        r.inputFiles = self.inputFiles
-        r.verbose = self.verbose
-        r.machine = AttributeDict()
-        r.batchmachine = None
+        r["inputFiles"] = self.inputFiles
+        r["verbose"] = self.verbose
+        r["machine"] = {}
+        r["batchmachine"] = None
         for key, value in self.machine.getResults().items():
-            r.machine[key] = value
+            r["machine"][key] = value
         if self.batchmachine:
-            r.batchmachine = AttributeDict()
+            r["batchmachine"] = {}
             for key, value in self.batchmachine.getResults().items():
-                r.batchmachine[key] = value
+                r["batchmachine"][key] = value
         for hook in self.onResultsRoutines:
             log('   Calling onResults function', hook.__name__, echo=True)
             hook(r, self)
@@ -1062,7 +1061,7 @@ BATCHED = ats.BATCHED
     def onSave(self, hook):
         """Add a hook for the results function. Will be passed two arguments:
 
-1. The proposed state r, an AttributeDict
+1. The proposed state r, a dict
 2. This manager
 
 The hook will sually will add items to r, but can make any desired
@@ -1135,9 +1134,9 @@ dependents_serial contain the serial numbers of the relevant tests.
 # now fix up test objects
 # First we need an object that prints like a test to avoid recursion.
 
-class TestLike (AttributeDict):
-    def __init__ (self, anAttributeDict):
-        AttributeDict.__init__(self, **anAttributeDict)
+class TestLike(dict):
+    def __init__ (self, aDict):
+        dict.__init__(self, **aDict)
         n = self.groupNumber
         if not state.groups.has_key(n):
             state.groups[n] = AtsTestGroup(n)
@@ -1229,45 +1228,45 @@ def filterdefs (text=None):
         _filterwith.append(text)
 
 # Set up the testing environment, add statuses to it.
-testEnvironment =AttributeDict(
-        debug= debug,
-        manager= manager,
-        test= test,
-        testif= testif,
-        source= source,
-        log= log,
-        define= define,
-        undefine= undefine,
-        get= get,
-        logDefinitions= logDefinitions,
-        filter= filter,
-        filterdefs= filterdefs,
-        wait= wait,
-        stick= stick,
-        unstick= unstick,
-        tack= tack,
-        untack= untack,
-        group = group,
-        endgroup = endgroup,
-        glue= glue,
-        unglue= unglue,
-        checkGlue= checkGlue,
-        getOptions= getOptions,
-        sys= sys,
-        os= os,
-        abspath= abspath,
-        AtsError= AtsError,
-        is_valid_file= is_valid_file,
-        SYS_TYPE= configuration.SYS_TYPE,
-        MACHINE_TYPE=configuration.MACHINE_TYPE,
-        BATCH_TYPE=configuration.BATCH_TYPE,
-        MACHINE_DIR=configuration.MACHINE_DIR,
-        onCollected = onCollected,
-        onPrioritized = onPrioritized,
-        onExit = onExit,
-        onSave = onSave,
-        getResults = getResults,
-        )
+testEnvironment = {
+        "debug": debug,
+        "manager": manager,
+        "test": test,
+        "testif": testif,
+        "source": source,
+        "log": log,
+        "define": define,
+        "undefine": undefine,
+        "get": get,
+        "logDefinitions": logDefinitions,
+        "filter": filter,
+        "filterdefs": filterdefs,
+        "wait": wait,
+        "stick": stick,
+        "unstick": unstick,
+        "tack": tack,
+        "untack": untack,
+        "group": group,
+        "endgroup": endgroup,
+        "glue": glue,
+        "unglue": unglue,
+        "checkGlue": checkGlue,
+        "getOptions": getOptions,
+        "sys": sys,
+        "os": os,
+        "abspath": abspath,
+        "AtsError": AtsError,
+        "is_valid_file": is_valid_file,
+        "SYS_TYPE": configuration.SYS_TYPE,
+        "MACHINE_TYPE": configuration.MACHINE_TYPE,
+        "BATCH_TYPE":configuration.BATCH_TYPE,
+        "MACHINE_DIR":configuration.MACHINE_DIR,
+        "onCollected": onCollected,
+        "onPrioritized": onPrioritized,
+        "onExit": onExit,
+        "onSave": onSave,
+        "getResults": getResults,
+    }
 testEnvironment.update(statuses)
 
 if __name__ == "__main__":

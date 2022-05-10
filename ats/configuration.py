@@ -12,7 +12,7 @@ import os, sys
 import importlib
 from optparse import OptionParser
 from ats import version
-from ats.atsut import debug, AttributeDict, abspath
+from ats.atsut import debug, abspath
 from ats.log import log, terminal
 from ats.times import atsStartTime, Duration
 from ats import machines
@@ -94,15 +94,6 @@ def addOptions(parser):
         blueos_np=-1,
         toss_nn=-1,
         kmpAffinity='granularity=core',
-        bindToCore=False,
-        bindToSocket=False,
-        bindToHwthread=False,
-        bindToL1cache=False,
-        bindToL2cache=False,
-        bindToL3cache=False,
-        bindToNuma=False,
-        bindToNone=False,
-        bindToBoard=False,
         continueFreq=None,
         cuttime=None,
         debug=False,
@@ -230,39 +221,6 @@ def addOptions(parser):
         parser.add_option('--lrun_ngpu', dest='blueos_ngpu', type='int',
             help='Blueos option: Sets of orver-rides test specific settings of ngpu (number of gpu devices per MPI process)) Maps to lrun -g option. Default is 0. Number of GPU devices for each MPI rank in each test.')
 
-    # Old Power8 MPI run options
-    #if SYS_TYPE == "blueos_3_ppc64le_ib":
-#
-#        parser.add_option('--bind-to-core', action='store_true', dest='bindToCore',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-socket', action='store_true', dest='bindToSocket',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-hwthread', action='store_true',dest='bindToHwthread',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-l1cache', action='store_true', dest='bindToL1cache',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-l2cache', action='store_true', dest='bindToL2cache',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-l3cache', action='store_true', dest='bindToL3cache',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-numa', action='store_true', dest='bindToNuma',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-none', action='store_true', dest='bindToNone',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--bind-to-board', action='store_true', dest='bindToBoard',
-#            help='Blueos option: Specify mpirun --bind-to core. By default, ATS uses --bind-to none')
-#
-#        parser.add_option('--mpibind', action='store_true', dest='blueos_mpibind',
-#            help='Blueos option: Run the application under the mpibind executable. This is necessary to access GPU device on Power8 (rzmanta) using mpirun. Default to off.')
-#
     parser.add_option('--sleepBeforeSrun', dest='sleepBeforeSrun', type='int',
         help='Number of seconds to sleep before each srun. Default is 0 on all systems.')
 
@@ -535,33 +493,34 @@ def init(clas = '', adder = None, examiner=None):
 
 # immediately make the options a real dictionary -- the way optparse leaves it
 # is misleading.
-    options = AttributeDict()
+    options = {}
     for k in vars(toptions).keys():
         options[k] = getattr(toptions, k)
 
 # set up the test default options so the machine(s) can add to it
-    options['testDefaults'] = AttributeDict(np=1,
-        batch=0,
-        level=1,
-        keep = options.keep,
-        hideOutput = options.hideOutput,
-        verbose = options.verbose,
-        testStdout = options.testStdout,
-        globalPrerunScript = options.globalPrerunScript,
-        globalPostrunScript = options.globalPostrunScript,
-        sequential = options.sequential,
-        nosrun = options.nosrun,
-        salloc = options.salloc
-        )
+    options['testDefaults'] = {
+        "np": 1,
+        "batch": 0,
+        "level": 1,
+        "keep": options["keep"],
+        "hideOutput": options["hideOutput"],
+        "verbose": options["verbose"],
+        "testStdout": options["testStdout"],
+        "globalPrerunScript": options["globalPrerunScript"],
+        "globalPostrunScript": options["globalPostrunScript"],
+        "sequential": options["sequential"],
+        "nosrun": options["nosrun"],
+        "salloc": options["salloc"]
+    }
 
 # let the machine(s) modify the results or act upon them in other ways.
     machine.examineOptions(options)
     if batchmachine:
         batchmachine.examineOptions(options)
 # unpack basic options
-    debug(options.debug)
-    if options.logdir:
-        log.set(directory = options.logdir)
+    debug(options["debug"])
+    if options["logdir"]:
+        log.set(directory = options["logdir"])
     else:
         dirname = SYS_TYPE + "." + atsStartTime + ".logs"
         log.set(directory = dirname)
@@ -579,11 +538,11 @@ def init(clas = '', adder = None, examiner=None):
         log("Batch specification for ", BATCH_TYPE, "in", bspecFoundIn)
 
 # unpack other options
-    cuttime = options.cuttime
+    cuttime = options["cuttime"]
     if cuttime is not None:
         cuttime = Duration(cuttime)
-    timelimit = Duration(options.timelimit)
-    defaultExecutable = executables.Executable(abspath(options.executable))
+    timelimit = Duration(options["timelimit"])
+    defaultExecutable = executables.Executable(abspath(options["executable"]))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     if 'ATSROOT' in os.environ:
         ATSROOT = os.environ['ATSROOT']

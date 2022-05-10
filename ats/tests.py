@@ -5,7 +5,7 @@ from ats import configuration
 from ats.log import log
 from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, RUNNING,\
                   CREATED, FILTERED, TIMEDOUT, HALTED, EXPECTED, \
-                  is_valid_file, debug, AtsError, abspath, AttributeDict
+                  is_valid_file, debug, AtsError, abspath
 
 from ats.times import hms, curDateTime, Duration
 from ats.executables import Executable
@@ -149,14 +149,14 @@ class AtsTest (object):
 
 # Combine the options: first the defaults, then the glued, then the tacked,
 # then the stuck, then the test options.
-        self.options = AttributeDict(
-            script = '',
-            clas = [],
-            executable = '',
-            directory= '',
-        )
+        self.options = {
+            "script": '',
+            "clas": [],
+            "executable": '',
+            "directory": '',
+        }
         try:
-            self.options.update(configuration.options.testDefaults)
+            self.options.update(configuration.options["testDefaults"])
             self.options.update(AtsTest.glued)
             self.options.update(AtsTest.tacked)
             self.options.update(AtsTest.stuck)
@@ -178,13 +178,13 @@ class AtsTest (object):
             raise AtsError(msg)
 
 
-        if configuration.options.allInteractive:
+        if configuration.options["allInteractive"]:
             self.batch = False
         else:
             self.batch = self.options['batch']
 
 
-        if configuration.options.combineOutErr:
+        if configuration.options["combineOutErr"]:
             self.combineOutput = True
         else:
             self.combineOutput = False
@@ -223,7 +223,7 @@ class AtsTest (object):
             if self.directory== '':
                 self.directory = os.getcwd()
             path = self.executable.path
-            junk, filename = os.path.split(path)
+            _, filename = os.path.split(path)
         else:
             if executable:
                 executable = executable.replace('$ATSROOT', configuration.ATSROOT)
@@ -239,10 +239,10 @@ class AtsTest (object):
             else:
                 if self.directory== '':
                     self.directory = os.getcwd()
-                junk, filename = os.path.split(self.executable.path)
+                _, filename = os.path.split(self.executable.path)
 
-        name, junk = os.path.splitext(filename)
-        self.setName (self.options.get('name', name))
+        name, _ = os.path.splitext(filename)
+        self.setName(self.options.get('name', name))
         label = self.options.get('label', '')
         if label:
             label = str(label).strip()
@@ -297,13 +297,13 @@ class AtsTest (object):
 
         # if the test ends up BATCHED, such jobs are legal.
 
-        if self.batch and configuration.options.nobatch:
+        if self.batch and configuration.options["nobatch"]:
             self.set(SKIPPED, "Batch not available")
 
         elif self.batch:
             problem = configuration.batchmachine.canRun(self)
             if not problem:
-                if configuration.options.skip:
+                if configuration.options["skip"]:
                     self.set(SKIPPED, "BACH skipped due to skip flag")
                 else:
                     self.set(BATCHED, "Ready to run in batch.")
@@ -314,8 +314,8 @@ class AtsTest (object):
             problem = configuration.machine.canRun(self)
             if not problem:
                 self.set(CREATED, "Ready to run interactively.")
-            elif configuration.options.allInteractive or \
-               configuration.options.nobatch or \
+            elif configuration.options["allInteractive"] or \
+               configuration.options["nobatch"] or \
                self.groupNumber:
                 self.set(SKIPPED, problem)
             else:
@@ -386,34 +386,35 @@ class AtsTest (object):
         # various integers are used to reconstruct the test/group relationships
         # See the coding in management.py that prints atsr.py
 
-        result = AttributeDict(name =self.name,
-            serialNumber= self.serialNumber,
-            groupNumber = self.groupNumber,
-            groupSerialNumber = self.groupSerialNumber,
-            runOrder = self.runOrder,
-            status = self.status,
-            batch = self.batch,
-            expectedResult = self.expectedResult,
-            message = self.message,
-            startDateTime = self.startDateTime,
-            endDateTime = self.endDateTime,
-            options = self.options,
-            directory = self.directory,
-            notes = self.notes,
-            output = out,
-            independent = self.independent,
-            block = self.block,
-            timelimit = self.timelimit,
-            commandList = self.commandList,
-            commandLine = self.commandLine,
-            elapsedTime = self.elapsedTime(),
-            executable = str(self.executable),
-            priority = self.priority,
-            totalPriority = self.totalPriority,
-            depends_on_serial = ds,
-            dependents_serial = [d.serialNumber for d in self.dependents],
-            waitUntil_serial = [t.serialNumber for t in self.waitUntil]
-        )
+        result = {
+            "name": self.name,
+            "serialNumber": self.serialNumber,
+            "groupNumber": self.groupNumber,
+            "groupSerialNumber": self.groupSerialNumber,
+            "runOrder": self.runOrder,
+            "status": self.status,
+            "batch": self.batch,
+            "expectedResult": self.expectedResult,
+            "message": self.message,
+            "startDateTime": self.startDateTime,
+            "endDateTime": self.endDateTime,
+            "options": self.options,
+            "directory": self.directory,
+            "notes": self.notes,
+            "output": out,
+            "independent": self.independent,
+            "block": self.block,
+            "timelimit": self.timelimit,
+            "commandList": self.commandList,
+            "commandLine": self.commandLine,
+            "elapsedTime": self.elapsedTime(),
+            "executable": str(self.executable),
+            "priority": self.priority,
+            "totalPriority": self.totalPriority,
+            "depends_on_serial": ds,
+            "dependents_serial": [d.serialNumber for d in self.dependents],
+            "waitUntil_serial": [t.serialNumber for t in self.waitUntil]
+        }
         return result
 
     def __str__ (self):
@@ -575,19 +576,19 @@ class AtsTest (object):
            Class method.
         """
         opt = configuration.options
-        options = dict(
-            np = 0,
-            batch = 0,
-            level = 1,
-            keep = opt.keep,
-            hideOutput = int(opt.hideOutput),
-            testStdout = opt.testStdout,
-            globalPrerunScript = opt.globalPrerunScript,
-            globalPostrunScript = opt.globalPostrunScript,
-            script = '',
-            clas = '',
-            executable = '',
-        )
+        options = {
+            np: 0,
+            batch: 0,
+            level: 1,
+            keep: opt["keep"],
+            hideOutput: int(opt["hideOutput"]),
+            testStdout: opt["testStdout"],
+            globalPrerunScript: opt["globalPrerunScript"],
+            globalPostrunScript: opt["globalPostrunScript"],
+            script: '',
+            clas: '',
+            executable: '',
+        }
         options.update(AtsTest.glued)
         options.update(AtsTest.tacked)
         options.update(AtsTest.stuck)
@@ -624,7 +625,7 @@ class AtsTest (object):
             self.notes.append('Please check the results of this test manually.')
             log('Please check the results of this test manually.', echo=True)
 
-        if configuration.options.skip:
+        if configuration.options["skip"]:
             return
 
 
