@@ -42,7 +42,7 @@ from ats import configuration
 from ats.management import manager, testEnvironment   # manager.main() to execute
 from ats.tests import AtsTest, AtsTestGroup
 # for possible use in driver scripts or unit testing
-from ats.atsut import AtsError, AttributeDict, \
+from ats.atsut import AtsError, \
                   StatusCode, statuses, debug, \
                   CREATED, INVALID, PASSED, FAILED, HALTED, EXPECTED, LSFERROR, \
                   SKIPPED, BATCHED, RUNNING, FILTERED, TIMEDOUT

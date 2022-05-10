@@ -164,16 +164,6 @@ class lsfMachine (machines.Machine):
         self.timelimit        = options.timelimit
         self.mpi_um           = options.mpi_um
 
-        self.bindToCore = options.bindToCore
-        self.bindToSocket = options.bindToSocket
-        self.bindToHwthread = options.bindToHwthread
-        self.bindToL1cache = options.bindToL1cache
-        self.bindToL2cache = options.bindToL2cache
-        self.bindToL3cache = options.bindToL3cache
-        self.bindToNuma = options.bindToNuma
-        self.bindToBoard = options.bindToBoard
-        self.bindToNone = options.bindToNone
-
         #if self.lrun_pack and self.lrun_pack == False:
         #    print("DBG 101 self.lrun_pack = False")
         #if self.lrun_pack and self.lrun_pack == True:

@@ -126,48 +126,48 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         # self.numberTestsRunningMax is set in init(), not need to call machines.Machine.examineOptions
         # machines.Machine.examineOptions(self, options)
 
-        self.distribution        = options.distribution
-        self.checkForAtsProcFlag = options.checkForAtsProc
+        self.distribution        = options["distribution"]
+        self.checkForAtsProcFlag = options["checkForAtsProc"]
 
         if SlurmProcessorScheduled.debugClass:
             DEBUG_SLURM = "DEBUG SlurmProcessorScheduled Class"
-            print("%s options.cuttime             = %s " % (DEBUG_SLURM, options.cuttime))
-            print("%s options.distribution        = %s " % (DEBUG_SLURM, options.distribution))
-            print("%s options.timelimit           = %s " % (DEBUG_SLURM, options.timelimit))
-            print("%s options.globalPostrunScript = %s " % (DEBUG_SLURM, options.globalPostrunScript))
-            print("%s options.globalPrerunScript  = %s " % (DEBUG_SLURM, options.globalPrerunScript))
-            print("%s options.testStdout          = %s " % (DEBUG_SLURM, options.testStdout))
-            print("%s options.logdir              = %s " % (DEBUG_SLURM, options.logdir))
-            print("%s options.level               = %s " % (DEBUG_SLURM, options.level))
-            print("%s options.npMax               = %s " % (DEBUG_SLURM, options.npMax))
-            print("%s options.reportFreq          = %s " % (DEBUG_SLURM, options.reportFreq))
-            print("%s options.ompNumThreads       = %s " % (DEBUG_SLURM, options.ompNumThreads))
-            print("%s options.cpusPerTask         = %s " % (DEBUG_SLURM, options.cpusPerTask))
-            print("%s options.sleepBeforeSrun     = %s " % (DEBUG_SLURM, options.sleepBeforeSrun))
-            print("%s options.continueFreq        = %s " % (DEBUG_SLURM, options.continueFreq))
-            print("%s options.verbose             = %s " % (DEBUG_SLURM, options.verbose))
-            print("%s options.debug               = %s " % (DEBUG_SLURM, options.debug))
-            print("%s options.info                = %s " % (DEBUG_SLURM, options.info))
-            print("%s options.hideOutput          = %s " % (DEBUG_SLURM, options.hideOutput))
-            print("%s options.keep                = %s " % (DEBUG_SLURM, options.keep))
-            print("%s options.logUsage            = %s " % (DEBUG_SLURM, options.logUsage))
-            print("%s options.okInvalid           = %s " % (DEBUG_SLURM, options.okInvalid))
-            print("%s options.oneFailure          = %s " % (DEBUG_SLURM, options.oneFailure))
-            print("%s options.sequential          = %s " % (DEBUG_SLURM, options.sequential))
-            print("%s options.nosrun              = %s " % (DEBUG_SLURM, options.nosrun))
-            print("%s options.salloc              = %s " % (DEBUG_SLURM, options.salloc))
-            print("%s options.checkForAtsProc     = %s " % (DEBUG_SLURM, options.checkForAtsProc))
-            print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
-            print("%s options.skip                = %s " % (DEBUG_SLURM, options.skip))
-            print("%s options.exclusive           = %s " % (DEBUG_SLURM, options.exclusive))
-            print("%s options.mpibind             = %s " % (DEBUG_SLURM, options.mpibind))
-            print("%s options.combineOutErr       = %s " % (DEBUG_SLURM, options.combineOutErr))
-            print("%s options.allInteractive      = %s " % (DEBUG_SLURM, options.allInteractive))
-            print("%s options.filter              = %s " % (DEBUG_SLURM, options.filter))
-            print("%s options.glue                = %s " % (DEBUG_SLURM, options.glue))
+            print("%s options["cuttime"]             = %s " % (DEBUG_SLURM, options["cuttime"]))
+            print("%s options["distribution"]        = %s " % (DEBUG_SLURM, options["distribution"]))
+            print("%s options["timelimit"]           = %s " % (DEBUG_SLURM, options["timelimit"]))
+            print("%s options["globalPostrunScript"] = %s " % (DEBUG_SLURM, options["globalPostrunScript"]))
+            print("%s options["globalPrerunScript"]  = %s " % (DEBUG_SLURM, options["globalPrerunScript"]))
+            print("%s options["testStdout"]          = %s " % (DEBUG_SLURM, options["testStdout"]))
+            print("%s options["logdir"]              = %s " % (DEBUG_SLURM, options["logdir"]))
+            print("%s options["level"]               = %s " % (DEBUG_SLURM, options["level"]))
+            print("%s options["npMax"]               = %s " % (DEBUG_SLURM, options["npMax"]))
+            print("%s options["reportFreq"]          = %s " % (DEBUG_SLURM, options["reportFreq"]))
+            print("%s options["ompNumThreads"]       = %s " % (DEBUG_SLURM, options["ompNumThreads"]))
+            print("%s options["cpusPerTask"]         = %s " % (DEBUG_SLURM, options["cpusPerTask"]))
+            print("%s options["sleepBeforeSrun"]     = %s " % (DEBUG_SLURM, options["sleepBeforeSrun"]))
+            print("%s options["continueFreq"]        = %s " % (DEBUG_SLURM, options["continueFreq"]))
+            print("%s options["verbose"]             = %s " % (DEBUG_SLURM, options["verbose"]))
+            print("%s options["debug"]               = %s " % (DEBUG_SLURM, options["debug"]))
+            print("%s options["info"]                = %s " % (DEBUG_SLURM, options["info"]))
+            print("%s options["hideOutput"]          = %s " % (DEBUG_SLURM, options["hideOutput"]))
+            print("%s options["keep"]                = %s " % (DEBUG_SLURM, options["keep"]))
+            print("%s options["logUsage"]            = %s " % (DEBUG_SLURM, options["logUsage"]))
+            print("%s options["okInvalid"]           = %s " % (DEBUG_SLURM, options["okInvalid"]))
+            print("%s options["oneFailure"]          = %s " % (DEBUG_SLURM, options["oneFailure"]))
+            print("%s options["sequential"]          = %s " % (DEBUG_SLURM, options["sequential"]))
+            print("%s options["nosrun"]              = %s " % (DEBUG_SLURM, options["nosrun"]))
+            print("%s options["salloc"]              = %s " % (DEBUG_SLURM, options["salloc"]))
+            print("%s options["checkForAtsProc"]     = %s " % (DEBUG_SLURM, options["checkForAtsProc"]))
+            print("%s options["showGroupStartOnly"]  = %s " % (DEBUG_SLURM, options["showGroupStartOnly"]))
+            print("%s options["skip"]                = %s " % (DEBUG_SLURM, options["skip"]))
+            print("%s options["exclusive"]           = %s " % (DEBUG_SLURM, options["exclusive"]))
+            print("%s options["mpibind"]             = %s " % (DEBUG_SLURM, options["mpibind"]))
+            print("%s options["combineOutErr"]       = %s " % (DEBUG_SLURM, options["combineOutErr"]))
+            print("%s options["allInteractive"]      = %s " % (DEBUG_SLURM, options["allInteractive"]))
+            print("%s options["filter"]              = %s " % (DEBUG_SLURM, options["filter"]))
+            print("%s options["glue"]                = %s " % (DEBUG_SLURM, options["glue"]))
 
-        if options.npMax > 0:
-            self.npMax = options.npMax
+        if options["npMax"] > 0:
+            self.npMax = options["npMax"]
         else:
             if self.runningWithinSalloc:
                 self.npMax = min(self.npMaxH, self.npMax)
@@ -175,12 +175,12 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 self.npMax = self.npMaxH
 
         if self.runningWithinSalloc:
-            options.numNodes = self.numNodes
+            options["numNodes"] = self.numNodes
 
         if not self.runningWithinSalloc:
             super(SlurmProcessorScheduled, self).examineOptions(options)
-            self.numNodes  = options.numNodes
-            self.partition = options.partition
+            self.numNodes  = options["numNodes"]
+            self.partition = options["partition"]
 
         self.numberMaxProcessors   = self.npMax * self.numNodes
 
@@ -188,7 +188,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         # AND if we running within an salloc partition
         # AND if one cpu is being used already for our shell or whatever
         # Then subtract one core from the max number of processors (across all nodes)
-        if options.npMax <= 0:
+        if options["npMax"] <= 0:
             if self.runningWithinSalloc==True:
                 if self.checkForAtsProc():
                     self.numberMaxProcessors -= 1
@@ -197,12 +197,12 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         self.numProcsAvailable     = self.numberMaxProcessors
         self.numberTestsRunningMax = self.numberMaxProcessors
 
-        self.exclusive = options.exclusive
-        self.mpibind   = options.mpibind
-        self.salloc    = options.salloc
-        self.toss_nn   = options.toss_nn
-        self.strict_nn = options.strict_nn
-        self.timelimit = options.timelimit
+        self.exclusive = options["exclusive"]
+        self.mpibind   = options["mpibind"]
+        self.salloc    = options["salloc"]
+        self.toss_nn   = options["toss_nn"]
+        self.strict_nn = options["strict_nn"]
+        self.timelimit = options["timelimit"]
 
         if SlurmProcessorScheduled.debugClass:
             DEBUG_OPTIONS = "DEBUG examineOptions leaving"
@@ -246,15 +246,15 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         # Command line option nt over-rides what is in the deck.
         test.nt = 1
-        if configuration.options.ompNumThreads > 0:
-            test.nt = configuration.options.ompNumThreads
+        if configuration.options["ompNumThreads"] > 0:
+            test.nt = configuration.options["ompNumThreads"]
         else:
             if 'nt' in test.options:
                 test.nt = test.options.get('nt', 1)
 
         test.cpus_per_task = -1
-        if configuration.options.cpusPerTask > -1:
-            test.cpus_per_task = configuration.options.cpusPerTask
+        if configuration.options["cpusPerTask"] > -1:
+            test.cpus_per_task = configuration.options["cpusPerTask"]
         else:
             if 'cpus_per_task' in test.options:
                 test.cpus_per_task = test.options.get('cpus_per_task', 1)
@@ -272,7 +272,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 if (self.toss_nn < 0):
                     test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
                     test.nn = test.num_nodes
-                    if configuration.options.verbose:
+                    if configuration.options["verbose"]:
                         print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
                               (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt))
 
@@ -324,7 +324,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             srun_mpi_type='--mpi=pmi2'
 
         srun_unbuffered='--comment="nounbuffered"'
-        if configuration.options.unbuffered:
+        if configuration.options["unbuffered"]:
             srun_unbuffered='--unbuffered'
 
         if MY_SYS_TYPE.startswith('toss'):
@@ -562,7 +562,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         sequential = test.options.get('sequential', False)
         if sequential == True:
             if (self.numProcsAvailable < self.numberMaxProcessors):
-                if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
+                if configuration.options["verbose"] or SlurmProcessorScheduled.canRunNow_debugClass:
                     string = "%d_%d" % (self.numProcsAvailable, self.numberMaxProcessors)
                     if string != SlurmProcessorScheduled.canRunNow_saved_string:
                         SlurmProcessorScheduled.canRunNow_saved_string = string
@@ -579,7 +579,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             np = num_nodes * self.npMax
             my_numProcsAvailable = self.numProcsAvailable + SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs
 
-            if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
+            if configuration.options["verbose"] or SlurmProcessorScheduled.canRunNow_debugClass:
                 string = "%d_%d" % (numberNodesRemaining, my_numProcsAvailable)
                 if string != SlurmProcessorScheduled.canRunNow_saved_string:
                     SlurmProcessorScheduled.canRunNow_saved_string = string
@@ -596,7 +596,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         # else, back to our original programming, see if there are enuf procs available
         else:
-            if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
+            if configuration.options["verbose"] or SlurmProcessorScheduled.canRunNow_debugClass:
                 if self.numProcsAvailable != SlurmProcessorScheduled.canRunNow_numProcsAvailableReported:
                     SlurmProcessorScheduled.canRunNow_numProcsAvailableReported = self.numProcsAvailable
                     if self.numProcsAvailable >= np:

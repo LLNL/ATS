@@ -12,7 +12,7 @@ import os, sys
 import importlib
 from optparse import OptionParser
 from ats import version
-from ats.atsut import debug, AttributeDict, abspath
+from ats.atsut import debug, abspath
 from ats.log import log, terminal
 from ats.times import atsStartTime, Duration
 from ats import machines
@@ -535,33 +535,34 @@ def init(clas = '', adder = None, examiner=None):
 
 # immediately make the options a real dictionary -- the way optparse leaves it
 # is misleading.
-    options = AttributeDict()
+    options = {}
     for k in vars(toptions).keys():
         options[k] = getattr(toptions, k)
 
 # set up the test default options so the machine(s) can add to it
-    options['testDefaults'] = AttributeDict(np=1,
-        batch=0,
-        level=1,
-        keep = options.keep,
-        hideOutput = options.hideOutput,
-        verbose = options.verbose,
-        testStdout = options.testStdout,
-        globalPrerunScript = options.globalPrerunScript,
-        globalPostrunScript = options.globalPostrunScript,
-        sequential = options.sequential,
-        nosrun = options.nosrun,
-        salloc = options.salloc
-        )
+    options['testDefaults'] = {
+        "np": 1,
+        "batch": 0,
+        "level": 1,
+        "keep": options["keep"],
+        "hideOutput": options["hideOutput"],
+        "verbose": options["verbose"],
+        "testStdout": options["testStdout"],
+        "globalPrerunScript": options["globalPrerunScript"],
+        "globalPostrunScript": options["globalPostrunScript"],
+        "sequential": options["sequential"],
+        "nosrun": options["nosrun"],
+        "salloc": options["salloc"]
+    }
 
 # let the machine(s) modify the results or act upon them in other ways.
     machine.examineOptions(options)
     if batchmachine:
         batchmachine.examineOptions(options)
 # unpack basic options
-    debug(options.debug)
-    if options.logdir:
-        log.set(directory = options.logdir)
+    debug(options["debug"])
+    if options["logdir"]:
+        log.set(directory = options["logdir"])
     else:
         dirname = SYS_TYPE + "." + atsStartTime + ".logs"
         log.set(directory = dirname)
@@ -579,11 +580,11 @@ def init(clas = '', adder = None, examiner=None):
         log("Batch specification for ", BATCH_TYPE, "in", bspecFoundIn)
 
 # unpack other options
-    cuttime = options.cuttime
+    cuttime = options["cuttime"]
     if cuttime is not None:
         cuttime = Duration(cuttime)
-    timelimit = Duration(options.timelimit)
-    defaultExecutable = executables.Executable(abspath(options.executable))
+    timelimit = Duration(options["timelimit"])
+    defaultExecutable = executables.Executable(abspath(options["executable"]))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     if 'ATSROOT' in os.environ:
         ATSROOT = os.environ['ATSROOT']
