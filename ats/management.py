@@ -599,7 +599,7 @@ See manual for discussion of these arguments.
 
         # Stop the execution of ats when the first INVALID test is found
         # unless option --okInvalid.
-        invalid_tests = [t in t for self.testlist if t.status is INVALID]
+        invalid_tests = [t for t in self.testlist if t.status is INVALID]
         log.indent()
         for bad_file in self.badlist:
             log('Bad file:', bad_file, echo=True)
