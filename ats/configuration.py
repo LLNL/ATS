@@ -351,7 +351,7 @@ def documentConfiguration():
     olist = list(options.keys())
     olist.sort()
     for k in olist:
-        log(k + ":", repr(getattr(options, k)))
+        log(f"{k}:", repr(options[k]))
     log.dedent()
     log.dedent()
 
@@ -493,9 +493,7 @@ def init(clas = '', adder = None, examiner=None):
 
 # immediately make the options a real dictionary -- the way optparse leaves it
 # is misleading.
-    options = {}
-    for k in vars(toptions).keys():
-        options[k] = getattr(toptions, k)
+    options = vars(toptions)
 
 # set up the test default options so the machine(s) can add to it
     options['testDefaults'] = {
