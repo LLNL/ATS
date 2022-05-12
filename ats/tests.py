@@ -156,7 +156,7 @@ class AtsTest (object):
             "directory": '',
         }
         try:
-            self.options.update(configuration.options["testDefaults"])
+            self.options.update(configuration.options.testDefaults)
             self.options.update(AtsTest.glued)
             self.options.update(AtsTest.tacked)
             self.options.update(AtsTest.stuck)
@@ -178,13 +178,13 @@ class AtsTest (object):
             raise AtsError(msg)
 
 
-        if configuration.options["allInteractive"]:
+        if configuration.options.allInteractive:
             self.batch = False
         else:
             self.batch = self.options['batch']
 
 
-        if configuration.options["combineOutErr"]:
+        if configuration.options.combineOutErr:
             self.combineOutput = True
         else:
             self.combineOutput = False
@@ -297,13 +297,13 @@ class AtsTest (object):
 
         # if the test ends up BATCHED, such jobs are legal.
 
-        if self.batch and configuration.options["nobatch"]:
+        if self.batch and configuration.options.nobatch:
             self.set(SKIPPED, "Batch not available")
 
         elif self.batch:
             problem = configuration.batchmachine.canRun(self)
             if not problem:
-                if configuration.options["skip"]:
+                if configuration.options.skip:
                     self.set(SKIPPED, "BACH skipped due to skip flag")
                 else:
                     self.set(BATCHED, "Ready to run in batch.")
@@ -314,8 +314,8 @@ class AtsTest (object):
             problem = configuration.machine.canRun(self)
             if not problem:
                 self.set(CREATED, "Ready to run interactively.")
-            elif configuration.options["allInteractive"] or \
-               configuration.options["nobatch"] or \
+            elif configuration.options.allInteractive or \
+               configuration.options.nobatch or \
                self.groupNumber:
                 self.set(SKIPPED, problem)
             else:
@@ -625,7 +625,7 @@ class AtsTest (object):
             self.notes.append('Please check the results of this test manually.')
             log('Please check the results of this test manually.', echo=True)
 
-        if configuration.options["skip"]:
+        if configuration.options.skip:
             return
 
 

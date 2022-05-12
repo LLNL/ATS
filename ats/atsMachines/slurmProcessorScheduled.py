@@ -246,15 +246,15 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         # Command line option nt over-rides what is in the deck.
         test.nt = 1
-        if configuration.options["ompNumThreads"] > 0:
-            test.nt = configuration.options["ompNumThreads"]
+        if configuration.options.ompNumThreads > 0:
+            test.nt = configuration.options.ompNumThreads
         else:
             if 'nt' in test.options:
                 test.nt = test.options.get('nt', 1)
 
         test.cpus_per_task = -1
-        if configuration.options["cpusPerTask"] > -1:
-            test.cpus_per_task = configuration.options["cpusPerTask"]
+        if configuration.options.cpusPerTask > -1:
+            test.cpus_per_task = configuration.options.cpusPerTask
         else:
             if 'cpus_per_task' in test.options:
                 test.cpus_per_task = test.options.get('cpus_per_task', 1)
@@ -272,7 +272,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 if (self.toss_nn < 0):
                     test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
                     test.nn = test.num_nodes
-                    if configuration.options["verbose"]:
+                    if configuration.options.verbose:
                         print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
                               (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt))
 
@@ -324,7 +324,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             srun_mpi_type='--mpi=pmi2'
 
         srun_unbuffered='--comment="nounbuffered"'
-        if configuration.options["unbuffered"]:
+        if configuration.options.unbuffered:
             srun_unbuffered='--unbuffered'
 
         if MY_SYS_TYPE.startswith('toss'):
@@ -562,7 +562,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         sequential = test.options.get('sequential', False)
         if sequential == True:
             if (self.numProcsAvailable < self.numberMaxProcessors):
-                if configuration.options["verbose"] or SlurmProcessorScheduled.canRunNow_debugClass:
+                if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
                     string = "%d_%d" % (self.numProcsAvailable, self.numberMaxProcessors)
                     if string != SlurmProcessorScheduled.canRunNow_saved_string:
                         SlurmProcessorScheduled.canRunNow_saved_string = string
@@ -579,7 +579,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             np = num_nodes * self.npMax
             my_numProcsAvailable = self.numProcsAvailable + SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs
 
-            if configuration.options["verbose"] or SlurmProcessorScheduled.canRunNow_debugClass:
+            if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
                 string = "%d_%d" % (numberNodesRemaining, my_numProcsAvailable)
                 if string != SlurmProcessorScheduled.canRunNow_saved_string:
                     SlurmProcessorScheduled.canRunNow_saved_string = string
@@ -596,7 +596,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         # else, back to our original programming, see if there are enuf procs available
         else:
-            if configuration.options["verbose"] or SlurmProcessorScheduled.canRunNow_debugClass:
+            if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
                 if self.numProcsAvailable != SlurmProcessorScheduled.canRunNow_numProcsAvailableReported:
                     SlurmProcessorScheduled.canRunNow_numProcsAvailableReported = self.numProcsAvailable
                     if self.numProcsAvailable >= np:
