@@ -1,5 +1,4 @@
 import os, re, sys, time, tempfile, traceback, socket
-from pathlib import Path
 from ats import configuration, version
 from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
                   RUNNING, FILTERED, CREATED, TIMEDOUT, HALTED, EXPECTED,\
@@ -582,7 +581,7 @@ See manual for discussion of these arguments.
             log("Checking that input files exist.")
         files = []
         for _testfile in [abspath(_file) for _file in self.inputFiles]:
-            if Path(_testfile).suffix and os.access(_testfile, os.R_OK):
+            if os.access(_testfile, os.R_OK):
                 files.append(_testfile)
             elif os.access(f'{_testfile}.ats', os.R_OK):
                 files.append(f'{_testfile}.ats')
@@ -629,7 +628,8 @@ See manual for discussion of these arguments.
         # Add parents to each test's waitlist.
         for t in (t for t in self.testlist if t.status is CREATED):
             for dependent in (d for d in t.dependents if t not in d.waitUntil):
-                dependent.waitUntil.append(t)
+                # NOTE: Intentionally not using "append()" on this list
+                dependent.waitUntil = dependent.waitUntil + [t]
 
         log.leading = ''
         log("------------------ Input complete --------", echo=True)
