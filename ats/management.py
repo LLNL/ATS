@@ -573,57 +573,46 @@ See manual for discussion of these arguments.
 
     def collectTests(self):
         """Process the input and collect the tests to be executed.
-We immediately make sure each input file exists and is readable.
-(If we don't we might not find out until many tests have run.)
-"""
+        We immediately make sure each input file exists and is readable.
+        (If we don't we might not find out until many tests have run.)
+        """
         # It is worth settling this now.
         if debug():
             log("Checking that input files exist.")
         files = []
-        for input_file in self.inputFiles:
-            t = abspath(input_file)
-            dir, filename = os.path.split(t)
-            name, e = os.path.splitext(filename)
-            if e:
-                namelist = [t]
+        for _testfile in [abspath(_file) for _file in self.inputFiles]:
+            if os.access(_testfile, os.R_OK):
+                files.append(_testfile)
+            elif os.access(f'{_testfile}.ats', os.R_OK):
+                files.append(f'{_testfile}.ats')
+            elif os.access(f'{_testfile}.py', os.R_OK):
+                files.append(f'{_testfile}.py')
             else:
-                namelist = [t, t+'.ats', t+'.py']
-            for t1 in namelist:
-                try:
-                    f = open(t1, 'r')
-                    break
-                except IOError:
-                    pass
-            else:
-                log.fatal_error('Cannot open %s.' % t)
-            f.close()
-            files.append(t1)
+                log.fatal_error(f'Cannot open {_testfile}.')
 
         log("Input ok. Now collect the tests.")
 
         # Now collect the tests.
-        for t in files:
-            self.source(t)
+        for testfile in files:
+            self.source(testfile)
 
-# Stop the execution of ats when the first INVALID test is found unless option --okInvalid.
+        # Stop the execution of ats when the first INVALID test is found
+        # unless option --okInvalid.
+        invalid_tests = [t for t in self.testlist if t.status is INVALID]
         log.indent()
-        found = False
-        for item in self.badlist:
-            found = True
-            log('Bad file:', item, echo=True)
-        for test in self.testlist:
-            if test.status is INVALID:
-                found = True
-                log(test.status, "#%d"%test.serialNumber, test.name, echo=True)
+        for bad_file in self.badlist:
+            log('Bad file:', bad_file, echo=True)
+        for test in invalid_tests:
+            log(test.status, "#%d"%test.serialNumber, test.name, echo=True)
         log.dedent()
 
-        if found:
-            log('************************************************', echo = True)
-            log('NOTE: Invalid tests or files', echo = True)
+        if any(self.badlist or invalid_tests):
+            log('************************************************', echo=True)
+            log('NOTE: Invalid tests or files', echo=True)
             if not configuration.options["okInvalid"]:
                 log.fatal_error("Fix invalid tests or rerun with --okInvalid.")
 
-# Make sure that every test has distinct name
+        # Make sure that every test has distinct name
         testnames = [t.name.lower() for t in self.testlist]
         for i in range(len(testnames)):
             name = testnames[i]
@@ -636,12 +625,11 @@ We immediately make sure each input file exists and is readable.
                         t.name += ("#%d" % count)
                         testnames[j] = t.name.lower()
 
-# Add parents to each test's waitlist.
-        for t in self.testlist:
-            if t.status is CREATED:
-                for d in t.dependents:
-                    if t not in d.waitUntil:
-                        d.waitUntil = d.waitUntil + [t]
+        # Add parents to each test's waitlist.
+        for t in (t for t in self.testlist if t.status is CREATED):
+            for dependent in (d for d in t.dependents if t not in d.waitUntil):
+                # NOTE: Intentionally not using "append()" on this list
+                dependent.waitUntil = dependent.waitUntil + [t]
 
         log.leading = ''
         log("------------------ Input complete --------", echo=True)
