@@ -25,11 +25,11 @@ class StandardScheduler (object):
         global machine, configuration
         from ats import configuration
         machine = configuration.machine
-        self.verbose = configuration.options.verbose or debug() or \
-                       configuration.options.skip
+        self.verbose = configuration.options["verbose"] or debug() or \
+                       configuration.options["skip"]
         self.schedule = AtsLog(directory=log.directory,
                                name='atss.log',
-                               logging=configuration.options.logUsage,
+                               logging=configuration.options["logUsage"],
                                echo=False)
 
         for t in interactiveTests:
@@ -194,7 +194,7 @@ class StandardScheduler (object):
         "Make appropriate log entries about the test that was started"
         if result:
             m1 = "Start"
-        elif configuration.options.skip:
+        elif configuration.options["skip"]:
             m1 = "SKIP "
         else:
             m1 = ""
@@ -233,7 +233,7 @@ class StandardScheduler (object):
                 msg = '%s #%4d (Group %d #%d) %s, %s nn=%i, np=%i, nt=%i, ngpu=%i %s' % \
                   (m1, test.serialNumber, test.groupNumber, test.groupSerialNumber, test.name, msgHosts, my_nn, test.np, my_nt, my_ngpu, time.asctime())
 
-        if configuration.options.showGroupStartOnly:
+        if configuration.options["showGroupStartOnly"]:
             echo = (not result) or self.verbose or (test.groupSerialNumber == 1) or test.options.get('record', False)
         else:
             echo = (result) or self.verbose or test.options.get('record', False)
