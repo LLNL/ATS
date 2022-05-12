@@ -582,11 +582,11 @@ See manual for discussion of these arguments.
             log("Checking that input files exist.")
         files = []
         for _testfile in [abspath(_file) for _file in self.inputFiles]:
-            if Path(_testfile).suffix and os.access(_testfile):
+            if Path(_testfile).suffix and os.access(_testfile, os.R_OK):
                 files.append(_testfile)
-            elif os.access(f'{_testfile}.ats'):
+            elif os.access(f'{_testfile}.ats', os.R_OK):
                 files.append(f'{_testfile}.ats')
-            elif os.access(f'{_testfile}.py'):
+            elif os.access(f'{_testfile}.py', os.R_OK):
                 files.append(f'{_testfile}.py')
             else:
                 log.fatal_error(f'Cannot open {_testfile}.')
