@@ -606,7 +606,7 @@ See manual for discussion of these arguments.
             log(test.status, "#%d"%test.serialNumber, test.name, echo=True)
         log.dedent()
 
-        if any(self.badlist or invalid_tests):
+        if len(self.badlist) or len(invalid_tests):
             log('************************************************', echo=True)
             log('NOTE: Invalid tests or files', echo=True)
             if not configuration.options["okInvalid"]:
