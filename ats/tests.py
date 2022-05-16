@@ -577,17 +577,17 @@ class AtsTest (object):
         """
         opt = configuration.options
         options = {
-            np: 0,
-            batch: 0,
-            level: 1,
-            keep: opt["keep"],
-            hideOutput: int(opt["hideOutput"]),
-            testStdout: opt["testStdout"],
-            globalPrerunScript: opt["globalPrerunScript"],
-            globalPostrunScript: opt["globalPostrunScript"],
-            script: '',
-            clas: '',
-            executable: '',
+            "np": 0,
+            "batch": 0,
+            "level": 1,
+            "keep": opt["keep"],
+            "hideOutput": int(opt["hideOutput"]),
+            "testStdout": opt["testStdout"],
+            "globalPrerunScript": opt["globalPrerunScript"],
+            "globalPostrunScript": opt["globalPostrunScript"],
+            "script": '',
+            "clas": '',
+            "executable": '',
         }
         options.update(AtsTest.glued)
         options.update(AtsTest.tacked)
