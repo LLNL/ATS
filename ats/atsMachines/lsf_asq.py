@@ -162,7 +162,6 @@ class lsfMachine (machines.Machine):
         self.blueos_np        = options.blueos_np
         self.cpusPerTask      = options.cpusPerTask
         self.timelimit        = options.timelimit
-        self.mpi_um           = options.mpi_um
 
         #if self.lrun_pack and self.lrun_pack == False:
         #    print("DBG 101 self.lrun_pack = False")
@@ -313,7 +312,6 @@ class lsfMachine (machines.Machine):
         test.lrun_pack       = self.lrun_pack
         test.lrun_jsrun_args = self.lrun_jsrun_args
         test.ompProcBind     = self.ompProcBind
-        test.mpi_um          = self.mpi_um
 
         if lsfMachine.debugJsrun:
             print("JSRUN 020 DEBUG lsf_asq test.jsrun_omp          =  %s " % test.jsrun_omp)
@@ -356,9 +354,6 @@ class lsfMachine (machines.Machine):
         str_mpibind = "/usr/tce/bin/mpibind"
         if self.mpibind_executable != "unset":
             str_mpibind = self.mpibind_executable
-
-        #if test.mpi_um == True:
-        #    str_smpi = "--smpiargs=\"-gpu\""
 
         if configuration.options.blueos_ngpu and configuration.options.blueos_ngpu >= 0:
             test.ngpu = configuration.options.blueos_ngpu

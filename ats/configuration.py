@@ -74,7 +74,6 @@ def addOptions(parser):
         combineOutErr=False,
         unbuffered=False,
         strict_nn=False,
-        mpi_um=False,
         bypassSerialMachineCheck=False,
         exclusive=True,
         mpibind='off',
@@ -134,12 +133,6 @@ def addOptions(parser):
 
     parser.add_option('--strict_nn', action='store_true', dest='strict_nn',
         help='Strictly observe test "nn" options, this may result in reduced througput or even slurm srun hangs.')
-
-    parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')
-
-    parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --m_gpu')
 
     parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck',
         help='Bypass check which prohibits ATS from running on serial machines such as rztrona or borax.')
