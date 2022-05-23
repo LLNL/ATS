@@ -10,7 +10,7 @@ until we process the options and get the desired properties.
 """
 import os, sys
 import importlib
-from optparse import OptionParser
+from argparse import ArgumentParser
 from ats import version
 from ats.atsut import debug, abspath
 from ats.log import log, terminal
@@ -57,6 +57,27 @@ MACHINE_DIR.append(atsMachines.__path__[0])
 
 MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
+
+class OptionParserWrapper(ArgumentParser):
+    """ArgumentParser wrapper to help transition away from OptionParser."""
+
+    _TYPES = {
+        "complex": complex,
+        "float": float,
+        "int": int,
+        "string": str,
+    }
+
+    """Handles arguments/options during 'optparse' --> 'argparse' upgrade."""
+    def __init__(self, version, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super().add_argument('--version', action='version', version=version)
+
+    def add_option(self, *args, **kwargs):
+        if 'type' in kwargs:
+            kwargs['type'] = self._TYPES[kwargs['type']]
+        super().add_argument(*args, **kwargs)
+
 
 def addOptions(parser):
     """If not specified:
@@ -454,8 +475,11 @@ def init(clas = '', adder = None, examiner=None):
         machine = machines.Machine('generic', -1)
 
 # create the option set
-    usage = "usage: %prog [options] [input files]"
-    parser = OptionParser(usage=usage, version="%prog " + version.version)
+    usage = "usage: %(prog)s [options] [input files]"
+    parser = OptionParserWrapper(
+        usage=usage,
+        version="%(prog)s " + version.version
+    )
     addOptions(parser)
     machine.addOptions(parser)
 # add the --nobatch option but force it true if no batch facility here.
@@ -472,26 +496,22 @@ def init(clas = '', adder = None, examiner=None):
         argv = shlex.split(clas)
     else:
         argv = sys.argv[1:]
-    (toptions, inputFiles) = parser.parse_args(argv)
-
-# immediately make the options a real dictionary -- the way optparse leaves it
-# is misleading.
-    options = vars(toptions)
+    options, inputFiles = parser.parse_known_args(argv)
 
 # set up the test default options so the machine(s) can add to it
-    options['testDefaults'] = {
+    options.testDefaults = {
         "np": 1,
         "batch": 0,
         "level": 1,
-        "keep": options["keep"],
-        "hideOutput": options["hideOutput"],
-        "verbose": options["verbose"],
-        "testStdout": options["testStdout"],
-        "globalPrerunScript": options["globalPrerunScript"],
-        "globalPostrunScript": options["globalPostrunScript"],
-        "sequential": options["sequential"],
-        "nosrun": options["nosrun"],
-        "salloc": options["salloc"]
+        "keep": options.keep,
+        "hideOutput": options.hideOutput,
+        "verbose": options.verbose,
+        "testStdout": options.testStdout,
+        "globalPrerunScript": options.globalPrerunScript,
+        "globalPostrunScript": options.globalPostrunScript,
+        "sequential": options.sequential,
+        "nosrun": options.nosrun,
+        "salloc": options.salloc
     }
 
 # let the machine(s) modify the results or act upon them in other ways.
@@ -499,9 +519,9 @@ def init(clas = '', adder = None, examiner=None):
     if batchmachine:
         batchmachine.examineOptions(options)
 # unpack basic options
-    debug(options["debug"])
-    if options["logdir"]:
-        log.set(directory = options["logdir"])
+    debug(options.debug)
+    if options.logdir:
+        log.set(directory = options.logdir)
     else:
         dirname = SYS_TYPE + "." + atsStartTime + ".logs"
         log.set(directory = dirname)
@@ -519,11 +539,11 @@ def init(clas = '', adder = None, examiner=None):
         log("Batch specification for ", BATCH_TYPE, "in", bspecFoundIn)
 
 # unpack other options
-    cuttime = options["cuttime"]
+    cuttime = options.cuttime
     if cuttime is not None:
         cuttime = Duration(cuttime)
-    timelimit = Duration(options["timelimit"])
-    defaultExecutable = executables.Executable(abspath(options["executable"]))
+    timelimit = Duration(options.timelimit)
+    defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     if 'ATSROOT' in os.environ:
         ATSROOT = os.environ['ATSROOT']
