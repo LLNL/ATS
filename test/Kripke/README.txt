@@ -13,16 +13,18 @@ This testing was based on the tarfile kripke-v1.2.5-20e9ea9.tar.gz from the abov
 
 gunzip kripke-v1.2.5-20e9ea9.tar.gz
 tar -xvf kripke-v1.2.5-20e9ea9.tar 
+cd kripke-v1.2.5-20e9ea9
 mkdir build
 cd build
 cmake .. -C../host-configs/llnl-toss3-gcc8.1.cmake -DCMAKE_BUILD_TYPE=Release
 make -j 8
+cd ../..
 
 
 2) Run Kripke under ATS.  Some examples are:
 
 
-/usr/apps/ats/7.0.0/bin/atslite1.py
-/usr/apps/ats/7.0.0/bin/atslite1.py --postrunScript=`pwd`/postrun.py
-/usr/apps/ats/7.0.0/bin/atslite1.py --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+/usr/apps/ats/7.0.4/bin/atslite1.py
+/usr/apps/ats/7.0.4/bin/atslite1.py --postrunScript=`pwd`/postrun.py
+/usr/apps/ats/7.0.4/bin/atslite1.py --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
 
