@@ -4,6 +4,9 @@
 ._shell:
   tags: &shell shell
 
+._borax:
+  tags: &borax borax
+
 ._lassen:
   tags: &lassen lassen
 
@@ -18,6 +21,16 @@
 .run_lassen_shell:
   tags:
     - *lassen
+    - *shell
+
+.run_borax_batch:
+  tags:
+    - *borax
+    - *batch
+
+.run_borax_shell:
+  tags:
+    - *borax
     - *shell
 
 .run_quartz_batch:
