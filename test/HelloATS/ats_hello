@@ -1,4 +1,4 @@
-#!/usr/apps/ats/7.0.8/bin/python
+#!/usr/apps/ats/7.0.9/bin/python
 
 import os
 import sys
@@ -92,7 +92,7 @@ interactive_partition = get_interactive_partition()
 # -------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
 
-    cmd = myats + " " + ' '.join(sys.argv[1:])
+    cmd = myats + " --debug " + " " + ' '.join(sys.argv[1:])
 
     create_test_ats_py = os.path.join(os.getcwd(), "create_test_ats.py")
 

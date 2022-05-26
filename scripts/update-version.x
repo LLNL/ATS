@@ -1,4 +1,4 @@
-/usr/gapps/ats/scripts/replace 7.0.. 7.0.8 \
+/usr/gapps/ats/scripts/replace 7.0.. 7.0.9 \
 ats/src/ats/bin/_ats.py \
 ats/src/ats/bin/_ats3.py \
 ats/src/ats/bin/atslite1.py \
@@ -9,4 +9,4 @@ test/HelloATS/create_test_ats.py \
 test/HelloGPU/READ.ME \
 test/HelloGPU/test.ats 
 
-/usr/gapps/ats/scripts/replace "ATS_PATCH = ." "ATS_PATCH = 8" ats/src/ats/version.py
+/usr/gapps/ats/scripts/replace "ATS_PATCH = ." "ATS_PATCH = 9" ats/src/ats/version.py
