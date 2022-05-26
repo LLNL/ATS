@@ -11,14 +11,14 @@ This testing was based on the tarfile kripke-v1.2.5-20e9ea9.tar.gz from the abov
 
 1) Build Kripke in this directory (test/Kripke)
 
-gunzip kripke-v1.2.5-20e9ea9.tar.gz
-tar -xvf kripke-v1.2.5-20e9ea9.tar 
+pushd .
+tar -xvzf kripke-v1.2.5-20e9ea9.tar.gz
 cd kripke-v1.2.5-20e9ea9
 mkdir build
 cd build
 cmake .. -C../host-configs/llnl-toss3-gcc8.1.cmake -DCMAKE_BUILD_TYPE=Release
 make -j 8
-cd ../..
+popd
 
 
 2) Run Kripke under ATS.  Some examples are:

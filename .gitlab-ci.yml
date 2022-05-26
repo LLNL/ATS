@@ -1,4 +1,5 @@
 include:
+  - local: .gitlab/kripke.yml
   - local: .gitlab/runners.yml
 
 stages:
@@ -7,13 +8,17 @@ stages:
 default:
   interruptible: true
 
-.hello_ATS:
-  stage: test
-  script:
+.install_ATS:
+  before_script:
     - ml python/3.8
     - python3 -m virtualenv --python=python3.8 TEST_VENV
     - source TEST_VENV/bin/activate
     - pip install .
+
+.hello_ATS:
+  extends: .install_ATS
+  stage: test
+  script:
     - cd test/HelloATS
     - mpicc hello_ats.c
     - atslite1
@@ -27,3 +32,12 @@ hello_ATS_TOSS:
 
 #hello_ATS_BLUEOS:
 #  extends: [.hello_ATS, .run_lassen_shell]
+
+test-kripke:
+  stage: test
+  extends: .run_quartz_shell
+  before_script:
+    - !reference [.install_ATS, before_script]
+    - !reference [.kripke_setup, before_script]
+  script:
+    - !reference [.kripke_test, script]
