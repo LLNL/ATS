@@ -18,7 +18,7 @@ from ats import configuration
 from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, statuses
 import utils, math
 import lcMachines
-import sys, os, time, subprocess
+import re, sys, os, time, subprocess
 
 
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
@@ -45,7 +45,8 @@ class SlurmProcessorScheduled (lcMachines.LCMachineCore):
         tarray=tstr.split() 
         SlurmProcessorScheduled.slurm_version_str=tarray[1]
         log('SLURM VERSION STRING', SlurmProcessorScheduled.slurm_version_str)
-        tarray=SlurmProcessorScheduled.slurm_version_str.split('.')
+        # tarray=SlurmProcessorScheduled.slurm_version_str.split('.')
+        tarray=re.split('[\.\-]',SlurmProcessorScheduled.slurm_version_str);
         SlurmProcessorScheduled.slurm_version_int=(int(tarray[0]) * 1000) + (int(tarray[1]) * 100) + (int(tarray[2]))
         log('SLURM VERSION NUMBER', SlurmProcessorScheduled.slurm_version_int)
 
