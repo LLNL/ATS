@@ -1,0 +1,23 @@
+variables:
+  ATS_API_URL: $CI_API_V4_URL/projects/$CI_PROJECT_ID/packages
+  KRIPKE_PACKAGE_URL: generic/kripke/v1.2.5
+  KRIPKE_FILE: kripke-v1.2.5-20e9ea9.tar.gz
+  KRIPKE_PATH: $CI_PROJECT_DIR/test/Kripke
+
+.kripke_setup:
+  before_script:
+    - cd $KRIPKE_PATH
+    - >
+      curl --header "JOB-TOKEN $CI_JOB_TOKEN"
+      ${ATS_PACKAGE_URL}/${KRIPKE_PACKAGE_URL}/${KRIPKE_FILE}
+    - tar -xvzf kripke-v1.2.5-20e9ea9.tar.gz
+    - cd kripke-v1.2.5-20e9ea9
+    - mkdir build
+    - cd build
+    - cmake .. -C../host-configs/llnl-toss3-gcc8.1.cmake -DCMAKE_BUILD_TYPE=Release
+    - make -j8
+
+.kripke_test:
+  script:
+    - cd $KRIPKE_PATH
+    - atslite1
