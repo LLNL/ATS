@@ -352,7 +352,7 @@ def documentConfiguration():
     log('ATS version:', version.version)
     log('Options:')
     log.indent()
-    for opt_dest, opt_value in vars(options):
+    for opt_dest, opt_value in vars(options).items():
         log(f"{opt_dest}: {opt_value!r}")
     log.dedent()
     log.dedent()
