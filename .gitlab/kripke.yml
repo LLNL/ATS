@@ -8,8 +8,8 @@ variables:
   before_script:
     - cd $KRIPKE_PATH
     - >
-      curl --header "JOB-TOKEN $CI_JOB_TOKEN"
-      ${ATS_PACKAGE_URL}/${KRIPKE_PACKAGE_URL}/${KRIPKE_FILE}
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" -O
+      "${ATS_PACKAGE_URL}/${KRIPKE_PACKAGE_URL}/${KRIPKE_FILE}"
     - tar -xvzf kripke-v1.2.5-20e9ea9.tar.gz
     - cd kripke-v1.2.5-20e9ea9
     - mkdir build
