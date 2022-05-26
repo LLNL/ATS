@@ -352,10 +352,8 @@ def documentConfiguration():
     log('ATS version:', version.version)
     log('Options:')
     log.indent()
-    olist = list(options.keys())
-    olist.sort()
-    for k in olist:
-        log(f"{k}:", repr(options[k]))
+    for opt_dest, opt_value in vars(options):
+        log(f"{opt_dest}: {opt_value!r}")
     log.dedent()
     log.dedent()
 
