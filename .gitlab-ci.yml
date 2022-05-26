@@ -34,6 +34,7 @@ hello_ATS_TOSS:
 #  extends: [.hello_ATS, .run_lassen_shell]
 
 test-kripke:
+  stage: test
   extends: .run_quartz_shell
   before_script:
     - !reference [.install_ATS, before_script]
