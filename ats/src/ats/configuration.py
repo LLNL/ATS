@@ -72,7 +72,9 @@ def addOptions(parser):
         unbuffered=False,
         strict_nn=False,
         useMinNodes=False,
-        mpi_um=False,
+        mpi_um=True,
+        smpi_off=False,
+        smpi_show=False,
         bypassSerialMachineCheck=False,
         exclusive=True,
         mpibind='off',
@@ -146,10 +148,16 @@ def addOptions(parser):
         help='Toss 3 option: Pass slurm the minimum number of nodes needed to run the test case.  This is experimental and may reduce throughput or cause hangs..')
 
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')
+        help='Blueos option: --smpiargs=-gpu will be added by to support MPI access to unified memory. Synonym with --smpi_gpu. Also default behavior.')
 
     parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --m_gpu')
+        help='Blueos option: --smpiargs=-gpu will be added by to support MPI access to unified memory. Synonym with --m_gpu. Also default behavior.')
+
+    parser.add_option('--smpi_off', action='store_true', dest='smpi_off',
+        help='Blueos option: Add --smpiargs=off to the lrun/jsrun line. Disables --smpiargs=-gpu')
+
+    parser.add_option('--smpi_show', action='store_true', dest='smpi_show',
+        help='Blueos option: Add --smpiargs=show to the lrun/jsrun line. Disables --smpiargs=-gpu')
 
     parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck',
         help='Bypass check which prohibits ATS from running on serial machines such as rztrona or borax.')
