@@ -43,13 +43,13 @@ code_args=['--layout dgz ',
 nprocs_2=[2, 4, 8, 16, 16]
 nprocs_code_args_2=['--procs 2,1,1', '--procs 2,2,1', '--procs 2,2,2', '--procs 2,2,4', '--procs 4,4,1']
 
-code_args_2=['--layout dgz ',
-             '--layout dzg ',
-             '--layout gdz ',
-             '--layout gzd ',
-             '--layout zdg ',
-             '--layout zgd ',
-             '--layout dgz  --pmethod bj'
+code_args_2=['--layout dgz --niter 200',
+             '--layout dzg --niter 200',
+             '--layout gdz --niter 200',
+             '--layout gzd --niter 200',
+             '--layout zdg --niter 200',
+             '--layout zgd --niter 200',
+             '--layout dgz --niter 200 --pmethod bj'
             ]
 
 # -------------------------------------------------------------------------------------------------
