@@ -6,6 +6,7 @@
 #ATS:slurm24                 SELF SlurmProcessorScheduled 24
 #ATS:slurm32                 SELF SlurmProcessorScheduled 32
 #ATS:slurm36                 SELF SlurmProcessorScheduled 36
+#ATS:slurm56                 SELF SlurmProcessorScheduled 56
 #ATS:toss_3_x86_64_ib        SELF SlurmProcessorScheduled 36
 #ATS:toss_3_x86_64           SELF SlurmProcessorScheduled 36
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64

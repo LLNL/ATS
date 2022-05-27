@@ -52,7 +52,12 @@ MACHINE_DIR.append(atsMachines.__path__[0])
 #if MACHINE_OVERRIDE_DIR:
 #    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
 
-MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
+
+if (my_hostname.startswith('ruby')):
+    MACHINE_TYPE = os.environ.get('MACHINE_TYPE', 'slurm56')
+else:
+    MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
+
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
 
 def addOptions(parser):
