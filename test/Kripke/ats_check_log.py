@@ -3,31 +3,13 @@ import os
 import sys
 
 if __name__ == '__main__':
-    pwd = os.getcwd()
-
-    if len(sys.argv) < 2:
-        sys.exit(1)
+    assert len(sys.argv) == 2, "log file not given to the script"
 
     logfile = sys.argv[1]
+    assert os.path.exists(logfile), f"File '{logfile}' not found."
 
-    if os.path.exists(logfile):
+    with open(logfile) as _file:
+        log_file_text = _file.read()
 
-        f = open( logfile, 'r')
-        lines = f.readlines()
-        f.close
-
-        for line in lines:
-            if "Differences found" in line:
-                print "test did not pass"
-                sys.exit(1)
-
-        # If we get to here, we found no differences
-        # test was good
-        print "test passed"
-        sys.exit(0)
-
-    # If we get to here, we did not find the log file
-    print "test did not pass"
-    sys.exit(1)
-
-# end of file
+    assert "Differences found" not in log_file_text, "test did not pass"
+    print("test passed")

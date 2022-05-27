@@ -23,8 +23,7 @@ popd
 
 2) Run Kripke under ATS.  Some examples are:
 
-
-atslite1.py
-atslite1.py --postrunScript=`pwd`/postrun.py
-atslite1.py --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+atslite1
+atslite1 --postrunScript=`pwd`/postrun.py
+atslite1 --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
 

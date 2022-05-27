@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import sys
 
 # 2016-Oct-18 Initial script setup by Shawn Dawson
@@ -22,13 +21,8 @@ import sys
 # to get us started.
 #
 
-if __name__=="__main__":
-
-    print "Hello From Post Run Script"
+if __name__ == "__main__":
+    print("Hello From Post Run Script")
 
     for index, arg in enumerate(sys.argv):
-        print "Argument %d : %s" % (index, arg)
-
-    sys.exit(0)
-
-# end of file
+        print(f"Argument {index}: {arg}")
