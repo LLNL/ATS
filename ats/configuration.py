@@ -55,7 +55,11 @@ MACHINE_DIR.append(atsMachines.__path__[0])
 #if MACHINE_OVERRIDE_DIR:
 #    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
 
-MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
+if (my_hostname.startswith('ruby')):
+    MACHINE_TYPE = os.environ.get('MACHINE_TYPE', 'slurm56')
+else:
+    MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
+
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
 
 def addOptions(parser):
@@ -74,7 +78,10 @@ def addOptions(parser):
         combineOutErr=False,
         unbuffered=False,
         strict_nn=False,
-        mpi_um=False,
+        useMinNodes=False,
+        mpi_um=True,
+        smpi_off=False,
+        smpi_show=False,
         bypassSerialMachineCheck=False,
         exclusive=True,
         mpibind='off',
@@ -144,11 +151,20 @@ def addOptions(parser):
     parser.add_option('--strict_nn', action='store_true', dest='strict_nn',
         help='Strictly observe test "nn" options, this may result in reduced througput or even slurm srun hangs.')
 
+    parser.add_option('--useMinNodes', action='store_true', dest='useMinNodes',
+        help='Toss 3 option: Pass slurm the minimum number of nodes needed to run the test case.  This is experimental and may reduce throughput or cause hangs..')
+
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
         help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')
 
     parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
         help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --m_gpu')
+
+    parser.add_option('--smpi_off', action='store_true', dest='smpi_off',
+        help='Blueos option: Add --smpiargs=off to the lrun/jsrun line. Disables --smpiargs=-gpu')
+
+    parser.add_option('--smpi_show', action='store_true', dest='smpi_show',
+        help='Blueos option: Add --smpiargs=show to the lrun/jsrun line. Disables --smpiargs=-gpu')
 
     parser.add_option('--bypassSerialMachineCheck', action='store_true', dest='bypassSerialMachineCheck',
         help='Bypass check which prohibits ATS from running on serial machines such as rztrona or borax.')
