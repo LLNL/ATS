@@ -69,9 +69,9 @@ def addOptions(parser):
 * default dest is long option name else short option name
 """
     if SYS_TYPE.startswith('toss'):
-        sleepBeforeSrunDefault=0
+        sleepBeforeRunDefault=0
     else:
-        sleepBeforeSrunDefault=0
+        sleepBeforeRunDefault=0
 
     parser.set_defaults(
         allInteractive=False,
@@ -128,7 +128,7 @@ def addOptions(parser):
         ompNumThreads=0,
         cpusPerTask=-1,
         ompDisplayEnv=False,
-        sleepBeforeSrun=sleepBeforeSrunDefault,
+        sleepBeforeRun=sleepBeforeRunDefault,
         sequential=False,
         nosrun=False,
         salloc=False,
@@ -155,10 +155,10 @@ def addOptions(parser):
         help='Toss 3 option: Pass slurm the minimum number of nodes needed to run the test case.  This is experimental and may reduce throughput or cause hangs..')
 
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --smpi_gpu')
+        help='Blueos option: --smpiargs=-gpu will be added by to support MPI access to unified memory. Synonym with --smpi_gpu. Also default behavior.')
 
     parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
-        help='Blueos option: Deprecated option. --smpiargs=-gpu will be added by default to support MPI access to unified memory. Synonym with --m_gpu')
+        help='Blueos option: --smpiargs=-gpu will be added by to support MPI access to unified memory. Synonym with --m_gpu. Also default behavior.')
 
     parser.add_option('--smpi_off', action='store_true', dest='smpi_off',
         help='Blueos option: Add --smpiargs=off to the lrun/jsrun line. Disables --smpiargs=-gpu')
@@ -279,8 +279,11 @@ def addOptions(parser):
 #        parser.add_option('--mpibind', action='store_true', dest='blueos_mpibind',
 #            help='Blueos option: Run the application under the mpibind executable. This is necessary to access GPU device on Power8 (rzmanta) using mpirun. Default to off.')
 #
-    parser.add_option('--sleepBeforeSrun', dest='sleepBeforeSrun', type='int',
-        help='Number of seconds to sleep before each srun. Default is 0 on all systems.')
+    parser.add_option('--sleepBeforeRun', dest='sleepBeforeRun', type='float',
+        help='Number of seconds to sleep before each run. Default is 0.0 on all systems.')
+
+    parser.add_option('--sleepBeforeSrun', dest='sleepBeforeRun', type='float',
+        help='Deprecated.  Renamed to sleepBeforeRun  Will treat as sleepBeforeRun');
 
     parser.add_option('--continueFreq', dest='continueFreq', type='float',
         help="""Frequency in minutes to write a continuation file. The default

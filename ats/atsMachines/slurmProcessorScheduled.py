@@ -474,6 +474,12 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 return str_args.split() + commandList
             # End of Coding suggested by Chris Scroeder
 
+            # launch args suggested by Chris Scroeder, where the test case has the args as a test argument
+            if test.options.get('tossrun'):
+                str_args = test.options.get('tossrun')
+                return str_args.split() + commandList
+            # End of Coding suggested by Chris Scroeder
+
             if self.salloc :
                 return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
             else:
