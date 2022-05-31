@@ -2,6 +2,11 @@
 
 ## 7.0.105
 
+Merge updates from the python 2 branch
+into the python 3 branch.  These updates
+are python version agnostic, and should be in
+both the python 2 and python 3 releases.
+
 Update sleepBeforeRun option.
 Renamed from sleepBeforeSrun.
 Still honor sleepBeforeSrun, simply map
