@@ -270,7 +270,12 @@ call noteEnd for machine-specific part.
             print("DEBUG MachineCore.testEnded invoked cwd= %s " % (os.getcwd()))
 
         globalPostrunScript_outname = test.globalPostrunScript_outname
+
         globalPostrunScript         = test.options.get('globalPostrunScript', None)
+        # Strip quotes which are somehow addedd to the string in Python3
+        # Otherwise we can't verify the file exists or execute it.
+        globalPostrunScript=globalPostrunScript.replace('"', '')
+
         #verbose                     = test.options.get('verbose', False)
         verbose                     = configuration.options.debug
 
@@ -520,7 +525,12 @@ The subprocess part of launch. Also the part that might fail.
         # See if user specified a file to use as stdin to the test problem.
         stdin_file                  = test.options.get('stdin', None)
         globalPrerunScript_outname  = test.globalPrerunScript_outname
+
         globalPrerunScript          = test.options.get('globalPrerunScript', None)
+        # Strip quotes which are somehow addedd to the string in Python3
+        # Otherwise we can't verify the file exists or execute it.
+        globalPrerunScript=globalPrerunScript.replace('"', '')
+
         #verbose                     = test.options.get('verbose', False)
         verbose                     = configuration.options.debug
 

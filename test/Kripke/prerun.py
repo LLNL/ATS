@@ -22,7 +22,7 @@ import sys
 #
 
 if __name__ == "__main__":
-    print "Hello From Pre Run Script"
+    print(f"Hello From Pre Run Script")
 
     for index, arg in enumerate(sys.argv):
         print(f"Argument {index}: {arg}")
