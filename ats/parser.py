@@ -8,7 +8,7 @@ class AtsCodeParser:
     def __init__(self, code_text: str) -> None:
         self.ast = ast.parse(code_text)
         self.raw_text = code_text
-        self.raw_text_dict = dict(enumerate(code_text.split(sep="\n"), 1))
+        self.raw_text_dict = dict(enumerate(code_text.splitlines(), 1))
 
     def _get_node_line_nums(self, node: ast.AST) -> list:
         """Get list of line numbers from node of an abstract syntax tree."""
@@ -34,7 +34,7 @@ class AtsFileParser(AtsCodeParser):
             file_contents = _file.read()
         super().__init__(file_contents)
         self._filename = filename
-        lineno_to_text = dict(enumerate(file_contents.split(sep="\n"), 1))
+        lineno_to_text = dict(enumerate(file_contents.splitlines(), 1))
         self.ATS_lines = {lineno: txt for lineno, txt in lineno_to_text.items()
                           if txt.startswith(self.ATS_HEADER)}
 
