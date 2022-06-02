@@ -6,6 +6,7 @@ from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, LSFERROR, \
 from ats.times import datestamp, Duration, wallTime, atsStartTimeLong
 from ats.tests import AtsTest
 from ats.log import log, terminal
+from ats.parser import AtsCodeParser, AtsFileParser
 
 def standardIntrospection(line):
     "Standard magic detector for input."
@@ -237,7 +238,10 @@ Attributes:
                     log(line, echo=False)
             os.chdir(directory)
             try:
-                exec(code, testenv)
+                parser = AtsCodeParser(code)
+                parsed_text = parser.get_parsed_text()
+                for line in parsed_text.splitlines():
+                    exec(line, testenv)
                 if debug():
                     log('Finished ', t1, datestamp())
             except KeyboardInterrupt:
@@ -252,7 +256,10 @@ Attributes:
             log.indent()
             os.chdir(directory)
             try:
-                exec(compile(open(t1, "rb").read(), t1, 'exec'), testenv)
+                parser = AtsFileParser(t1)
+                parsed_text = parser.get_parsed_text()
+                for line in parsed_text.splitlines():
+                    exec(line, testenv)
                 if debug(): log('Finished ', t1, datestamp())
                 result = 1
             except KeyboardInterrupt:
