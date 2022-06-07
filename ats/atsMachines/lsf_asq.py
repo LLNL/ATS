@@ -158,7 +158,6 @@ class lsfMachine (machines.Machine):
         self.jsrun_bind       = options.blueos_jsrun_bind
         self.ompProcBind      = options.ompProcBind
         self.ngpu             = options.blueos_ngpu
-        # self.jsrun_nn         = options.blueos_jsrun_nn
         self.blueos_np        = options.blueos_np
         self.cpusPerTask      = options.cpusPerTask
         self.timelimit        = options.timelimit
