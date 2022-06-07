@@ -40,14 +40,14 @@ class MachineCore(object):
     def examineBasicOptions(self, options):
         "Examine options from command line, possibly override command line choices."
         from ats import configuration
-        if configuration.options["sequential"]:
+        if configuration.options.sequential:
             self.numberTestsRunningMax = 1
         elif self.hardLimit:
-            if options["npMax"] > 0:
-                self.numberTestsRunningMax = options["npMax"]
+            if options.npMax > 0:
+                self.numberTestsRunningMax = options.npMax
         else:
-            if options["npMax"] > 0:
-                self.numberTestsRunningMax = options["npMax"]
+            if options.npMax > 0:
+                self.numberTestsRunningMax = options.npMax
 
     def checkForTimeOut(self, test):
         """ Check the time elapsed since test's start time.  If greater
@@ -87,7 +87,7 @@ class MachineCore(object):
                 stillRunning.append(test)
             else:   # test has finished
                 if test.status is not PASSED:
-                    if configuration.options["oneFailure"]:
+                    if configuration.options.oneFailure:
                         raise AtsError("Test failed in oneFailure mode.")
         self.running = stillRunning
 
@@ -272,7 +272,7 @@ call noteEnd for machine-specific part.
         globalPostrunScript_outname = test.globalPostrunScript_outname
         globalPostrunScript         = test.options.get('globalPostrunScript', None)
         #verbose                     = test.options.get('verbose', False)
-        verbose                     = configuration.options["debug"]
+        verbose                     = configuration.options.debug
 
         if not (globalPostrunScript == "unset"):
             here = os.getcwd()
@@ -349,28 +349,28 @@ call noteEnd for machine-specific part.
         # set either by the user before the run, or by the test 'nt' option, or by
         # the command line option to ATS --ompNumThreads.  If none of these are set, then
         # set it to 1.
-        if configuration.options["ompNumThreads"] > 0:
+        if configuration.options.ompNumThreads > 0:
             # Priority 1 setting, ats command line
-            if configuration.options["verbose"]:
+            if configuration.options.verbose:
                 print("ATS launch setting OMP_NUM_THREADS %d as user specified --ompNumThreads=%d" %
-                      (configuration.options["ompNumThreads"], configuration.options["ompNumThreads"]))
-            os.environ['OMP_NUM_THREADS'] = str(configuration.options["ompNumThreads"])
+                      (configuration.options.ompNumThreads, configuration.options.ompNumThreads))
+            os.environ['OMP_NUM_THREADS'] = str(configuration.options.ompNumThreads)
         else:
             # Priority 2  setting, within an ATS test line
             omp_num_threads = test.options.get('nt', -1)
             if (omp_num_threads > 0):
-                if configuration.options["verbose"]:
+                if configuration.options.verbose:
                     print("ATS launch setting OMP_NUM_THREADS %d based on test 'nt'option" % omp_num_threads)
                 os.environ['OMP_NUM_THREADS'] = str(omp_num_threads)
             else:
                 # Priority 3 setting, the user has already set OMP_NUM_THREADS in their environment
                 if 'OMP_NUM_THREADS' in os.environ:
-                    if configuration.options["verbose"]:
+                    if configuration.options.verbose:
                         temp_omp= os.getenv("OMP_NUM_THREADS")
                         # print "ATS detected that OMP_NUM_THREADS is already set to %s" % (temp_omp)
                 # Priority 4 setting, set it to 1 if it is not othewise set
                 else:
-                    if configuration.options["verbose"]:
+                    if configuration.options.verbose:
                         print("ATS launch setting OMP_NUM_THREADS 1 by default for as it was not specified for the test.")
                         # print "    This should allow for threaded applications to run with non threaded tests with a single thread."
                     os.environ['OMP_NUM_THREADS'] = str(1)
@@ -380,8 +380,8 @@ call noteEnd for machine-specific part.
         if configuration.SYS_TYPE.startswith('toss'):
             if MachineCore.printExperimentalNotice:
                 MachineCore.printExperimentalNotice = False
-                print("ATS Experimental: setting KMP_AFFINITY to %s on Toss" % configuration.options["kmpAffinity"])
-            os.environ['KMP_AFFINITY'] = configuration.options["kmpAffinity"]
+                print("ATS Experimental: setting KMP_AFFINITY to %s on Toss" % configuration.options.kmpAffinity)
+            os.environ['KMP_AFFINITY'] = configuration.options.kmpAffinity
 
         # Turn off shared memory mpi collective operations on toss and chaos
         if configuration.SYS_TYPE.startswith('toss'):
@@ -447,7 +447,7 @@ call noteEnd for machine-specific part.
 
 
         #--- placing this here doesn't allow the machines to handle the skip option themselves..
-        if configuration.options["skip"]:
+        if configuration.options.skip:
             test.set(SKIPPED, "--skip option")
             return False
 
@@ -522,7 +522,7 @@ The subprocess part of launch. Also the part that might fail.
         globalPrerunScript_outname  = test.globalPrerunScript_outname
         globalPrerunScript          = test.options.get('globalPrerunScript', None)
         #verbose                     = test.options.get('verbose', False)
-        verbose                     = configuration.options["debug"]
+        verbose                     = configuration.options.debug
 
 
         if not (globalPrerunScript == "unset"):
@@ -575,17 +575,17 @@ The subprocess part of launch. Also the part that might fail.
             # 2016-12-02
             # Default sleep is now 0 on all systems.
             if hasattr(test, 'runningWithinSalloc'):
-                if configuration.options["sleepBeforeSrun"] > 0:
+                if configuration.options.sleepBeforeSrun > 0:
                     if MachineCore.printSleepBeforeSrunNotice:
                         MachineCore.printSleepBeforeSrunNotice = False
-                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options["sleepBeforeSrun"])
-                    time.sleep(configuration.options["sleepBeforeSrun"])
+                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
+                    time.sleep(configuration.options.sleepBeforeSrun)
             else:
-                if configuration.options["sleepBeforeSrun"] > 0:
+                if configuration.options.sleepBeforeSrun > 0:
                     if MachineCore.printSleepBeforeSrunNotice:
                         MachineCore.printSleepBeforeSrunNotice = False
-                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options["sleepBeforeSrun"])
-                    time.sleep(configuration.options["sleepBeforeSrun"])
+                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
+                    time.sleep(configuration.options.sleepBeforeSrun)
 
 
             if testStdout == 'file':

@@ -33,6 +33,16 @@
     - *lassen
     - *shell
 
+.run_borax_batch:
+  tags:
+    - *borax
+    - *batch
+
+.run_borax_shell:
+  tags:
+    - *borax
+    - *shell
+
 .run_quartz_batch:
   tags:
     - *quartz
