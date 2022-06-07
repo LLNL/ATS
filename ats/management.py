@@ -239,9 +239,8 @@ Attributes:
             os.chdir(directory)
             try:
                 parser = AtsCodeParser(code)
-                parsed_text = parser.get_parsed_text()
-                for line in parsed_text.splitlines():
-                    exec(line, testenv)
+                for code_segment in parser.get_code_iterator():
+                    exec(code_segment, testenv)
                 if debug():
                     log('Finished ', t1, datestamp())
             except KeyboardInterrupt:
@@ -257,9 +256,8 @@ Attributes:
             os.chdir(directory)
             try:
                 parser = AtsFileParser(t1)
-                parsed_text = parser.get_parsed_text()
-                for line in parsed_text.splitlines():
-                    exec(line, testenv)
+                for code_segment in parser.get_code_iterator():
+                    exec(code_segment, testenv)
                 if debug(): log('Finished ', t1, datestamp())
                 result = 1
             except KeyboardInterrupt:
