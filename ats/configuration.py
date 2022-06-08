@@ -8,9 +8,12 @@ ATSROOT, cuttime, log.
 The log object is created by importing log, but it can't write to a file
 until we process the options and get the desired properties.
 """
-import os, sys
-import importlib
 from argparse import ArgumentParser
+from glob import glob
+import importlib
+import os
+import re
+import sys
 from ats import version
 from ats.atsut import debug, abspath
 from ats.log import log, terminal
@@ -371,6 +374,36 @@ def get_machine_factory(module_name, machine_class,
     machine_factory = getattr(machine_module, machine_class)
     return machine_factory
 
+def get_machine(file_text, file_name, is_batch=False):
+    header = '#BATS:' if is_batch else '#ATS:'
+    machine_type = BATCH_TYPE if is_batch else MACHINE_TYPE
+    ats_lines = (ats_line for ats_line in file_text.splitlines()
+                 if ats_line.startswith(header))
+    for line in ats_lines:
+        items = line[len(header):].split()
+        machine_name, module_name, machine_class, npMaxH = items
+        if machine_name == machine_type:
+            if module_name == "SELF":
+                module_name = os.path.splitext(file_name)[0]
+            try:
+                machine_factory = get_machine_factory(module_name,
+                                                      machine_class)
+                print(f"from ats.atsMachines.{module_name} "
+                      f"import {machine_class} as Machine")
+            except ModuleNotFoundError:
+                machine_factory = get_machine_factory(module_name,
+                                                      machine_class,
+                                                      machine_package='atsMachines')
+                print(f"from atsMachines.{module_name} "
+                      f"import {machine_class} as Machine")
+            machine = machine_factory(machine_name, int(npMaxH))
+            break
+    else:
+        machine = None
+
+    return machine
+
+
 def init(clas = '', adder = None, examiner=None):
     """Called by manager.init(class, adder, examiner)
        Initialize configuration and process command-line options; create log,
@@ -388,22 +421,13 @@ def init(clas = '', adder = None, examiner=None):
     # get the machine and possible batch facility
     machineDirs = MACHINE_DIR
 
-    # delete, not needed, handled above
-    #if MACHINE_OVERRIDE_DIR:
-    #    machineDirs.append(MACHINE_OVERRIDE_DIR)
-
     machineList = []
     for machineDir in machineDirs:
        log('machineDir', machineDir)
-       machineList.extend([os.path.join(machineDir,x) for x in os.listdir(machineDir) if x.endswith('.py') and not x.endswith('__init__.py')])
+       py_files = os.path.join(machineDir, "*.py")
+       machineList.extend([py_file for py_file in glob(py_files)
+                           if not py_file.endswith('__init__.py')])
        sys.path.insert(0, machineDir)
-
-    #machineList = []
-    #for machineDir in machineDirs:
-    #    print("DEBUG machineDir=%s " % (machineDir))
-    #    machineList.extend(
-    #        [os.path.join(machineDir,x) for x in os.listdir(machineDir)
-    #         if x.endswith('.py') and not x.endswith('__init__.py')])
 
     machine = None
     batchmachine = None
@@ -417,53 +441,27 @@ def init(clas = '', adder = None, examiner=None):
         print(MACHINE_TYPE)
         print("DEBUG init 200")
 
+    # Regex patterns looking for text at beginning of each line.
+    ATS_PATTERN = re.compile(f'^#ATS:', re.MULTILINE)
+    BATS_PATTERN = re.compile(f'^#BATS:', re.MULTILINE)
+    BOTH_PATTERN = re.compile(f'^#B?ATS:', re.MULTILINE)
+
     for full_path in machineList:
-        moduleName = ''
-        fname = os.path.basename(full_path)
-        # print "DEBUG 000 fname = %s" % fname
-        f = open(full_path, 'r')
-        for line in f:
-            if line.startswith('#ATS:') and not machine:
-                items = line[5:-1].split()
-                machineName, moduleName, machineClass, npMaxH = items
-                if init_debugClass:
-                    print("DEBUG init machineName=%s moduleName=%s machineClass=%s npMaxH=%s" %
-                          (machineName, moduleName, machineClass, npMaxH))
+        with open(full_path) as _file:
+            file_text = _file.read()
 
-                # print "DEBUG init MACHINE_TYPE=%s machineName=%s moduleName=%s machineClass=%s npMaxH=%s" % (MACHINE_TYPE, machineName, moduleName, machineClass, npMaxH)
+        # Skip to next file if both '#ATS:' and '#BATS:' are not found.
+        if not re.search(BOTH_PATTERN, file_text):
+            continue
 
-                if machineName == MACHINE_TYPE:
-                    if moduleName == "SELF":
-                        moduleName, junk = os.path.splitext(fname)
-                    specFoundIn = full_path
-                    print(f"from ats.atsMachines.{moduleName} "
-                          f"import {machineClass} as Machine")
-                    try:
-                        machine_factory = get_machine_factory(moduleName,
-                                                              machineClass)
-                    except ModuleNotFoundError:
-                        machine_factory = get_machine_factory(moduleName,
-                                                              machineClass,
-                                                              machine_package='atsMachines')
-                    machine = machine_factory(machineName, int(npMaxH))
+        file_name = os.path.basename(full_path)
+        if not machine and re.search(ATS_PATTERN, file_text):
+            machine = get_machine(file_text, file_name)
+            specFoundIn = full_path
 
-            elif line.startswith('#BATS:') and not batchmachine:
-                items = line[6:-1].split()
-                machineName, moduleName, machineClass, npMaxH = items
-
-                if machineName == BATCH_TYPE:
-                    if moduleName == "SELF":
-                        moduleName, junk = os.path.splitext(fname)
-                    bspecFoundIn = full_path
-                    try:
-                        machine_factory = get_machine_factory(moduleName,
-                                                              machineClass)
-                    except ModuleNotFoundError:
-                        machine_factory = get_machine_factory(moduleName,
-                                                              machineClass,
-                                                              machine_package='atsMachines')
-                    batchmachine = machine_factory(moduleName, int(npMaxH))
-        f.close()
+        if not batchmachine and re.search(BATS_PATTERN, file_text):
+            batchmachine = get_machine(file_text, file_name, is_batch=True)
+            bspecFoundIn = full_path
 
         if machine and batchmachine:
             break
