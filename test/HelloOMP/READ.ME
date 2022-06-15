@@ -1,0 +1,57 @@
+--------------------------------------------------------------------------------
+--                 READ.ME for omp_test sample program                       --
+--------------------------------------------------------------------------------
+
+Sample use of lightweight ATS wrapper script
+
+How to use:
+
+    export PATH=/usr/gapps/ats/toss_3_x86_64_ib/7.0.105/bin:$PATH
+
+    (or put the python with ATS you are working on in your upath, wherever that is)
+
+    omp_test.c             <- Simple executable -- will be your projects exectuable(s)
+    create_test_ats.py     <- Python script which will create the test.ats file
+                              Enables projects to easily create tests with
+                              variable number of MPI processes, code executables,
+                              code arguments (test decks, etc), sandbox options,
+                              and post test checkers.
+
+How to build:
+    
+    Use the 'Makefile' to build omp_test.  Or use whatevever compiler you want,
+    and compile omp_test.c by hand to generate omp_test.
+    just ensure it has the proper flags to support OpenMP. 
+
+How to run omp_test by hand:
+
+    Sample Runs of the code to familiarize yourself with different rank and thread
+    bindings to cores which may achieved  with various srun options.
+
+    export OMP_NUM_THREADS=9
+    srun -N2 -n4 -p pdebug ./omp_test 100 2
+    srun -N2 -n4 -p pdebug --exclusive ./omp_test 100 2
+    srun -N2 -n4 -c 9 -p pdebug --exclusive ./omp_test 100 2
+    srun -N2 -n4 -c 9 -p pdebug --mpibind=on --exclusive ./omp_test 100 2
+    srun -N2 -n4 -c 9 --cpu-bind=threads -p pdebug --exclusive ./omp_test 100 2
+
+    Note the inefficiency in one or more of the above srun lines.  
+
+
+Sample ATS runs of the code
+
+   ./create_test_ats.py                         <- create the test.ats file
+
+   /usr/apps/ats/7.0.105/bin/atslite1           <- pre-allocate node and run on the allocation
+                                                   Throughput mode, run tests concurrently.
+
+   /usr/apps/ats/7.0.105/bin/ats test.ats --verbose --exclusive      
+                                                
+                                                ^- run ats on login node, let each test have private allocation
+                                                   This is especially useful for performance testing OpenMP
+                                                   codes
+
+
+--------------------------------------------------------------------------------
+--                           end of READ.ME                                   --
+--------------------------------------------------------------------------------
