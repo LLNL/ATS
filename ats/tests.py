@@ -427,7 +427,7 @@ class AtsTest (object):
         "It is not proper to test the truth of a test."
         self.set(FAILED, 'if test(...) not allowed.')
         log(self, echo=True)
-        return 0
+        return False
 
     def setStartDateTime(self):
         "Sets date and time in the form of yyyy-mm-dd hh:mm:ss for database"
