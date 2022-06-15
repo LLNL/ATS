@@ -77,7 +77,7 @@ int main( int argc, char *argv[])
     (void)sched_getaffinity(0, sizeof(coremask), &coremask);
     cpuset_to_cstr(&coremask, clbuf);
     #pragma omp barrier
-    printf("Test %10d MPI_Rank:%d Node:%s: Thread %03d Core:%s\n", my_rank,unique_identifier,hnbuf, thread, clbuf);
+    printf("Test %10d MPI_Rank:%d Thread:%02d Node:%s: Core:%s\n", unique_identifier,my_rank,thread,hnbuf,clbuf);
   }
 
   if (my_rank == 0)
