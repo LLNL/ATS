@@ -69,24 +69,6 @@ int main( int argc, char *argv[])
   MPI_Comm_size(MPI_COMM_WORLD, &my_size);
   MPI_Get_processor_name(hostname, &sz);
 
-  #if 0
-  if (my_rank == 0) {
-
-      memset(arg_string, '\0', 1024);
-      for (argndx=1; argndx<argc; argndx++) {
-          if ( strlen(argv[argndx]) < 1020 - strlen(arg_string) ) {
-              strcat(arg_string, argv[argndx]);
-              strcat(arg_string, " ");
-          }
-      }
-
-      printf("Hello OMP: There are %d MPI ranks running -- MPI Version is %s -- Argument list is %s\n", my_size,  buffer, arg_string);
-  }
-  MPI_Barrier(MPI_COMM_WORLD);
-  printf("MPI Rank %d is on node %s\n", my_rank, hostname);
-  MPI_Barrier(MPI_COMM_WORLD);
-  #endif
-
 #pragma omp parallel private(thread, coremask, clbuf)
   {
     // #pragma omp master
@@ -95,7 +77,7 @@ int main( int argc, char *argv[])
     (void)sched_getaffinity(0, sizeof(coremask), &coremask);
     cpuset_to_cstr(&coremask, clbuf);
     #pragma omp barrier
-    printf("Test %10d Node:%s: Thread %03d Core:%s\n", unique_identifier,hnbuf, thread, clbuf);
+    printf("Test %10d MPI_Rank:%d Node:%s: Thread %03d Core:%s\n", my_rank,unique_identifier,hnbuf, thread, clbuf);
   }
 
   if (my_rank == 0)
