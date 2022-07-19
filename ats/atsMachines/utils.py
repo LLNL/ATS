@@ -1,7 +1,11 @@
-import os, sys, subprocess
-from ats import debug, SYS_TYPE
+import os
+import subprocess
+import sys
 
-_myDebugLevel= 10
+from ats import SYS_TYPE, debug
+
+_myDebugLevel = 10
+
 
 def utilDebugLevel(value=None):
     "Return the _myDebugLevel flag; if value given, set it."
@@ -11,7 +15,9 @@ def utilDebugLevel(value=None):
     else:
         _myDebugLevel = int(value)
 
-#--------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+
 
 def tryint(s):
     try:
@@ -19,53 +25,57 @@ def tryint(s):
     except:
         return s
 
+
 def alphanum_key(s):
-    """ Turn a string into a list of string and number chunks.
-        "z23a" -> ["z", 23, "a"]
+    """Turn a string into a list of string and number chunks.
+    "z23a" -> ["z", 23, "a"]
     """
     import re
-    return [ tryint(c) for c in re.split('([0-9]+)', s) ]
+
+    return [tryint(c) for c in re.split("([0-9]+)", s)]
+
 
 # Used by getAllHostnames()
 def sort_nicely(l):
 
-    """ Sort the given list in the way that humans expect.
-    """
+    """Sort the given list in the way that humans expect."""
     l.sort(key=alphanum_key)
 
 
-#--------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+
 
 def getAllHostnames():
 
-    cmd= "srun hostname"
-    if SYS_TYPE.startswith('aix'):
-        cmd= "poe hostname"
-    elif SYS_TYPE.startswith('bgqos'):
-        cmd= "hostname"
+    cmd = "srun hostname"
+    if SYS_TYPE.startswith("aix"):
+        cmd = "poe hostname"
+    elif SYS_TYPE.startswith("bgqos"):
+        cmd = "hostname"
 
     if debug() >= utilDebugLevel():
         print("in getAllHostnames() ---- running command:  %s" % cmd)
-    allHostname= []
+    allHostname = []
     try:
-        import subprocess
         import getpass
+        import subprocess
 
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
+        proc = subprocess.Popen(
+            cmd, shell=True, stdout=subprocess.PIPE, text=True
+        )
         stdout_value = proc.communicate()[0]
 
-        if (len(stdout_value)==0):
+        if len(stdout_value) == 0:
             return allHostname
 
-        theLines = stdout_value.split('\n')
+        theLines = stdout_value.split("\n")
 
         for aline in theLines:
-            aline= "spacer:" + aline
+            aline = "spacer:" + aline
             oneHostname = aline.split(":")[-1]
-            if oneHostname != '':
+            if oneHostname != "":
                 if oneHostname not in allHostname:
                     allHostname.append(oneHostname)
-
 
         if debug() >= utilDebugLevel():
             print("DEBUG: before sort %s" % allHostname)
@@ -74,55 +84,68 @@ def getAllHostnames():
             print("DEBUG: after sort %s" % allHostname)
 
     except:
-        print("Unexpected error in utils.py getAllHostnames:%s" % sys.exc_info()[0])
+        print(
+            "Unexpected error in utils.py getAllHostnames:%s"
+            % sys.exc_info()[0]
+        )
         return allHostname
     return allHostname
 
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def setStepNumWithNode(inMaxStepNum):
-# inMaxStepNum - For a group of nodes, the max step number is the max number of nodes minus 1.
-# Returns:  The stepid used to obtain the nodes and for each step, the node assoicated with it.
-#           returns --> stepid, nodeStepDic[node]=stepNum
+    # inMaxStepNum - For a group of nodes, the max step number is the max number of nodes minus 1.
+    # Returns:  The stepid used to obtain the nodes and for each step, the node assoicated with it.
+    #           returns --> stepid, nodeStepDic[node]=stepNum
 
-    return  getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStepNum)
+    return getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStepNum)
 
-#------------------------------------------------------------------------------
 
-def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNode, inNodeStepNumDic, inOldStep):
-# inNodeList - List of nodes available to use.
-# desiredAmount - The number of processors needed.
-# inNodeStepNumDic - Dic of (stepNum, node) association.
-# inStepId - The step id used.
-#
-# Returns the step number that is qualified to provide the desired number of processors needed.
-# If no steps are valid, None is returned.
-#         returns -> stepNum
-#
-    import subprocess
+# ------------------------------------------------------------------------------
+
+
+def getUnusedNode(
+    inNodeAvailTotalDic,
+    inNodeList,
+    desiredAmount,
+    maxProcsPerNode,
+    inNodeStepNumDic,
+    inOldStep,
+):
+    # inNodeList - List of nodes available to use.
+    # desiredAmount - The number of processors needed.
+    # inNodeStepNumDic - Dic of (stepNum, node) association.
+    # inStepId - The step id used.
+    #
+    # Returns the step number that is qualified to provide the desired number of processors needed.
+    # If no steps are valid, None is returned.
+    #         returns -> stepNum
+    #
     import getpass
+    import subprocess
 
-    #print "DEBUG SAD 107"
-    #print inNodeAvailTotalDic
-    #print inNodeList
-    #print desiredAmount
-    #print maxProcsPerNode
-    #print inNodeStepNumDic
-    #print inOldStep
-    #sys.exit(0)
+    # print "DEBUG SAD 107"
+    # print inNodeAvailTotalDic
+    # print inNodeList
+    # print desiredAmount
+    # print maxProcsPerNode
+    # print inNodeStepNumDic
+    # print inOldStep
+    # sys.exit(0)
 
-    maxCount= len(inNodeList)
+    maxCount = len(inNodeList)
 
-    stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
+    stepNodeDic = {v: k for k, v in inNodeStepNumDic.items()}
 
-    nodeAvailDic= inNodeAvailTotalDic
+    nodeAvailDic = inNodeAvailTotalDic
 
-
-    stepNum= 0 #start with first node
+    stepNum = 0  # start with first node
     import math
-    desiredAmount= max(desiredAmount, 1)  # should desire at least 1 processor
-    numNodesToUse= max(1, int(math.ceil(float(desiredAmount)/float(maxProcsPerNode))) )
+
+    desiredAmount = max(desiredAmount, 1)  # should desire at least 1 processor
+    numNodesToUse = max(
+        1, int(math.ceil(float(desiredAmount) / float(maxProcsPerNode)))
+    )
 
     #
     # Start by requesting the minimum number of nodes.  Then if a set of those which
@@ -136,52 +159,64 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
 
     while numNodesToUse <= maxCount:
 
-        #-------------------------------------------
+        # -------------------------------------------
         # Find all the combinations
-        #-------------------------------------------
+        # -------------------------------------------
         if debug() >= utilDebugLevel():
-            print("DEBUG: in utils::getUnusedNode() -- numNodesToUse= %s" % numNodesToUse)
+            print(
+                "DEBUG: in utils::getUnusedNode() -- numNodesToUse= %s"
+                % numNodesToUse
+            )
 
-        comboList= []
+        comboList = []
 
-        for ii in range (stepNum, maxCount):
-            totalValue= ii
-            tempCombo= []
+        for ii in range(stepNum, maxCount):
+            totalValue = ii
+            tempCombo = []
             for jj in range(numNodesToUse):
                 tempCombo.append(totalValue)
-                if totalValue < maxCount-1:
+                if totalValue < maxCount - 1:
                     totalValue += 1
                 else:
                     break
-            if len(tempCombo)==numNodesToUse:
+            if len(tempCombo) == numNodesToUse:
                 comboList.append(tempCombo)
 
         if debug() >= utilDebugLevel():
-            print("DEBUG: in utils::getUnusedNode() -- desiredAmount= %s" % desiredAmount)
-            print("DEBUG: in utils::getUnusedNode() -- comboList= %s" % comboList)
+            print(
+                "DEBUG: in utils::getUnusedNode() -- desiredAmount= %s"
+                % desiredAmount
+            )
+            print(
+                "DEBUG: in utils::getUnusedNode() -- comboList= %s" % comboList
+            )
 
-        #-------------------------------sum all the combo
-        allSavedStep= []
+        # -------------------------------sum all the combo
+        allSavedStep = []
         for eachCombo in comboList:
-            totalAvail= 0
-            savedStep= -1
+            totalAvail = 0
+            savedStep = -1
 
             for astep in eachCombo:
-                if savedStep==-1:
-                    savedStep= astep    # note the first step
-                totalAvail= totalAvail + nodeAvailDic[ stepNodeDic[str(astep)] ]
+                if savedStep == -1:
+                    savedStep = astep  # note the first step
+                totalAvail = totalAvail + nodeAvailDic[stepNodeDic[str(astep)]]
                 if debug() >= utilDebugLevel():
-                    print("eachCombo= %s astep=%s totalAvail=%s" % (eachCombo, astep, totalAvail))
+                    print(
+                        "eachCombo= %s astep=%s totalAvail=%s"
+                        % (eachCombo, astep, totalAvail)
+                    )
                 sys.stdout.flush()
                 if totalAvail >= desiredAmount:
-                    if savedStep != inOldStep:     # Do not submit to the same node twice in a row
+                    if (
+                        savedStep != inOldStep
+                    ):  # Do not submit to the same node twice in a row
                         if debug() >= utilDebugLevel():
                             print("returned savedStep= %s" % savedStep)
                             print("returned numNodesToUse= %s" % numNodesToUse)
                         return nodeAvailDic, savedStep, numNodesToUse
                     else:
                         allSavedStep.append(savedStep)
-
 
         if len(allSavedStep) > 0:
             if debug() >= utilDebugLevel():
@@ -196,8 +231,7 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
     return nodeAvailDic, None, 0
 
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #
 # Use this one if not using -N and -r option and letting slurm round
 # robin the processes as needed
@@ -206,89 +240,130 @@ def getUnusedNode(inNodeAvailTotalDic, inNodeList, desiredAmount, maxProcsPerNod
 #                to nodes.  This may overdelete the cpus when > 1 node is
 #                needed for a test, but will avoid over-subscribing nodes.
 #
-#------------------------------------------------------------------------------
-def removeFromUsedTotalDicNoSrun(inNodeAvailDic, inNodeStepNumDic, inMaxProcsPerNode, inAmountToDelete, inNodeList):
+# ------------------------------------------------------------------------------
+def removeFromUsedTotalDicNoSrun(
+    inNodeAvailDic,
+    inNodeStepNumDic,
+    inMaxProcsPerNode,
+    inAmountToDelete,
+    inNodeList,
+):
 
-    #print "SAD DEBUG removeFromUsedTotalDicNoSrun Begin inNodeAvailDic follows"
-    #print inNodeAvailDic
+    # print "SAD DEBUG removeFromUsedTotalDicNoSrun Begin inNodeAvailDic follows"
+    # print inNodeAvailDic
 
-    stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
+    stepNodeDic = {v: k for k, v in inNodeStepNumDic.items()}
 
-    amountLeft= max(inAmountToDelete, 1)
+    amountLeft = max(inAmountToDelete, 1)
 
     aLen = len(inNodeAvailDic)
 
     while amountLeft > 0:
-        aStep= 0
+        aStep = 0
         for ii in range(0, aLen):
-            tempToDelete= min(1, inNodeAvailDic[ stepNodeDic[str( aStep )] ])
-            inNodeAvailDic[ stepNodeDic[str( aStep )] ] -= tempToDelete
+            tempToDelete = min(1, inNodeAvailDic[stepNodeDic[str(aStep)]])
+            inNodeAvailDic[stepNodeDic[str(aStep)]] -= tempToDelete
             amountLeft -= tempToDelete
             aStep = (aStep + 1) % aLen
-            if amountLeft<=0:
+            if amountLeft <= 0:
                 break
 
-    #print "SAD DEBUG removeFromUsedTotalDicNoSrun End inNodeAvailDic follows"
-    #print inNodeAvailDic
+    # print "SAD DEBUG removeFromUsedTotalDicNoSrun End inNodeAvailDic follows"
+    # print inNodeAvailDic
 
     return inNodeAvailDic
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #
 # Used if the -N and -r options are being used
 #
-#------------------------------------------------------------------------------
-def removeFromUsedTotalDic (inNodeAvailDic, inNodeStepNumDic, inMaxProcsPerNode, inFirstStep, inAmountToDelete, inNumberOfNodesNeeded, inNumNodesToUse, inSrunRelativeNode, inStepId, inNodeList):
+# ------------------------------------------------------------------------------
+def removeFromUsedTotalDic(
+    inNodeAvailDic,
+    inNodeStepNumDic,
+    inMaxProcsPerNode,
+    inFirstStep,
+    inAmountToDelete,
+    inNumberOfNodesNeeded,
+    inNumNodesToUse,
+    inSrunRelativeNode,
+    inStepId,
+    inNodeList,
+):
 
-    stepNodeDic= {v: k for k, v in inNodeStepNumDic.items()}
+    stepNodeDic = {v: k for k, v in inNodeStepNumDic.items()}
 
-    amountLeft= max(inAmountToDelete, 1)
+    amountLeft = max(inAmountToDelete, 1)
 
     while amountLeft > 0:
-        aStep= inFirstStep
+        aStep = inFirstStep
         for ii in range(0, inNumNodesToUse):
-            tempToDelete= min(1, inNodeAvailDic[ stepNodeDic[str( aStep )] ])
-            inNodeAvailDic[ stepNodeDic[str( aStep )] ] -= tempToDelete
+            tempToDelete = min(1, inNodeAvailDic[stepNodeDic[str(aStep)]])
+            inNodeAvailDic[stepNodeDic[str(aStep)]] -= tempToDelete
             amountLeft -= tempToDelete
             aStep = (aStep + 1) % len(inNodeStepNumDic)
-            if amountLeft<=0:
+            if amountLeft <= 0:
                 break
 
     return inNodeAvailDic
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-def findAvailableStep(inNodeList, inNodeAvailTotalDic, inNodeStepNumDic,
-                      inMaxProcsPerNode, inDesiredAmount,  oldStep=0):
 
-    newStep= None
+def findAvailableStep(
+    inNodeList,
+    inNodeAvailTotalDic,
+    inNodeStepNumDic,
+    inMaxProcsPerNode,
+    inDesiredAmount,
+    oldStep=0,
+):
+
+    newStep = None
 
     # SAD DEBUGGING,
-    nodeAvailTotalDic, newStep, numNodesToUse= getUnusedNode(inNodeAvailTotalDic, inNodeList, inDesiredAmount, inMaxProcsPerNode, inNodeStepNumDic, oldStep)
+    nodeAvailTotalDic, newStep, numNodesToUse = getUnusedNode(
+        inNodeAvailTotalDic,
+        inNodeList,
+        inDesiredAmount,
+        inMaxProcsPerNode,
+        inNodeStepNumDic,
+        oldStep,
+    )
 
     if newStep is None:
-            # update nodeAvailTotalDic then call getUnusedNode
-        nodeAvailTotalDic= usingRshFindTotalProcessorsAvail(inNodeAvailTotalDic, inNodeStepNumDic, inMaxProcsPerNode)
-        nodeAvailTotalDic, newStep, numNodesToUse= getUnusedNode(nodeAvailTotalDic, inNodeList, inDesiredAmount, inMaxProcsPerNode, inNodeStepNumDic, oldStep)
+        # update nodeAvailTotalDic then call getUnusedNode
+        nodeAvailTotalDic = usingRshFindTotalProcessorsAvail(
+            inNodeAvailTotalDic, inNodeStepNumDic, inMaxProcsPerNode
+        )
+        nodeAvailTotalDic, newStep, numNodesToUse = getUnusedNode(
+            nodeAvailTotalDic,
+            inNodeList,
+            inDesiredAmount,
+            inMaxProcsPerNode,
+            inNodeStepNumDic,
+            oldStep,
+        )
 
     return nodeAvailTotalDic, newStep, numNodesToUse
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def checkForSrunDefunct(anode):
-    rshCommand= 'rsh ' +  anode + ' ps u'
-    returnCode, runOutput= runThisCommand(rshCommand)
+    rshCommand = "rsh " + anode + " ps u"
+    returnCode, runOutput = runThisCommand(rshCommand)
 
-    theLines = runOutput.split('\n')
+    theLines = runOutput.split("\n")
     for aline in theLines:
-        if 'srun' in aline and 'defunct' in aline:
+        if "srun" in aline and "defunct" in aline:
             return 1
 
     return 0
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 #
 # This is the routine which queries the system to find which nodes
 # have processors which are not being used.
@@ -310,97 +385,110 @@ def checkForSrunDefunct(anode):
 # So save the output and then loop through them, which will help us fine
 # tune this routine in the future as well.
 #
-#------------------------------------------------------------------------------
-def usingRshFindTotalProcessorsAvail (inNodeList, inStepNumNodeNameDic, maxProcsPerNode):
-    taskTotal= {}
+# ------------------------------------------------------------------------------
+def usingRshFindTotalProcessorsAvail(
+    inNodeList, inStepNumNodeNameDic, maxProcsPerNode
+):
+    taskTotal = {}
     for anode in inNodeList:
-        taskTotal[anode]= 0
+        taskTotal[anode] = 0
     import time
+
     time.sleep(1)
     for anode in inNodeList:
 
-        rshCommand= 'rsh ' +  anode + ' ps -ef | grep $USER | grep -v "ps -ef" | grep -v "/usr/apps/ats.*exec" | grep -v "/usr/gapps/ats.*exec" | grep -v "/bin/csh" | grep -v "/bin/bash" | grep -v " bash" | grep -v "/usr/bin/xterm" | grep -v "/bin/ksh" | grep -v "grep $USER" | grep -v "srun .*label" | grep -v "srun.*defunct" | grep -v "pts/0.*-sh" | grep -v "tee temp" '
-        returnCode, runOutput= runThisCommand(rshCommand)
+        rshCommand = (
+            "rsh "
+            + anode
+            + ' ps -ef | grep $USER | grep -v "ps -ef" | grep -v "/usr/apps/ats.*exec" | grep -v "/usr/gapps/ats.*exec" | grep -v "/bin/csh" | grep -v "/bin/bash" | grep -v " bash" | grep -v "/usr/bin/xterm" | grep -v "/bin/ksh" | grep -v "grep $USER" | grep -v "srun .*label" | grep -v "srun.*defunct" | grep -v "pts/0.*-sh" | grep -v "tee temp" '
+        )
+        returnCode, runOutput = runThisCommand(rshCommand)
         runLines = (line for line in runOutput.split(os.linesep))
         numProcsUsed = 0
         for aLine in runLines:
-            #print "DEBUG SAD 346: '%s'" % aLine
-            if (len(aLine) > 10):
+            # print "DEBUG SAD 346: '%s'" % aLine
+            if len(aLine) > 10:
                 # print "DEBUG SAD 304 usingRshFindTotalProcessorsAvail I think the following is a test process: \n\t%s" % aLine
                 numProcsUsed += 1
-        taskTotal[anode]= max(0, maxProcsPerNode - numProcsUsed)
+        taskTotal[anode] = max(0, maxProcsPerNode - numProcsUsed)
 
     # SAD DEBUGGING LINES FOLLOW
-    #msg = "Processors Available by rsh:"
-    #for key, val in sorted(taskTotal.items()):
+    # msg = "Processors Available by rsh:"
+    # for key, val in sorted(taskTotal.items()):
     #    msg = msg + " " + key + "=" + str(val)
-    #print "            %s" % msg
-    #sys.exit(0)
+    # print "            %s" % msg
+    # sys.exit(0)
 
     return taskTotal
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
-#
-# Returns the node and step id associated with the step number.
-#       returns -> node, stepid
-    #--------------------------------------------------
+    #
+    # Returns the node and step id associated with the step number.
+    #       returns -> node, stepid
+    # --------------------------------------------------
     # Determine who the user is..
-    #--------------------------------------------------
-    cmd= "whoami"
+    # --------------------------------------------------
+    cmd = "whoami"
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     return taskTotal
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
-#
-# Returns the node and step id associated with the step number.
-#       returns -> node, stepid
-    #--------------------------------------------------
+    #
+    # Returns the node and step id associated with the step number.
+    #       returns -> node, stepid
+    # --------------------------------------------------
     # Determine who the user is..
-    #--------------------------------------------------
-    cmd= "whoami"
+    # --------------------------------------------------
+    cmd = "whoami"
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
 
     stdout_value = proc.communicate()[0]
-    if (len(stdout_value)==0):
+    if len(stdout_value) == 0:
 
         if debug() >= utilDebugLevel():
-            print("DEBUG: in utils::getNodeAndStepIdAssociatedWithStepNumberLinux() -- whoami ")
-        userName= os.environ['LOGNAME']
+            print(
+                "DEBUG: in utils::getNodeAndStepIdAssociatedWithStepNumberLinux() -- whoami "
+            )
+        userName = os.environ["LOGNAME"]
     else:
-        theLines = stdout_value.split('\n')
+        theLines = stdout_value.split("\n")
         if len(theLines) >= 1:
-            userName= theLines[0]
+            userName = theLines[0]
 
-    #--------------------------------------------------
+    # --------------------------------------------------
     # Gather any stepids for the user first
     # "squeue -s -u userName"
-    #--------------------------------------------------
+    # --------------------------------------------------
     #
     #  unset SQUEUE_FORMAT before using "squeue -s"
-    #--------------------------------------------------
-    if 'SQUEUE_FORMAT' in os.environ:
-        oldSqueueFormatValue= os.environ['SQUEUE_FORMAT']
-        os.unsetenv('SQUEUE_FORMAT')
+    # --------------------------------------------------
+    if "SQUEUE_FORMAT" in os.environ:
+        oldSqueueFormatValue = os.environ["SQUEUE_FORMAT"]
+        os.unsetenv("SQUEUE_FORMAT")
 
-    squeueCmd= "squeue -s -u " + userName
-    proc = subprocess.Popen(squeueCmd, shell=True, stdout=subprocess.PIPE, text=True)
+    squeueCmd = "squeue -s -u " + userName
+    proc = subprocess.Popen(
+        squeueCmd, shell=True, stdout=subprocess.PIPE, text=True
+    )
     stdout_value = proc.communicate()[0]
 
-    if (len(stdout_value)==0):          # no return values
+    if len(stdout_value) == 0:  # no return values
         return inStepNum
 
-    stepList= []
-    nameList= []
+    stepList = []
+    nameList = []
 
-    theLines = stdout_value.split('\n')
+    theLines = stdout_value.split("\n")
     for aline in theLines:
         if "STEPID" in aline:
             continue
         else:
-            splitVals= aline.split()
+            splitVals = aline.split()
             if len(splitVals) > 4:
                 stepList.append(splitVals[0])
             if len(splitVals) > 4:
@@ -410,100 +498,108 @@ def getNodeAndStepIdAssociatedWithStepNumberLinux(inMaxStep):
         print("stepList= %s" % stepList)
         print("nameList= %s" % nameList)
 
-    #--------------------------------------------------
+    # --------------------------------------------------
     # For the step number, determine the node assoicated with it.
-    #--------------------------------------------------
+    # --------------------------------------------------
     # Using "sleep" check which node is used.
     #
-    stepToCheck= 0
+    stepToCheck = 0
     for ii in range(inMaxStep):
         # embed the process id into the job name to distinguish between invocation of the ats.
-        cmd= "srun -N1 -J %d_%d -n 1 -r %d sleep 5" % ( ii, os.getpid(), ii )
-        sleepProc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
+        cmd = "srun -N1 -J %d_%d -n 1 -r %d sleep 5" % (ii, os.getpid(), ii)
+        sleepProc = subprocess.Popen(
+            cmd, shell=True, stdout=subprocess.PIPE, text=True
+        )
 
-    #--------------------------------------------------
+    # --------------------------------------------------
     # "squeue -s -u userName " --- again to check which node corresponds to the step
-    #--------------------------------------------------
+    # --------------------------------------------------
 
     # continue issuing the squeueCmd until all the nodes corresponding to the step are found.
-    stepIdToCheck= None
+    stepIdToCheck = None
     while 1:
-        proc = subprocess.Popen(squeueCmd, shell=True, stdout=subprocess.PIPE, text=True)
+        proc = subprocess.Popen(
+            squeueCmd, shell=True, stdout=subprocess.PIPE, text=True
+        )
         stdout_value = proc.communicate()[0]
-        if (len(stdout_value)==0):
+        if len(stdout_value) == 0:
             return None
 
-        theLines= stdout_value.split('\n')
+        theLines = stdout_value.split("\n")
 
         if debug() >= utilDebugLevel():
             for aline in theLines:
                 print("LINES READ: %s" % aline)
 
-        nodeToCheck= ""
-        newStep= '0'
-        nodeStepDic= {}
+        nodeToCheck = ""
+        newStep = "0"
+        nodeStepDic = {}
         for aline in theLines:
             if "STEPID" in aline:
                 continue
             else:
-                splitVals= aline.split()
+                splitVals = aline.split()
                 if len(splitVals) > 5:
-                    newStep=  splitVals[0]
-                    newName=   splitVals[1]
-                    #checking newStep value is not enough because the user may have the step used to run something else.
+                    newStep = splitVals[0]
+                    newName = splitVals[1]
+                    # checking newStep value is not enough because the user may have the step used to run something else.
                     if newStep not in stepList or newName not in nameList:
-                        nodeToCheck= splitVals[5]
-                        stepLink, pid = splitVals[1].split("_")      # part of the pid may get cut off!
+                        nodeToCheck = splitVals[5]
+                        stepLink, pid = splitVals[1].split(
+                            "_"
+                        )  # part of the pid may get cut off!
 
                         if str(pid) in str(os.getpid()):
-                            nodeStepDic[nodeToCheck]= stepLink
+                            nodeStepDic[nodeToCheck] = stepLink
                         else:
                             continue
 
-        if (len(nodeStepDic) > 0):
-            stepIdToCheck= newStep.split(".")[0]
+        if len(nodeStepDic) > 0:
+            stepIdToCheck = newStep.split(".")[0]
 
         if debug() >= utilDebugLevel():
             print("nodeStepDic= %s" % nodeStepDic)
             print("stepIdToCheck= %s" % stepIdToCheck)
 
-        if (len(nodeStepDic) == inMaxStep ):
+        if len(nodeStepDic) == inMaxStep:
             break
         # end while loop
 
-
     #  re-set SQUEUE_FORMAT after using "squeue -s"
-    #--------------------------------------------------
-    if 'SQUEUE_FORMAT' in os.environ:
-        os.environ['SQUEUE_FORMAT']=  oldSqueueFormatValue
+    # --------------------------------------------------
+    if "SQUEUE_FORMAT" in os.environ:
+        os.environ["SQUEUE_FORMAT"] = oldSqueueFormatValue
 
-    if nodeToCheck == '' or newStep== '':
+    if nodeToCheck == "" or newStep == "":
         return None, None
 
     return stepIdToCheck, nodeStepDic
 
 
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def getNumberOfProcessorsPerNode(useNode=None):
     # Assume all nodes on this machine has the same number of processors
 
-    if 'SYS_TYPE' in os.environ:
-        SYS_TYPE= os.environ['SYS_TYPE']
+    if "SYS_TYPE" in os.environ:
+        SYS_TYPE = os.environ["SYS_TYPE"]
     else:
-        SYS_TYPE= ''
+        SYS_TYPE = ""
     try:
         import subprocess
-        stdout_value = '0'
-        catCmd= 'lsdev -C -c processor | wc -l'
 
-        if SYS_TYPE.startswith('aix'):
+        stdout_value = "0"
+        catCmd = "lsdev -C -c processor | wc -l"
 
-            cmd = 'scontrol show node | head -2 '
+        if SYS_TYPE.startswith("aix"):
 
-            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
+            cmd = "scontrol show node | head -2 "
+
+            proc = subprocess.Popen(
+                cmd, shell=True, stdout=subprocess.PIPE, text=True
+            )
             stdout_value = proc.communicate()[0]
 
-            cmdVal= repr(stdout_value)
+            cmdVal = repr(stdout_value)
 
             # Expect value to be similar to this format
             #
@@ -513,28 +609,30 @@ def getNumberOfProcessorsPerNode(useNode=None):
 
             allVals = cmdVal.split()
 
-            numCPU= '0'
+            numCPU = "0"
             for val in allVals:
-                if val.startswith('CPUTot'):
-                    numCPU= val.split('=')[-1]
+                if val.startswith("CPUTot"):
+                    numCPU = val.split("=")[-1]
                     break
 
-            return  int(numCPU)
+            return int(numCPU)
 
-        else: #if SYS_TYPE.startswith('linux'):
-            catCmd= 'cat /proc/cpuinfo | grep processor | wc -l'
+        else:  # if SYS_TYPE.startswith('linux'):
+            catCmd = "cat /proc/cpuinfo | grep processor | wc -l"
 
         # grab cpu information
-        if useNode==None:
-            cmdToUse= catCmd
+        if useNode == None:
+            cmdToUse = catCmd
         else:
-            sshCmd= 'ssh ' + useNode + ' '
-            cmdToUse= sshCmd + '"' + catCmd + '"'
+            sshCmd = "ssh " + useNode + " "
+            cmdToUse = sshCmd + '"' + catCmd + '"'
 
-        proc = subprocess.Popen(cmdToUse, shell=True, stdout=subprocess.PIPE, text=True)
+        proc = subprocess.Popen(
+            cmdToUse, shell=True, stdout=subprocess.PIPE, text=True
+        )
         stdout_value = proc.communicate()[0]
-        numCpu = stdout_value.split()[0]   # another way of getting CPUs
-        return  int(numCpu)
+        numCpu = stdout_value.split()[0]  # another way of getting CPUs
+        return int(numCpu)
     except KeyboardInterrupt:
         raise
     except:
@@ -542,40 +640,51 @@ def getNumberOfProcessorsPerNode(useNode=None):
         return 0
 
 
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+
 
 def runThisCommand(cmd):
     import subprocess
-    aProcess = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, text=True)
+
+    aProcess = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, text=True
+    )
     aProcess.wait()
     output = aProcess.communicate()[0]
-    returnCode= aProcess.returncode
+    returnCode = aProcess.returncode
 
     return returnCode, output
 
-#---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 def getAllSlurmStepIds():
-    import subprocess
     # get username
-    import getpass, os
+    import getpass
+    import os
+    import subprocess
 
-    envUser= None
-    if 'USER' not in os.environ:
-        envUser= getpass.getuser()
+    envUser = None
+    if "USER" not in os.environ:
+        envUser = getpass.getuser()
     else:
-        envUser= os.environ['USER']
-
+        envUser = os.environ["USER"]
 
     try:
-        squeueCommand= "squeue  -s -u " + envUser + " -o '%.50i %.9P %.220j %.8u %.10M'"
+        squeueCommand = (
+            "squeue  -s -u " + envUser + " -o '%.50i %.9P %.220j %.8u %.10M'"
+        )
 
-        returnCode, stdOutput= runThisCommand(squeueCommand)
+        returnCode, stdOutput = runThisCommand(squeueCommand)
 
-        theLines = stdOutput.split('\n')
+        theLines = stdOutput.split("\n")
 
     except OSError as e:
-        theLines= "---- killUsingSlurmStepId, execution of command failed :  %s----" %  (squeueCommand)
+        theLines = (
+            "---- killUsingSlurmStepId, execution of command failed :  %s----"
+            % (squeueCommand)
+        )
 
     return theLines
 
-#---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------

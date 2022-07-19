@@ -6,12 +6,14 @@ Created on Oct 22, 2014
 Various base classes
 """
 
-__all__ = ['NoNewFields', 'DebugFields']
+__all__ = ["NoNewFields", "DebugFields"]
 
-from ats.util import logs
 import pprint
 
-#-----------------------------------------------------------------------------
+from ats.util import logs
+
+
+# -----------------------------------------------------------------------------
 class NoNewFields(object):
     """Once the fields are set in __init__, setting a new field will raise
     AttributeError.
@@ -20,6 +22,7 @@ class NoNewFields(object):
     e.g. _names = ('a', 'b', 'c').
     To initialize the fields to other than None, override _fieldDefault.
     """
+
     _fieldNames = ()
     _fieldDefault = None
 
@@ -39,8 +42,10 @@ class NoNewFields(object):
                 name = next(nameIter)
                 self.__setattr__(name, value)
             except StopIteration:
-                raise AttributeError('Too many positional args initialzing %s object.  Expected %s, but got %s.' %
-                    (self.__class__, len(self._fieldNames), len(args)))
+                raise AttributeError(
+                    "Too many positional args initialzing %s object.  Expected %s, but got %s."
+                    % (self.__class__, len(self._fieldNames), len(args))
+                )
 
     def __setKeywordFields(self, kwargs):
         for name, value in kwargs.items():
@@ -48,64 +53,71 @@ class NoNewFields(object):
 
     def __setattr__(self, name, value):
         if name not in self.__dict__:
-            raise AttributeError('Field "%s" not found in "%s" object.' % (name, self.__class__))
+            raise AttributeError(
+                'Field "%s" not found in "%s" object.' % (name, self.__class__)
+            )
         else:
             object.__setattr__(self, name, value)
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 class DebugFields(object):
-    """Adds PrettyPrinter behavior to classes.
-    """
-    #classwide indent, when setIndent has not been called:
+    """Adds PrettyPrinter behavior to classes."""
+
+    # classwide indent, when setIndent has not been called:
     _indent = 0
+
     def __repr__(self):
-        return '%s:\n%s' % (self.__class__,
-                            pprint.PrettyPrinter(indent = self._indent).
-                            pformat(self.__dict__))
+        return "%s:\n%s" % (
+            self.__class__,
+            pprint.PrettyPrinter(indent=self._indent).pformat(self.__dict__),
+        )
 
     def setIndent(self, indent):
         # Sets indent for individual instance:
         self._indent = indent
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 def demoNoNewFields():
     print("")
-    logger = logs.getLogger('demoNoNewFields')
+    logger = logs.getLogger("demoNoNewFields")
     # Using DebugFields to log class instances below:
     class XY(NoNewFields, DebugFields):
-        _fieldNames = ('x', 'y')
+        _fieldNames = ("x", "y")
         _fieldDefault = 99
 
     foo = XY()
-    logger.info ("foo: %r" % foo)
+    logger.info("foo: %r" % foo)
     foo.x = 17
-    logger.info ("foo: %r" % foo)
+    logger.info("foo: %r" % foo)
     try:
         foo.z = 18
     except AttributeError as x:
-        logger.info ("Got expected AttributeError:\n'%s'" % str(x))
+        logger.info("Got expected AttributeError:\n'%s'" % str(x))
 
-    bar = XY(1,2)
-    logger.info ("bar: %r" % bar)
+    bar = XY(1, 2)
+    logger.info("bar: %r" % bar)
     bar = XY(1)
-    logger.info ("bar: %r" % bar)
+    logger.info("bar: %r" % bar)
     bar = XY()
-    logger.info ("bar: %r" % bar)
+    logger.info("bar: %r" % bar)
     try:
-        bar = XY (1,2,3)
+        bar = XY(1, 2, 3)
     except AttributeError as x:
-        logger.info ("Got expected AttributeError:\n'%s'" % str(x))
+        logger.info("Got expected AttributeError:\n'%s'" % str(x))
 
     bat = XY(x=1, y=2)
-    logger.info ("bat: %r" % bat)
+    logger.info("bat: %r" % bat)
     bat = XY(y=2)
-    logger.info ("bat: %r" % bat)
+    logger.info("bat: %r" % bat)
     bat = XY(x=1)
-    logger.info ("bat: %r" % bat)
+    logger.info("bat: %r" % bat)
     try:
         bat = XY(x=1, y=2, z=3)
     except AttributeError as x:
-        logger.info ("Got expected AttributeError:\n'%s'" % str(x))
+        logger.info("Got expected AttributeError:\n'%s'" % str(x))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     demoNoNewFields()

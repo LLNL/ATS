@@ -12,17 +12,27 @@
 
 import inspect
 import math
-import sys, os, time, subprocess
+import os
+import subprocess
+import sys
+import time
 
-from ats import machines, debug, atsut
-from ats import log, terminal
-from ats import configuration
-from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTED, EXPECTED, statuses
-from ats.atsMachines import utils
-from ats.atsMachines import lcMachines
+from ats import atsut, configuration, debug, log, machines, terminal
+from ats.atsMachines import lcMachines, utils
+from ats.atsut import (
+    CREATED,
+    EXPECTED,
+    FAILED,
+    HALTED,
+    PASSED,
+    RUNNING,
+    SKIPPED,
+    TIMEDOUT,
+    statuses,
+)
 
+MY_SYS_TYPE = os.environ.get("SYS_TYPE", sys.platform)
 
-MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
 
 class SlurmProcessorScheduled(lcMachines.LCMachineCore):
 
@@ -35,47 +45,56 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
     checkForAtsProcNumRemovedProcs = 0
     debugClass = False
     canRunNow_debugClass = False
-    slurm_version_str=""
-    slurm_version_int=0
+    slurm_version_str = ""
+    slurm_version_int = 0
 
     def init(self):
 
         # Identify the slurm version so ATS may account for differences
         # in slurm behavior
-        tstr = subprocess.check_output(['srun', '--version'], text=True)
-        tarray=tstr.split() 
-        SlurmProcessorScheduled.slurm_version_str=tarray[1]
-        log('SLURM VERSION STRING', SlurmProcessorScheduled.slurm_version_str)
-        tarray=SlurmProcessorScheduled.slurm_version_str.split('.')
-        SlurmProcessorScheduled.slurm_version_int=(int(tarray[0]) * 1000) + (int(tarray[1]) * 100) + (int(tarray[2]))
-        log('SLURM VERSION NUMBER', SlurmProcessorScheduled.slurm_version_int)
+        tstr = subprocess.check_output(["srun", "--version"], text=True)
+        tarray = tstr.split()
+        SlurmProcessorScheduled.slurm_version_str = tarray[1]
+        log("SLURM VERSION STRING", SlurmProcessorScheduled.slurm_version_str)
+        tarray = SlurmProcessorScheduled.slurm_version_str.split(".")
+        SlurmProcessorScheduled.slurm_version_int = (
+            (int(tarray[0]) * 1000) + (int(tarray[1]) * 100) + (int(tarray[2]))
+        )
+        log("SLURM VERSION NUMBER", SlurmProcessorScheduled.slurm_version_int)
 
         self.runningWithinSalloc = True
 
         if "SLURM_JOB_NUM_NODES" in os.environ.keys():
-            self.numNodes= int(os.getenv("SLURM_JOB_NUM_NODES"))
-            self.npMax= int(os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0])
+            self.numNodes = int(os.getenv("SLURM_JOB_NUM_NODES"))
+            self.npMax = int(
+                os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0]
+            )
         elif "SLURM_NNODES" in os.environ.keys():
-            self.numNodes= int(os.getenv("SLURM_NNODES"))
-            self.npMax= int(os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0])
+            self.numNodes = int(os.getenv("SLURM_NNODES"))
+            self.npMax = int(
+                os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0]
+            )
         else:
             self.runningWithinSalloc = False
-            self.npMax= self.numberTestsRunningMax
+            self.npMax = self.numberTestsRunningMax
 
         # Set cores on alastor to 20
         if "HOSTNAME" in os.environ.keys():
-            self.hostname= os.getenv("HOSTNAME")
-            if self.hostname.startswith('rzalastor'):
+            self.hostname = os.getenv("HOSTNAME")
+            if self.hostname.startswith("rzalastor"):
                 print("Setting npMax to 20 on alastor")
                 self.npMax = 20
                 self.npMaxH = 20
 
-
         # Does slurm see the ATS process itself as utilizing a core?
         self.slurmSeesATSProcessAsUsingACore = False
-        if "SLURM_PTY_PORT" in os.environ.keys() or "SLURM_STEP_ID" in os.environ.keys():
+        if (
+            "SLURM_PTY_PORT" in os.environ.keys()
+            or "SLURM_STEP_ID" in os.environ.keys()
+        ):
             self.slurmSeesATSProcessAsUsingACore = True
-            print("""
+            print(
+                """
 ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             ATS Will ignore 'nn' (number of nodes) test options and allow processes
             to span multiple nodes for better throughput and to help prevent srun hangs.
@@ -88,7 +107,8 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
             CAUTION: Use of --strict_nn may result in slurm/srun hangs which are 
                      beyond the control of ATS, depending on how the nodes were allocated
-""")
+"""
+            )
 
         super(SlurmProcessorScheduled, self).init()
 
@@ -102,7 +122,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
     #
     def checkForAtsProc(self):
         if self.checkForAtsProcFlag == True:
-            if "SLURM_PTY_PORT" in os.environ.keys() or "SLURM_STEP_ID" in os.environ.keys():
+            if (
+                "SLURM_PTY_PORT" in os.environ.keys()
+                or "SLURM_STEP_ID" in os.environ.keys()
+            ):
                 if SlurmProcessorScheduled.debugClass:
                     print("DEBUG checkForAtsProc returning 1 (TRUE)")
                 return 1
@@ -112,9 +135,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 return 0
         else:
             if SlurmProcessorScheduled.debugClass:
-                print("DEBUG (checkForAtsProc is False) checkForAtsProc returning 0 (FALSE)")
+                print(
+                    "DEBUG (checkForAtsProc is False) checkForAtsProc returning 0 (FALSE)"
+                )
             return 0
-
 
     def getNumberOfProcessors(self):
         return self.numberMaxProcessors
@@ -126,45 +150,147 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         # self.numberTestsRunningMax is set in init(), not need to call machines.Machine.examineOptions
         # machines.Machine.examineOptions(self, options)
 
-        self.distribution        = options.distribution
+        self.distribution = options.distribution
         self.checkForAtsProcFlag = options.checkForAtsProc
 
         if SlurmProcessorScheduled.debugClass:
             DEBUG_SLURM = "DEBUG SlurmProcessorScheduled Class"
-            print("%s options.cuttime             = %s " % (DEBUG_SLURM, options.cuttime))
-            print("%s options.distribution        = %s " % (DEBUG_SLURM, options.distribution))
-            print("%s options.timelimit           = %s " % (DEBUG_SLURM, options.timelimit))
-            print("%s options.globalPostrunScript = %s " % (DEBUG_SLURM, options.globalPostrunScript))
-            print("%s options.globalPrerunScript  = %s " % (DEBUG_SLURM, options.globalPrerunScript))
-            print("%s options.testStdout          = %s " % (DEBUG_SLURM, options.testStdout))
-            print("%s options.logdir              = %s " % (DEBUG_SLURM, options.logdir))
-            print("%s options.level               = %s " % (DEBUG_SLURM, options.level))
-            print("%s options.npMax               = %s " % (DEBUG_SLURM, options.npMax))
-            print("%s options.reportFreq          = %s " % (DEBUG_SLURM, options.reportFreq))
-            print("%s options.ompNumThreads       = %s " % (DEBUG_SLURM, options.ompNumThreads))
-            print("%s options.cpusPerTask         = %s " % (DEBUG_SLURM, options.cpusPerTask))
-            print("%s options.sleepBeforeSrun     = %s " % (DEBUG_SLURM, options.sleepBeforeSrun))
-            print("%s options.continueFreq        = %s " % (DEBUG_SLURM, options.continueFreq))
-            print("%s options.verbose             = %s " % (DEBUG_SLURM, options.verbose))
-            print("%s options.debug               = %s " % (DEBUG_SLURM, options.debug))
-            print("%s options.info                = %s " % (DEBUG_SLURM, options.info))
-            print("%s options.hideOutput          = %s " % (DEBUG_SLURM, options.hideOutput))
-            print("%s options.keep                = %s " % (DEBUG_SLURM, options.keep))
-            print("%s options.logUsage            = %s " % (DEBUG_SLURM, options.logUsage))
-            print("%s options.okInvalid           = %s " % (DEBUG_SLURM, options.okInvalid))
-            print("%s options.oneFailure          = %s " % (DEBUG_SLURM, options.oneFailure))
-            print("%s options.sequential          = %s " % (DEBUG_SLURM, options.sequential))
-            print("%s options.nosrun              = %s " % (DEBUG_SLURM, options.nosrun))
-            print("%s options.salloc              = %s " % (DEBUG_SLURM, options.salloc))
-            print("%s options.checkForAtsProc     = %s " % (DEBUG_SLURM, options.checkForAtsProc))
-            print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
-            print("%s options.skip                = %s " % (DEBUG_SLURM, options.skip))
-            print("%s options.exclusive           = %s " % (DEBUG_SLURM, options.exclusive))
-            print("%s options.mpibind             = %s " % (DEBUG_SLURM, options.mpibind))
-            print("%s options.combineOutErr       = %s " % (DEBUG_SLURM, options.combineOutErr))
-            print("%s options.allInteractive      = %s " % (DEBUG_SLURM, options.allInteractive))
-            print("%s options.filter              = %s " % (DEBUG_SLURM, options.filter))
-            print("%s options.glue                = %s " % (DEBUG_SLURM, options.glue))
+            print(
+                "%s options.cuttime             = %s "
+                % (DEBUG_SLURM, options.cuttime)
+            )
+            print(
+                "%s options.distribution        = %s "
+                % (DEBUG_SLURM, options.distribution)
+            )
+            print(
+                "%s options.timelimit           = %s "
+                % (DEBUG_SLURM, options.timelimit)
+            )
+            print(
+                "%s options.globalPostrunScript = %s "
+                % (DEBUG_SLURM, options.globalPostrunScript)
+            )
+            print(
+                "%s options.globalPrerunScript  = %s "
+                % (DEBUG_SLURM, options.globalPrerunScript)
+            )
+            print(
+                "%s options.testStdout          = %s "
+                % (DEBUG_SLURM, options.testStdout)
+            )
+            print(
+                "%s options.logdir              = %s "
+                % (DEBUG_SLURM, options.logdir)
+            )
+            print(
+                "%s options.level               = %s "
+                % (DEBUG_SLURM, options.level)
+            )
+            print(
+                "%s options.npMax               = %s "
+                % (DEBUG_SLURM, options.npMax)
+            )
+            print(
+                "%s options.reportFreq          = %s "
+                % (DEBUG_SLURM, options.reportFreq)
+            )
+            print(
+                "%s options.ompNumThreads       = %s "
+                % (DEBUG_SLURM, options.ompNumThreads)
+            )
+            print(
+                "%s options.cpusPerTask         = %s "
+                % (DEBUG_SLURM, options.cpusPerTask)
+            )
+            print(
+                "%s options.sleepBeforeSrun     = %s "
+                % (DEBUG_SLURM, options.sleepBeforeSrun)
+            )
+            print(
+                "%s options.continueFreq        = %s "
+                % (DEBUG_SLURM, options.continueFreq)
+            )
+            print(
+                "%s options.verbose             = %s "
+                % (DEBUG_SLURM, options.verbose)
+            )
+            print(
+                "%s options.debug               = %s "
+                % (DEBUG_SLURM, options.debug)
+            )
+            print(
+                "%s options.info                = %s "
+                % (DEBUG_SLURM, options.info)
+            )
+            print(
+                "%s options.hideOutput          = %s "
+                % (DEBUG_SLURM, options.hideOutput)
+            )
+            print(
+                "%s options.keep                = %s "
+                % (DEBUG_SLURM, options.keep)
+            )
+            print(
+                "%s options.logUsage            = %s "
+                % (DEBUG_SLURM, options.logUsage)
+            )
+            print(
+                "%s options.okInvalid           = %s "
+                % (DEBUG_SLURM, options.okInvalid)
+            )
+            print(
+                "%s options.oneFailure          = %s "
+                % (DEBUG_SLURM, options.oneFailure)
+            )
+            print(
+                "%s options.sequential          = %s "
+                % (DEBUG_SLURM, options.sequential)
+            )
+            print(
+                "%s options.nosrun              = %s "
+                % (DEBUG_SLURM, options.nosrun)
+            )
+            print(
+                "%s options.salloc              = %s "
+                % (DEBUG_SLURM, options.salloc)
+            )
+            print(
+                "%s options.checkForAtsProc     = %s "
+                % (DEBUG_SLURM, options.checkForAtsProc)
+            )
+            print(
+                "%s options.showGroupStartOnly  = %s "
+                % (DEBUG_SLURM, options.showGroupStartOnly)
+            )
+            print(
+                "%s options.skip                = %s "
+                % (DEBUG_SLURM, options.skip)
+            )
+            print(
+                "%s options.exclusive           = %s "
+                % (DEBUG_SLURM, options.exclusive)
+            )
+            print(
+                "%s options.mpibind             = %s "
+                % (DEBUG_SLURM, options.mpibind)
+            )
+            print(
+                "%s options.combineOutErr       = %s "
+                % (DEBUG_SLURM, options.combineOutErr)
+            )
+            print(
+                "%s options.allInteractive      = %s "
+                % (DEBUG_SLURM, options.allInteractive)
+            )
+            print(
+                "%s options.filter              = %s "
+                % (DEBUG_SLURM, options.filter)
+            )
+            print(
+                "%s options.glue                = %s "
+                % (DEBUG_SLURM, options.glue)
+            )
 
         if options.npMax > 0:
             self.npMax = options.npMax
@@ -179,28 +305,28 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         if not self.runningWithinSalloc:
             super(SlurmProcessorScheduled, self).examineOptions(options)
-            self.numNodes  = options.numNodes
+            self.numNodes = options.numNodes
             self.partition = options.partition
 
-        self.numberMaxProcessors   = self.npMax * self.numNodes
+        self.numberMaxProcessors = self.npMax * self.numNodes
 
         # If the user did not set npMax by hand
         # AND if we running within an salloc partition
         # AND if one cpu is being used already for our shell or whatever
         # Then subtract one core from the max number of processors (across all nodes)
         if options.npMax <= 0:
-            if self.runningWithinSalloc==True:
+            if self.runningWithinSalloc == True:
                 if self.checkForAtsProc():
                     self.numberMaxProcessors -= 1
                     SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs = 1
 
-        self.numProcsAvailable     = self.numberMaxProcessors
+        self.numProcsAvailable = self.numberMaxProcessors
         self.numberTestsRunningMax = self.numberMaxProcessors
 
         self.exclusive = options.exclusive
-        self.mpibind   = options.mpibind
-        self.salloc    = options.salloc
-        self.toss_nn   = options.toss_nn
+        self.mpibind = options.mpibind
+        self.salloc = options.salloc
+        self.toss_nn = options.toss_nn
         self.strict_nn = options.strict_nn
         self.timelimit = options.timelimit
 
@@ -208,8 +334,14 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             DEBUG_OPTIONS = "DEBUG examineOptions leaving"
             print("%s self.npMax = %d " % (DEBUG_OPTIONS, self.npMax))
             print("%s self.npMaxH = %d " % (DEBUG_OPTIONS, self.npMaxH))
-            print("%s self.numberMaxProcessors = %d " % (DEBUG_OPTIONS, self.numberMaxProcessors))
-            print("%s self.numberTestsRunningMax = %d " % (DEBUG_OPTIONS, self.numberTestsRunningMax))
+            print(
+                "%s self.numberMaxProcessors = %d "
+                % (DEBUG_OPTIONS, self.numberMaxProcessors)
+            )
+            print(
+                "%s self.numberTestsRunningMax = %d "
+                % (DEBUG_OPTIONS, self.numberTestsRunningMax)
+            )
 
     def addOptions(self, parser):
         """Add options needed on this machine."""
@@ -217,22 +349,36 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         temp_uname = os.uname()
         host = temp_uname[1]
 
-        add_partition = 'pdebug'
-        if host.startswith('rzwhamo'):
-            add_partition = 'nvidia'
+        add_partition = "pdebug"
+        if host.startswith("rzwhamo"):
+            add_partition = "nvidia"
 
-        parser.add_option("--partition", action="store", type="string", dest='partition',
-            default = add_partition,
-            help = "Partition in which to run jobs with np > 0")
+        parser.add_option(
+            "--partition",
+            action="store",
+            type="string",
+            dest="partition",
+            default=add_partition,
+            help="Partition in which to run jobs with np > 0",
+        )
 
-        parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
-           default = 2,
-           help="Number of nodes to use")
+        parser.add_option(
+            "--numNodes",
+            action="store",
+            type="int",
+            dest="numNodes",
+            default=2,
+            help="Number of nodes to use",
+        )
 
-        parser.add_option("--distribution", action="store", type="string", dest='distribution',
-           default = 'unset',
-           help="srun distribution of mpi processes across nodes")
-
+        parser.add_option(
+            "--distribution",
+            action="store",
+            type="string",
+            dest="distribution",
+            default="unset",
+            help="srun distribution of mpi processes across nodes",
+        )
 
     def getResults(self):
         """I'm not sure what this function is supposed to do"""
@@ -240,66 +386,89 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
     def label(self):
         return "SlurmProcessorScheduled: %d nodes, %d processors per node." % (
-            self.numNodes, self.npMax)
+            self.numNodes,
+            self.npMax,
+        )
 
-    def set_nt_num_nodes(self,test):
+    def set_nt_num_nodes(self, test):
 
         # Command line option nt over-rides what is in the deck.
         test.nt = 1
         if configuration.options.ompNumThreads > 0:
             test.nt = configuration.options.ompNumThreads
         else:
-            if 'nt' in test.options:
-                test.nt = test.options.get('nt', 1)
+            if "nt" in test.options:
+                test.nt = test.options.get("nt", 1)
 
         test.cpus_per_task = -1
         if configuration.options.cpusPerTask > -1:
             test.cpus_per_task = configuration.options.cpusPerTask
         else:
-            if 'cpus_per_task' in test.options:
-                test.cpus_per_task = test.options.get('cpus_per_task', 1)
+            if "cpus_per_task" in test.options:
+                test.cpus_per_task = test.options.get("cpus_per_task", 1)
 
         # Command line option toss_nn over-rides what is in the deck.
-        if (self.toss_nn < 0):
-            test.num_nodes = test.options.get('nn', 0)
+        if self.toss_nn < 0:
+            test.num_nodes = test.options.get("nn", 0)
         else:
             test.num_nodes = self.toss_nn
 
         # If num_nodes not specified check to see if we are running more than 40 MPI processes, if so we need
         # multiple nodes (hosts)
-        if ((test.np * test.nt) > self.npMax):
+        if (test.np * test.nt) > self.npMax:
             if test.num_nodes < 1:
-                if (self.toss_nn < 0):
-                    test.num_nodes = math.ceil( (float(test.np) * float(test.nt)) / float(self.npMax))
+                if self.toss_nn < 0:
+                    test.num_nodes = math.ceil(
+                        (float(test.np) * float(test.nt)) / float(self.npMax)
+                    )
                     test.nn = test.num_nodes
                     if configuration.options.verbose:
-                        print("ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes." %
-                              (test.num_nodes, test.name, test.np, test.nt, test.np, test.nt, test.np * test.nt))
+                        print(
+                            "ATS setting test.nn to %i for test %s based on test.np = %i and test.nt=%i (%i x %i = %i) which spans 2 or more nodes."
+                            % (
+                                test.num_nodes,
+                                test.name,
+                                test.np,
+                                test.nt,
+                                test.np,
+                                test.nt,
+                                test.np * test.nt,
+                            )
+                        )
 
     def calculateCommandList(self, test):
         """Prepare for run of executable using a suitable command. First we get the plain command
-         line that would be executed on a vanilla machine, then we modify it if necessary
-         for use on this machines.
+        line that would be executed on a vanilla machine, then we modify it if necessary
+        for use on this machines.
         """
 
         import os
 
-        np                 = max(test.np, 1)
-        distribution       = self.distribution        # default is cyclic, by can be overridden with --distribution=xxx
+        np = max(test.np, 1)
+        distribution = (
+            self.distribution
+        )  # default is cyclic, by can be overridden with --distribution=xxx
         test.runningWithinSalloc = self.runningWithinSalloc
-        commandList        = self.calculateBasicCommandList(test)
-        timeNow            = time.strftime('%H%M%S',time.localtime())
-        test.jobname       = "t%d_%d%s%s" % (np, test.serialNumber, test.namebase[0:50], timeNow)
-        test_time          = test.options.get('time',0);
+        commandList = self.calculateBasicCommandList(test)
+        timeNow = time.strftime("%H%M%S", time.localtime())
+        test.jobname = "t%d_%d%s%s" % (
+            np,
+            test.serialNumber,
+            test.namebase[0:50],
+            timeNow,
+        )
+        test_time = test.options.get("time", 0)
 
         SlurmProcessorScheduled.set_nt_num_nodes(self, test)
-        num_nodes   = test.num_nodes
+        num_nodes = test.num_nodes
         num_threads = test.nt
         # minNodes    = np / self.npMax + (np % self.npMax != 0 )
-        minNodes    = math.ceil( (float(np) * float(num_threads)) / float(self.npMax))
+        minNodes = math.ceil(
+            (float(np) * float(num_threads)) / float(self.npMax)
+        )
 
-        #print("DEBUG SAD JULY np=%i num_threads=%i" % (np, num_threads))
-        #print("DEBUG SAD JULY test.num_nodes=%i num_nodes=%i" % (test.num_nodes, num_nodes))
+        # print("DEBUG SAD JULY np=%i num_threads=%i" % (np, num_threads))
+        # print("DEBUG SAD JULY test.num_nodes=%i num_nodes=%i" % (test.num_nodes, num_nodes))
 
         #
         # --exclusive is the default, but it can be switched via the --share ats argument
@@ -319,15 +488,15 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         temp_uname = os.uname()
         host = temp_uname[1]
 
-        srun_mpi_type='--comment="nompitype"'
-        if host.startswith('rznevaxxx'):
-            srun_mpi_type='--mpi=pmi2'
+        srun_mpi_type = '--comment="nompitype"'
+        if host.startswith("rznevaxxx"):
+            srun_mpi_type = "--mpi=pmi2"
 
-        srun_unbuffered='--comment="nounbuffered"'
+        srun_unbuffered = '--comment="nounbuffered"'
         if configuration.options.unbuffered:
-            srun_unbuffered='--unbuffered'
+            srun_unbuffered = "--unbuffered"
 
-        if MY_SYS_TYPE.startswith('toss'):
+        if MY_SYS_TYPE.startswith("toss"):
             # none means to not specify mpibind at all, use slurm defaults
             if self.mpibind == "none":
                 srun_mpibind = "--comment=nompindspeccification"
@@ -339,85 +508,101 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         #
         # If the distribution is unset, then set it to cyclic
         #
-        if distribution == 'unset':
-            srun_distribution="--distribution=cyclic"
+        if distribution == "unset":
+            srun_distribution = "--distribution=cyclic"
         else:
-            srun_distribution="--distribution=%s" % distribution
+            srun_distribution = "--distribution=%s" % distribution
 
         # set more srun defaults here, may be over-ridden below
         # For running within an allocation we set it to allow slurm to use all
         # the nodes as the default
-        srun_nodes="--nodes=%i-%i" % (1, self.numNodes)
-        srun_partition="--comment=nopartition"
-        srun_cpus_per_task="--cpus-per-task=1"
+        srun_nodes = "--nodes=%i-%i" % (1, self.numNodes)
+        srun_partition = "--comment=nopartition"
+        srun_cpus_per_task = "--cpus-per-task=1"
 
         # Set the --partition option here
         # If not within an salloc, then set the partition to be used for the srun line
         if self.runningWithinSalloc == False:
-            srun_partition="--partition=%s" % self.partition
+            srun_partition = "--partition=%s" % self.partition
 
         # Set the --nodes srun option  here
         #
         # print("DEBUG SAD JULY num_nodes=%i minNodes=%i self.numNodes=%i " % (num_nodes, minNodes, self.numNodes))
         #
         # DEBUG SAD JULY num_nodes=0 minNodes=1 self.numNodes=3
-        
+
         # Note these 3 node values are:
         #   num_nodes     : the nn value for the test, will be 0 if not requested by the user
         #   minNodes      : the number of nodes calculated based on the np (number of mpi) processes and threads
         #   self.numNodes : the number of nodes allocated for this run of ATS for all concurren tests, typically 3-6 nodes
-         
+
         # we are running on the login node, each test will be a separate srun line and allocation
-        if self.runningWithinSalloc == False:                           
+        if self.runningWithinSalloc == False:
             if num_nodes > 0:
-                srun_nodes="--nodes=%i-%i" % (num_nodes, num_nodes)     # If user set nn then honor it
+                srun_nodes = "--nodes=%i-%i" % (
+                    num_nodes,
+                    num_nodes,
+                )  # If user set nn then honor it
             else:
                 if self.exclusive == True:
-                    test.numNodesToUse = minNodes                       # If user asked for exclusive access to each node
-                    srun_nodes="--nodes=%i-%i" % (minNodes, minNodes)   # then set nodes based on minNodes, which is
-                else:                                                   # determined by the number of processors
-                    nodes="--comment=nonodes"                           # This will allow tests to share nodes with other users
+                    test.numNodesToUse = minNodes  # If user asked for exclusive access to each node
+                    srun_nodes = "--nodes=%i-%i" % (
+                        minNodes,
+                        minNodes,
+                    )  # then set nodes based on minNodes, which is
+                else:  # determined by the number of processors
+                    nodes = "--comment=nonodes"  # This will allow tests to share nodes with other users
 
         # We are running on a pre-allocated set of node
         # If the num_nodes is > 0 (ie the user specified "nn=1" or something similar for the test)
         elif num_nodes > 0:
-            if (self.strict_nn == False):
-                srun_nodes="--nodes=%i-%i" % (num_nodes, self.numNodes)
+            if self.strict_nn == False:
+                srun_nodes = "--nodes=%i-%i" % (num_nodes, self.numNodes)
             else:
-                srun_nodes="--nodes=%i-%i" % (num_nodes, num_nodes)
+                srun_nodes = "--nodes=%i-%i" % (num_nodes, num_nodes)
 
         # ----------------------------------------------------------------------------------------------------------------------------
-        # 
+        #
         # ----------------------------------------------------------------------------------------------------------------------------
         if num_nodes > 0:
 
             test.numNodesToUse = num_nodes
 
-            if     "SLURM_JOB_CPUS_PER_NODE" in os.environ.keys():
-                self.slurm_cpus_on_node = int(os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0])
-            elif   "SLURM_CPUS_ON_NODE" in os.environ.keys():
+            if "SLURM_JOB_CPUS_PER_NODE" in os.environ.keys():
+                self.slurm_cpus_on_node = int(
+                    os.getenv("SLURM_JOB_CPUS_PER_NODE", "1").split("(")[0]
+                )
+            elif "SLURM_CPUS_ON_NODE" in os.environ.keys():
                 self.slurm_cpus_on_node = int(os.getenv("SLURM_CPUS_ON_NODE"))
             elif self.npMax > 0:
                 self.slurm_cpus_on_node = self.npMax
             else:
-                print("ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set.")
+                print(
+                    "ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set."
+                )
                 sys.exit(1)
 
-            tasks_per_node        = np / num_nodes
+            tasks_per_node = np / num_nodes
             tasks_per_node_modulo = np % num_nodes
-            if (tasks_per_node < 1) :
+            if tasks_per_node < 1:
                 tasks_per_node = 1
 
             if not tasks_per_node_modulo == 0:
 
                 #  Bump up the tasks per node by 1 as at least 1 node will have extra tasks.
-                tasks_per_node +=1
+                tasks_per_node += 1
 
                 if self.salloc == False:
                     print(test)
                     print("ATS Warning: np=%i nn=%i" % (np, num_nodes))
-                    print("             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes))
-                    print("             %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo))
+                    print(
+                        "             number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"
+                        % (np, num_nodes)
+                    )
+                    print(
+                        "             %i modulo %i = %i "
+                        % (np, num_nodes, tasks_per_node_modulo)
+                    )
                     print(" ")
                     print("             %s " % test.name)
                     print(" ")
@@ -427,7 +612,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 cpus_per_task = int(test.cpus_per_task)
 
             else:
-                if (num_threads > 1):
+                if num_threads > 1:
 
                     cpus_per_task = int(num_threads)
 
@@ -436,12 +621,16 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                     # In this case, bump up the cpus_per_task to achieve this under slurm.
                     # Do not let slurm pack a partial set of nodes and let other nodes sit idle.
                     if self.slurmSeesATSProcessAsUsingACore == False:
-                        all_the_cpus_per_task = int(self.slurm_cpus_on_node / tasks_per_node)
+                        all_the_cpus_per_task = int(
+                            self.slurm_cpus_on_node / tasks_per_node
+                        )
                         if all_the_cpus_per_task > cpus_per_task:
                             cpus_per_task = all_the_cpus_per_task
 
                 else:
-                    cpus_per_task = int(self.slurm_cpus_on_node / tasks_per_node)
+                    cpus_per_task = int(
+                        self.slurm_cpus_on_node / tasks_per_node
+                    )
 
                 # NOTE 123 SAD 2012-12-12
                 # If the user has specified a job which will utilize all the nodes and cpus_per_task is > 1
@@ -450,32 +639,50 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 # was set based on the openmp number of threads.  It may be less efficient, depending on how
                 # the threads are bound to cores, but it will run.
                 if self.slurmSeesATSProcessAsUsingACore:
-                    while (cpus_per_task > 1) and ((np * cpus_per_task) >= self.numberMaxProcessors):
+                    while (cpus_per_task > 1) and (
+                        (np * cpus_per_task) >= self.numberMaxProcessors
+                    ):
                         cpus_per_task -= 1
 
-                test.cpus_per_task  = cpus_per_task
+                test.cpus_per_task = cpus_per_task
 
             test.tasks_per_node = tasks_per_node
 
             if test.cpus_per_task > 0:
-                srun_cpus_per_task="--cpus-per-task=%i" % test.cpus_per_task
+                srun_cpus_per_task = "--cpus-per-task=%i" % test.cpus_per_task
 
             if SlurmProcessorScheduled.debugClass:
                 print("SAD DEBUG SRUN100")
 
             # launch args suggested by Chris Scroeder, where the test case has the args as a test argument
-            if test.options.get('tossrun'):
-                str_args = test.options.get('tossrun')
+            if test.options.get("tossrun"):
+                str_args = test.options.get("tossrun")
                 return str_args.split() + commandList
             # End of Coding suggested by Chris Scroeder
 
-            if self.salloc :
-                return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+            if self.salloc:
+                return [
+                    "salloc",
+                    srun_partition,
+                    srun_ex_or_sh,
+                    srun_nodes,
+                ] + commandList
             else:
-                return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
-                    srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
-                    "--ntasks=%i" % np \
-                   ] + commandList
+                return [
+                    "srun",
+                    srun_mpi_type,
+                    "--label",
+                    "-J",
+                    test.jobname,
+                    srun_partition,
+                    srun_ex_or_sh,
+                    srun_unbuffered,
+                    srun_mpibind,
+                    srun_distribution,
+                    srun_nodes,
+                    srun_cpus_per_task,
+                    "--ntasks=%i" % np,
+                ] + commandList
 
         # ----------------------------------------------------------------------------------------------------------------------------
         # If we are here then num_nodes <= 0 (ie it was not specified)
@@ -488,39 +695,57 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             cpus_per_task = int(1)
 
             # if set to num_threads if specified (and if test.cpus_per_task is not specified)
-            if (num_threads > 1):
+            if num_threads > 1:
                 cpus_per_task = int(num_threads)
 
             # see NOTE 123 above for explanation here
             if self.slurmSeesATSProcessAsUsingACore:
-                while (cpus_per_task > 1) and ((np * cpus_per_task) >= self.numberMaxProcessors):
+                while (cpus_per_task > 1) and (
+                    (np * cpus_per_task) >= self.numberMaxProcessors
+                ):
                     cpus_per_task -= 1
 
-            test.cpus_per_task  = cpus_per_task
+            test.cpus_per_task = cpus_per_task
 
         if test.cpus_per_task > 0:
-            srun_cpus_per_task="--cpus-per-task=%i" % test.cpus_per_task
+            srun_cpus_per_task = "--cpus-per-task=%i" % test.cpus_per_task
 
         if SlurmProcessorScheduled.debugClass:
             print("SAD DEBUG SRUN800 ")
 
-        if self.salloc :
-            return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+        if self.salloc:
+            return [
+                "salloc",
+                srun_partition,
+                srun_ex_or_sh,
+                srun_nodes,
+            ] + commandList
         else:
-            return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
-               srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
-               "--ntasks=%i" % np \
-               ] + commandList
+            return [
+                "srun",
+                srun_mpi_type,
+                "--label",
+                "-J",
+                test.jobname,
+                srun_partition,
+                srun_ex_or_sh,
+                srun_unbuffered,
+                srun_mpibind,
+                srun_distribution,
+                srun_nodes,
+                srun_cpus_per_task,
+                "--ntasks=%i" % np,
+            ] + commandList
 
     def canRun(self, test):
         """Is this machine able to run the test interactively when resources become available?
-           If so return ''.  Otherwise return the reason it cannot be run here.
+        If so return ''.  Otherwise return the reason it cannot be run here.
         """
         np = max(test.np, 1)
         if np > self.numberMaxProcessors:
             return "Too many processors needed (%d)" % np
 
-        return ''
+        return ""
 
     def canRunNow(self, test):
         "Is this machine able to run this test now? Return True/False"
@@ -529,46 +754,96 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         # Print Debug method used by just this class
         #
         def printDebug(self, numberNodesRemaining, num_nodes, np):
-            #if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
+            # if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
             if SlurmProcessorScheduled.canRunNow_debugClass:
-                print("DEBUG canRunNow ================================================================================================")
-                print("DEBUG canRunNow self.numNodes                    =%d" % (self.numNodes))
-                print("DEBUG canRunNow self.numberNodesExclusivelyUsed  =%d" % (self.numberNodesExclusivelyUsed))
-                print("DEBUG canRunNow self.npMax                       =%d" % (self.npMax))
-                print("DEBUG canRunNow numberNodesRemaining             =%d" % (numberNodesRemaining))
-                print("DEBUG canRunNow num_nodes                        =%d" % (num_nodes))
-                print("DEBUG canRunNow self.numProcsAvailable           =%d" % (self.numProcsAvailable))
-                print("DEBUG canRunNow self.numberMaxProcessors         =%d" % (self.numberMaxProcessors))
-                print("DEBUG canRunNow np                               =%d" % (np))
-                print("DEBUG canRunNow self.numberTestsRunningMax       =%d" % (self.numberTestsRunningMax))
-                sequential = test.options.get('sequential', False)
-                print("DEBUG canRunNow sequential                       =", sequential)
+                print(
+                    "DEBUG canRunNow ================================================================================================"
+                )
+                print(
+                    "DEBUG canRunNow self.numNodes                    =%d"
+                    % (self.numNodes)
+                )
+                print(
+                    "DEBUG canRunNow self.numberNodesExclusivelyUsed  =%d"
+                    % (self.numberNodesExclusivelyUsed)
+                )
+                print(
+                    "DEBUG canRunNow self.npMax                       =%d"
+                    % (self.npMax)
+                )
+                print(
+                    "DEBUG canRunNow numberNodesRemaining             =%d"
+                    % (numberNodesRemaining)
+                )
+                print(
+                    "DEBUG canRunNow num_nodes                        =%d"
+                    % (num_nodes)
+                )
+                print(
+                    "DEBUG canRunNow self.numProcsAvailable           =%d"
+                    % (self.numProcsAvailable)
+                )
+                print(
+                    "DEBUG canRunNow self.numberMaxProcessors         =%d"
+                    % (self.numberMaxProcessors)
+                )
+                print(
+                    "DEBUG canRunNow np                               =%d"
+                    % (np)
+                )
+                print(
+                    "DEBUG canRunNow self.numberTestsRunningMax       =%d"
+                    % (self.numberTestsRunningMax)
+                )
+                sequential = test.options.get("sequential", False)
+                print(
+                    "DEBUG canRunNow sequential                       =",
+                    sequential,
+                )
 
         # Get the number of processors needed and the number of nodes needed for this test
         # if specified.  Get the number of nodes remaining for exclusive use.
         #
         numberNodesRemaining = self.numNodes - self.numberNodesExclusivelyUsed
-        np        = max(test.np, 1)
-        num_nodes = test.options.get('nn', -1)
+        np = max(test.np, 1)
+        num_nodes = test.options.get("nn", -1)
 
         # how many nodes are needed?  The test case may have specified -nn, or if a user
         # is running with --exclusive, we will calculate this based on the np option.
         # and the number of processors on each node
         #
-        if (num_nodes <= 0):
-            if self.exclusive == True and not "SLURM_JOBID" in os.environ.keys():
-                num_nodes = np / self.npMax + (np % self.npMax != 0 )
+        if num_nodes <= 0:
+            if (
+                self.exclusive == True
+                and not "SLURM_JOBID" in os.environ.keys()
+            ):
+                num_nodes = np / self.npMax + (np % self.npMax != 0)
 
-        sequential = test.options.get('sequential', False)
+        sequential = test.options.get("sequential", False)
         if sequential == True:
-            if (self.numProcsAvailable < self.numberMaxProcessors):
-                if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
-                    string = "%d_%d" % (self.numProcsAvailable, self.numberMaxProcessors)
+            if self.numProcsAvailable < self.numberMaxProcessors:
+                if (
+                    configuration.options.verbose
+                    or SlurmProcessorScheduled.canRunNow_debugClass
+                ):
+                    string = "%d_%d" % (
+                        self.numProcsAvailable,
+                        self.numberMaxProcessors,
+                    )
                     if string != SlurmProcessorScheduled.canRunNow_saved_string:
                         SlurmProcessorScheduled.canRunNow_saved_string = string
                         printDebug(self, numberNodesRemaining, num_nodes, np)
-                        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print("DEBUG canRunNow returning FALSE based on sequential option: numProcsAvailable = %d < numberMaxProcessors = %d" % (self.numProcsAvailable, self.numberMaxProcessors))
+                        if (
+                            SlurmProcessorScheduled.debugClass
+                            or SlurmProcessorScheduled.canRunNow_debugClass
+                        ):
+                            print(
+                                "DEBUG canRunNow returning FALSE based on sequential option: numProcsAvailable = %d < numberMaxProcessors = %d"
+                                % (
+                                    self.numProcsAvailable,
+                                    self.numberMaxProcessors,
+                                )
+                            )
 
                 return False
 
@@ -577,80 +852,165 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         #   requested x the max number of processors per node
         if num_nodes > 0:
             np = num_nodes * self.npMax
-            my_numProcsAvailable = self.numProcsAvailable + SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs
+            my_numProcsAvailable = (
+                self.numProcsAvailable
+                + SlurmProcessorScheduled.checkForAtsProcNumRemovedProcs
+            )
 
-            if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
+            if (
+                configuration.options.verbose
+                or SlurmProcessorScheduled.canRunNow_debugClass
+            ):
                 string = "%d_%d" % (numberNodesRemaining, my_numProcsAvailable)
                 if string != SlurmProcessorScheduled.canRunNow_saved_string:
                     SlurmProcessorScheduled.canRunNow_saved_string = string
-                    if numberNodesRemaining >= num_nodes and my_numProcsAvailable >= np:
+                    if (
+                        numberNodesRemaining >= num_nodes
+                        and my_numProcsAvailable >= np
+                    ):
                         printDebug(self, numberNodesRemaining, num_nodes, np)
-                        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print("DEBUG canRunNow returning TRUE  based on node avail: %d is  >= %d and proc avail : %d is  >= %d" % (numberNodesRemaining, num_nodes, my_numProcsAvailable, np))
+                        if (
+                            SlurmProcessorScheduled.debugClass
+                            or SlurmProcessorScheduled.canRunNow_debugClass
+                        ):
+                            print(
+                                "DEBUG canRunNow returning TRUE  based on node avail: %d is  >= %d and proc avail : %d is  >= %d"
+                                % (
+                                    numberNodesRemaining,
+                                    num_nodes,
+                                    my_numProcsAvailable,
+                                    np,
+                                )
+                            )
                     else:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
-                        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print("DEBUG canRunNow returning FALSE based on node avail: %d not >= %d or proc avail : %d not >= %d" % (numberNodesRemaining, num_nodes, my_numProcsAvailable, np))
+                        if (
+                            SlurmProcessorScheduled.debugClass
+                            or SlurmProcessorScheduled.canRunNow_debugClass
+                        ):
+                            print(
+                                "DEBUG canRunNow returning FALSE based on node avail: %d not >= %d or proc avail : %d not >= %d"
+                                % (
+                                    numberNodesRemaining,
+                                    num_nodes,
+                                    my_numProcsAvailable,
+                                    np,
+                                )
+                            )
 
-            return numberNodesRemaining >= num_nodes and my_numProcsAvailable >= np
+            return (
+                numberNodesRemaining >= num_nodes and my_numProcsAvailable >= np
+            )
 
         # else, back to our original programming, see if there are enuf procs available
         else:
-            if configuration.options.verbose or SlurmProcessorScheduled.canRunNow_debugClass:
-                if self.numProcsAvailable != SlurmProcessorScheduled.canRunNow_numProcsAvailableReported:
-                    SlurmProcessorScheduled.canRunNow_numProcsAvailableReported = self.numProcsAvailable
+            if (
+                configuration.options.verbose
+                or SlurmProcessorScheduled.canRunNow_debugClass
+            ):
+                if (
+                    self.numProcsAvailable
+                    != SlurmProcessorScheduled.canRunNow_numProcsAvailableReported
+                ):
+                    SlurmProcessorScheduled.canRunNow_numProcsAvailableReported = (
+                        self.numProcsAvailable
+                    )
                     if self.numProcsAvailable >= np:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
-                        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print("DEBUG canRunNow returning TRUE  based on proc avail: %d is  >= %d " % (self.numProcsAvailable, np))
+                        if (
+                            SlurmProcessorScheduled.debugClass
+                            or SlurmProcessorScheduled.canRunNow_debugClass
+                        ):
+                            print(
+                                "DEBUG canRunNow returning TRUE  based on proc avail: %d is  >= %d "
+                                % (self.numProcsAvailable, np)
+                            )
                     else:
                         printDebug(self, numberNodesRemaining, num_nodes, np)
-                        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-                            print("DEBUG canRunNow returning FALSE based on proc avail: %d not >= %d " % (self.numProcsAvailable, np))
+                        if (
+                            SlurmProcessorScheduled.debugClass
+                            or SlurmProcessorScheduled.canRunNow_debugClass
+                        ):
+                            print(
+                                "DEBUG canRunNow returning FALSE based on proc avail: %d not >= %d "
+                                % (self.numProcsAvailable, np)
+                            )
 
             return self.numProcsAvailable >= np
 
     def noteLaunch(self, test):
         """A test has been launched."""
         np = max(test.np, 1)
-        self.numProcsAvailable -= (np * test.cpus_per_task)
+        self.numProcsAvailable -= np * test.cpus_per_task
         test.cpus_per_task_for_noteEnd = test.cpus_per_task
-        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-            print("DEBUG noteLaunch decreased self.numProcsAvailable by (%d x %d) to %d " % (np,  test.cpus_per_task, self.numProcsAvailable))
+        if (
+            SlurmProcessorScheduled.debugClass
+            or SlurmProcessorScheduled.canRunNow_debugClass
+        ):
+            print(
+                "DEBUG noteLaunch decreased self.numProcsAvailable by (%d x %d) to %d "
+                % (np, test.cpus_per_task, self.numProcsAvailable)
+            )
 
     def noteEnd(self, test):
-        """A test has finished running. """
+        """A test has finished running."""
 
         SlurmProcessorScheduled.set_nt_num_nodes(self, test)
         my_np = max(test.np, 1)
         my_nt = max(test.nt, 1)
         my_nn = max(test.num_nodes, 0)
 
-        self.numProcsAvailable += (my_np * test.cpus_per_task_for_noteEnd)
-        if SlurmProcessorScheduled.debugClass or SlurmProcessorScheduled.canRunNow_debugClass:
-            print("DEBUG noteEnd increased self.numProcsAvailable by (%d x %d) to %d " % (my_np, test.cpus_per_task_for_noteEnd, self.numProcsAvailable))
+        self.numProcsAvailable += my_np * test.cpus_per_task_for_noteEnd
+        if (
+            SlurmProcessorScheduled.debugClass
+            or SlurmProcessorScheduled.canRunNow_debugClass
+        ):
+            print(
+                "DEBUG noteEnd increased self.numProcsAvailable by (%d x %d) to %d "
+                % (
+                    my_np,
+                    test.cpus_per_task_for_noteEnd,
+                    self.numProcsAvailable,
+                )
+            )
 
-        msg = '%s #%4d %s,  nn=%d, np=%d, nt=%d, ngpu=0 %s' % \
-            ("Stop ", test.serialNumber, test.name, my_nn, my_np, my_nt, time.asctime())
+        msg = "%s #%4d %s,  nn=%d, np=%d, nt=%d, ngpu=0 %s" % (
+            "Stop ",
+            test.serialNumber,
+            test.name,
+            my_nn,
+            my_np,
+            my_nt,
+            time.asctime(),
+        )
 
         print(msg)
 
     def periodicReport(self):
         "Report on current status of tasks"
         if len(self.running):
-            terminal("CURRENTLY RUNNING %d tests:" % len(self.running),
-                     " ".join([t.name for t in self.running]) )
-        terminal("-"*80)
-        terminal("CURRENTLY UTILIZING %d of %d processors." % (
-            self.numberMaxProcessors - self.numProcsAvailable, self.numberMaxProcessors) )
-        terminal("-"*80)
+            terminal(
+                "CURRENTLY RUNNING %d tests:" % len(self.running),
+                " ".join([t.name for t in self.running]),
+            )
+        terminal("-" * 80)
+        terminal(
+            "CURRENTLY UTILIZING %d of %d processors."
+            % (
+                self.numberMaxProcessors - self.numProcsAvailable,
+                self.numberMaxProcessors,
+            )
+        )
+        terminal("-" * 80)
 
     def remainingCapacity(self):
         """How many nodes or processors are free? ?"""
-        numberNodesRemaining = self.numNodes              - self.numberNodesExclusivelyUsed
-        numberTestsRemaining = self.numberTestsRunningMax - self.numberTestsRunning
+        numberNodesRemaining = self.numNodes - self.numberNodesExclusivelyUsed
+        numberTestsRemaining = (
+            self.numberTestsRunningMax - self.numberTestsRunning
+        )
 
-        #if SlurmProcessorScheduled.debugClass:
+        # if SlurmProcessorScheduled.debugClass:
         #    print "DEBUG remainingCapacity ================================================================================================"
         #    print "DEBUG remainingCapacity self.numNodes                    =%d" % (self.numNodes)
         #    print "DEBUG remainingCapacity self.numberNodesExclusivelyUsed  =%d" % (self.numberNodesExclusivelyUsed)
@@ -661,54 +1021,132 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         #    print "DEBUG remainingCapacity numberTestsRemaining             =%d" % (numberTestsRemaining)
 
         if self.exclusive == True and not "SLURM_JOBID" in os.environ.keys():
-            if numberNodesRemaining != SlurmProcessorScheduled.remainingCapacity_numNodesReported:
-                SlurmProcessorScheduled.remainingCapacity_numNodesReported = numberNodesRemaining
+            if (
+                numberNodesRemaining
+                != SlurmProcessorScheduled.remainingCapacity_numNodesReported
+            ):
+                SlurmProcessorScheduled.remainingCapacity_numNodesReported = (
+                    numberNodesRemaining
+                )
 
             if numberNodesRemaining < 1:
                 if SlurmProcessorScheduled.canRunNow_debugClass:
-                    if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
-                        SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                        print("DEBUG remainingCapacity returning %d nodes available (A)" % 0)
+                    if (
+                        inspect.getframeinfo(inspect.currentframe()).lineno
+                        != SlurmProcessorScheduled.lastMessageLine
+                    ):
+                        SlurmProcessorScheduled.lastMessageLine = (
+                            inspect.getframeinfo(inspect.currentframe()).lineno
+                            - 1
+                        )
+                        print(
+                            "DEBUG remainingCapacity returning %d nodes available (A)"
+                            % 0
+                        )
                 return 0
             else:
                 if SlurmProcessorScheduled.canRunNow_debugClass:
-                    if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
-                        SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                        print("DEBUG remainingCapacity returning %d nodes available (A)" % numberNodesRemaining)
+                    if (
+                        inspect.getframeinfo(inspect.currentframe()).lineno
+                        != SlurmProcessorScheduled.lastMessageLine
+                    ):
+                        SlurmProcessorScheduled.lastMessageLine = (
+                            inspect.getframeinfo(inspect.currentframe()).lineno
+                            - 1
+                        )
+                        print(
+                            "DEBUG remainingCapacity returning %d nodes available (A)"
+                            % numberNodesRemaining
+                        )
                 return numberNodesRemaining
         else:
             if numberNodesRemaining < 1:
-                if numberNodesRemaining != SlurmProcessorScheduled.remainingCapacity_numNodesReported:
-                    SlurmProcessorScheduled.remainingCapacity_numNodesReported = numberNodesRemaining
+                if (
+                    numberNodesRemaining
+                    != SlurmProcessorScheduled.remainingCapacity_numNodesReported
+                ):
+                    SlurmProcessorScheduled.remainingCapacity_numNodesReported = (
+                        numberNodesRemaining
+                    )
 
                 if numberNodesRemaining < 1:
                     if SlurmProcessorScheduled.canRunNow_debugClass:
-                        if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
-                            SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print("DEBUG remainingCapacity returning %d nodes available (B)" % 0)
+                        if (
+                            inspect.getframeinfo(inspect.currentframe()).lineno
+                            != SlurmProcessorScheduled.lastMessageLine
+                        ):
+                            SlurmProcessorScheduled.lastMessageLine = (
+                                inspect.getframeinfo(
+                                    inspect.currentframe()
+                                ).lineno
+                                - 1
+                            )
+                            print(
+                                "DEBUG remainingCapacity returning %d nodes available (B)"
+                                % 0
+                            )
                     return 0
                 else:
                     if SlurmProcessorScheduled.canRunNow_debugClass:
-                        if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
-                            SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print("DEBUG remainingCapacity returning %d nodes available (B)" % numberNodesRemaining)
+                        if (
+                            inspect.getframeinfo(inspect.currentframe()).lineno
+                            != SlurmProcessorScheduled.lastMessageLine
+                        ):
+                            SlurmProcessorScheduled.lastMessageLine = (
+                                inspect.getframeinfo(
+                                    inspect.currentframe()
+                                ).lineno
+                                - 1
+                            )
+                            print(
+                                "DEBUG remainingCapacity returning %d nodes available (B)"
+                                % numberNodesRemaining
+                            )
                     return numberNodesRemaining
             else:
-                if self.numProcsAvailable != SlurmProcessorScheduled.remainingCapacity_numProcsReported:
-                    SlurmProcessorScheduled.remainingCapacity_numProcsReported = self.numProcsAvailable
+                if (
+                    self.numProcsAvailable
+                    != SlurmProcessorScheduled.remainingCapacity_numProcsReported
+                ):
+                    SlurmProcessorScheduled.remainingCapacity_numProcsReported = (
+                        self.numProcsAvailable
+                    )
 
                 if self.numProcsAvailable < 1:
                     if SlurmProcessorScheduled.canRunNow_debugClass:
-                        if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
-                            SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print("DEBUG remainingCapacity returning %d numProcsAvailable available (C)" % 0)
+                        if (
+                            inspect.getframeinfo(inspect.currentframe()).lineno
+                            != SlurmProcessorScheduled.lastMessageLine
+                        ):
+                            SlurmProcessorScheduled.lastMessageLine = (
+                                inspect.getframeinfo(
+                                    inspect.currentframe()
+                                ).lineno
+                                - 1
+                            )
+                            print(
+                                "DEBUG remainingCapacity returning %d numProcsAvailable available (C)"
+                                % 0
+                            )
                     return 0
                 else:
                     if SlurmProcessorScheduled.canRunNow_debugClass:
-                        if inspect.getframeinfo(inspect.currentframe()).lineno != SlurmProcessorScheduled.lastMessageLine:
-                            SlurmProcessorScheduled.lastMessageLine = inspect.getframeinfo(inspect.currentframe()).lineno - 1
-                            print("DEBUG remainingCapacity returning %d numProcsAvailable available (C)" % self.numProcsAvailable)
+                        if (
+                            inspect.getframeinfo(inspect.currentframe()).lineno
+                            != SlurmProcessorScheduled.lastMessageLine
+                        ):
+                            SlurmProcessorScheduled.lastMessageLine = (
+                                inspect.getframeinfo(
+                                    inspect.currentframe()
+                                ).lineno
+                                - 1
+                            )
+                            print(
+                                "DEBUG remainingCapacity returning %d numProcsAvailable available (C)"
+                                % self.numProcsAvailable
+                            )
                     return self.numProcsAvailable
+
 
 # ################################################################################################################### #
 #                                               End of File                                                           #

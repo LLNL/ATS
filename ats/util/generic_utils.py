@@ -1,21 +1,20 @@
-import os
-import sys
-
 import grp
+import os
 import re
 import shlex
 import shutil
 import stat
+import subprocess
+import sys
+from subprocess import PIPE, STDOUT, CalledProcessError, Popen
 
 from ats import log
-import subprocess
-from subprocess import Popen, PIPE, CalledProcessError, STDOUT
 
 # Define module variables to hold names of ASC and project modules
 # for dynamic loading of module members.
 
-ASCModuleName        = 'ASC_atsb'
-baseASCPATH          = ''
+ASCModuleName = "ASC_atsb"
+baseASCPATH = ""
 projectATSModuleName = None
 
 #####################################################################
@@ -23,7 +22,7 @@ projectATSModuleName = None
 #####################################################################
 
 # Coding to load module found in Python Cookbook, Section 15.3, pg 456
-def importName( moduleName, name, default_func=None, verbose=False ):
+def importName(moduleName, name, default_func=None, verbose=False):
     """
     At run time, dynamically import 'name' from 'moduleName'.
     """
@@ -32,66 +31,80 @@ def importName( moduleName, name, default_func=None, verbose=False ):
     func = default_func
     try:
         print("WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
-        my_mod = __import__( moduleName, globals(), locals(), [name] )
-        func   =  vars(my_mod)[name]
+        my_mod = __import__(moduleName, globals(), locals(), [name])
+        func = vars(my_mod)[name]
     except ImportError as value:
-        print("Import of function %s from %s failed: %s" % (name, moduleName, value))
+        print(
+            "Import of function %s from %s failed: %s"
+            % (name, moduleName, value)
+        )
         raise Exception
     except KeyError as value:
-        print("KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
+        print(
+            "KeyError during import of function %s from %s failed: %s"
+            % (name, moduleName, value)
+        )
         pass
 
     return func
+
 
 # --------------------------------------------------------------------------
 #
 # Short cut function to simpify loading project functions.
 #
 # --------------------------------------------------------------------------
-def getProjectFunction( name, default_func=None, verbose=False ):
-    return importName( projectATSModuleName, name, default_func, verbose )
+def getProjectFunction(name, default_func=None, verbose=False):
+    return importName(projectATSModuleName, name, default_func, verbose)
+
 
 #####################################################################
 
-def runCommand( cmd_line, file_name=None, exit=True, verbose=False):
+
+def runCommand(cmd_line, file_name=None, exit=True, verbose=False):
     """
     Function to run a command and capture its output.
     """
-    popen_args = shlex.split( cmd_line )
+    popen_args = shlex.split(cmd_line)
 
-    log('runCommand command line: %s' % cmd_line, echo = verbose)
+    log("runCommand command line: %s" % cmd_line, echo=verbose)
 
     try:
 
         if file_name is not None:
-            if os.path.exists( file_name ):
-                stdout_pipe = open( file_name, 'a')
-                stderr_pipe = open( '%s.err' % file_name, 'a')
+            if os.path.exists(file_name):
+                stdout_pipe = open(file_name, "a")
+                stderr_pipe = open("%s.err" % file_name, "a")
             else:
-                stdout_pipe = open( file_name, 'w')
-                stderr_pipe = open( '%s.err' % file_name, 'w')
+                stdout_pipe = open(file_name, "w")
+                stderr_pipe = open("%s.err" % file_name, "w")
         else:
             stdout_pipe = PIPE
             stderr_pipe = PIPE
 
-        (stdout_txt, stderr_txt) = Popen(popen_args, stdout=stdout_pipe, stderr=stderr_pipe, text=True).communicate()
+        (stdout_txt, stderr_txt) = Popen(
+            popen_args, stdout=stdout_pipe, stderr=stderr_pipe, text=True
+        ).communicate()
 
         if file_name is not None:
             stdout_pipe.close()
             stderr_pipe.close()
 
     except CalledProcessError as error:
-        log('Command failed: error code %d' % error.returncode, echo=True)
-        log('Failed Command: %s' % cmd_line, echo=True)
+        log("Command failed: error code %d" % error.returncode, echo=True)
+        log("Failed Command: %s" % cmd_line, echo=True)
         if exit:
             raise SystemExit(1)
     except OSError as error:
-        log('Command failed with OSError: traceback %s' % error.child_traceback, echo=True)
-        log('Failed Command: %s' % cmd_line, echo=True)
+        log(
+            "Command failed with OSError: traceback %s" % error.child_traceback,
+            echo=True,
+        )
+        log("Failed Command: %s" % cmd_line, echo=True)
         if exit:
             raise SystemExit(1)
 
-    return ( stdout_txt, stderr_txt )
+    return (stdout_txt, stderr_txt)
 
 
 # --------------------------------------------------------------------------
@@ -106,21 +119,26 @@ def execute(cmd_line, file_name=None, verbose=False):
     """
     Function to run a command and display output to screen.
     """
-    log(f'Execute command line: {cmd_line}', echo=verbose)
-    completed_process = subprocess.run(cmd_line.split(), text=True,
-                                       stdout=PIPE, stderr=STDOUT)
+    log(f"Execute command line: {cmd_line}", echo=verbose)
+    completed_process = subprocess.run(
+        cmd_line.split(), text=True, stdout=PIPE, stderr=STDOUT
+    )
     if verbose:
         # Writes to ats.log
         log(completed_process.stdout, echo=True)
     if file_name:
-        with open(file_name, 'w') as log_file:
-            log_file.write(f'Command: {cmd_line}\n{completed_process.stdout}')
+        with open(file_name, "w") as log_file:
+            log_file.write(f"Command: {cmd_line}\n{completed_process.stdout}")
             if completed_process.returncode:
-                log_file('Command failed: error code '
-                         f'{completed_process.returncode}')
+                log_file(
+                    "Command failed: error code "
+                    f"{completed_process.returncode}"
+                )
     if completed_process.returncode:
-        log(f'Command failed: error code {completed_process.returncode}',
-            echo=True)
+        log(
+            f"Command failed: error code {completed_process.returncode}",
+            echo=True,
+        )
 
     return completed_process.returncode
 
@@ -135,161 +153,213 @@ def execute(cmd_line, file_name=None, verbose=False):
 ####################################################################################
 def listdirs(folder):
     try:
-        dir_list = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
+        dir_list = [
+            d
+            for d in os.listdir(folder)
+            if os.path.isdir(os.path.join(folder, d))
+        ]
     except OSError as error:
         log("WARNING - listdirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
 
+
 def listDatedDirs(folder):
     try:
-        dir_list = [d for d in os.listdir(folder) \
-                      if re.search('2[0-9][0-9][0-9]_[0-9][0-9]$', d) \
-                      if os.path.isdir(os.path.join(folder, d))]
+        dir_list = [
+            d
+            for d in os.listdir(folder)
+            if re.search("2[0-9][0-9][0-9]_[0-9][0-9]$", d)
+            if os.path.isdir(os.path.join(folder, d))
+        ]
     except OSError as error:
         log("WARNING - listDatedDirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
 
+
 def listfiles(folder):
     try:
-        file_list = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d))]
+        file_list = [
+            d
+            for d in os.listdir(folder)
+            if os.path.isfile(os.path.join(folder, d))
+        ]
     except OSError as error:
         log("WARNING - listfiles: %s" % error.strerror, echo=True)
         file_list = []
     return file_list
 
+
 ####################################################################################
 
+
 def copyFile(filename, srcdir, destdir, groupID):
-    srcfile = os.path.join( srcdir, filename)
+    srcfile = os.path.join(srcdir, filename)
     if os.path.isfile(srcfile):
         shutil.copy(srcfile, destdir)
         destfile = os.path.join(destdir, os.path.basename(filename))
         try:
-            os.chown( destfile, -1, groupID)
-            os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
+            os.chown(destfile, -1, groupID)
+            os.chmod(
+                destfile,
+                stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP,
+            )
         except OSError as error:
-            log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
-                echo=True)
+            log(
+                "WARNING - failed to set permissions on %s: %s"
+                % (destfile, error.strerror),
+                echo=True,
+            )
         return destfile
     else:
-        log("WARNING - copyFile: %s file does not exist in %s." % (filename, srcdir),
-            echo=True )
+        log(
+            "WARNING - copyFile: %s file does not exist in %s."
+            % (filename, srcdir),
+            echo=True,
+        )
         # raise Exception("\n\n\t%s file does not exist in %s." % (filename, srcdir) )
 
+
 def copyAndRenameFile(filename, newfilename, srcdir, destdir, groupID):
-    srcfile = os.path.join( srcdir, filename)
+    srcfile = os.path.join(srcdir, filename)
     if os.path.isfile(srcfile):
-        destfile = os.path.join(destdir, os.path.basename(newfilename) )
+        destfile = os.path.join(destdir, os.path.basename(newfilename))
         shutil.copyfile(srcfile, destfile)
         try:
-            os.chown( destfile, -1, groupID)
-            os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
+            os.chown(destfile, -1, groupID)
+            os.chmod(
+                destfile,
+                stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP,
+            )
         except OSError as error:
-            log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
-                echo=True)
+            log(
+                "WARNING - failed to set permissions on %s: %s"
+                % (destfile, error.strerror),
+                echo=True,
+            )
         return destfile
     else:
-        log("WARNING - copyAndRenameFile: %s file does not exist in %s." % (filename, srcdir),
-            echo=True )
-        #raise Exception("\n\n\t%s file does not exist." % (srcfile) )
+        log(
+            "WARNING - copyAndRenameFile: %s file does not exist in %s."
+            % (filename, srcdir),
+            echo=True,
+        )
+        # raise Exception("\n\n\t%s file does not exist." % (srcfile) )
+
 
 ####################################################################################
 
-def makeDir( new_dir ):
+
+def makeDir(new_dir):
     if not os.path.exists(new_dir):
         try:
-            os.mkdir( new_dir )
+            os.mkdir(new_dir)
 
         except OSError as error:
-            log('Error making %s: %s' %( new_dir, error.strerror), echo=True)
+            log("Error making %s: %s" % (new_dir, error.strerror), echo=True)
             raise SystemExit(1)
 
     elif not os.path.isdir(new_dir):
-        log('ERROR: %s exists and is NOT a directory' % new_dir, echo=True)
+        log("ERROR: %s exists and is NOT a directory" % new_dir, echo=True)
         raise SystemExit(1)
 
-def makeSymLink( path, target ):
+
+def makeSymLink(path, target):
     if not os.path.exists(target):
         try:
-            os.symlink( path, target )
+            os.symlink(path, target)
 
         except OSError as error:
-            log('Error making link to %s: %s' %( target, error.strerror), echo=True)
+            log(
+                "Error making link to %s: %s" % (target, error.strerror),
+                echo=True,
+            )
             raise SystemExit(1)
 
     elif os.path.islink(target):
         try:
-            os.unlink( target)
-            os.symlink( path, target )
+            os.unlink(target)
+            os.symlink(path, target)
 
         except OSError as error:
-            log('Error making link to %s: %s' %( target, error.strerror), echo=True)
+            log(
+                "Error making link to %s: %s" % (target, error.strerror),
+                echo=True,
+            )
             raise SystemExit(1)
 
     else:
-        log('ERROR: %s exists and is NOT a symlink' % target, echo=True)
+        log("ERROR: %s exists and is NOT a symlink" % target, echo=True)
         raise SystemExit(1)
 
 
-
-
 ####################################################################################
 
-def getGroupID( group_name ):
-    gid = grp.getgrnam( group_name )[2]
+
+def getGroupID(group_name):
+    gid = grp.getgrnam(group_name)[2]
     return gid
 
+
 ####################################################################################
+
 
 def readFile(filename):
     lines = []
     if os.path.isfile(filename):
-        ifp = open(filename,  'r')
+        ifp = open(filename, "r")
         lines = ifp.readlines()
         ifp.close()
-#    else:
-#        raise Exception("\n\n\t%s file does not exist." % (filename) )
+    #    else:
+    #        raise Exception("\n\n\t%s file does not exist." % (filename) )
     return lines
+
 
 def findKeyVal(lines, key, sep):
     value = ""
     for line in lines:
-        if (line.find(key) >= 0) :
+        if line.find(key) >= 0:
             toks = line.partition(sep)
-            value  = toks[2]
+            value = toks[2]
             value2 = value.lstrip()
-            value  = value2.rstrip()
+            value = value2.rstrip()
             break
 
     return value
 
+
 ####################################################################################
-def setUrlFromPath( path ):
-    lc_server_path = '/usr/global/web-pages/lc/www/'
-    if path.startswith( lc_server_path ):
-        url = path.replace( lc_server_path, 'https://rzlc.llnl.gov/')
+def setUrlFromPath(path):
+    lc_server_path = "/usr/global/web-pages/lc/www/"
+    if path.startswith(lc_server_path):
+        url = path.replace(lc_server_path, "https://rzlc.llnl.gov/")
     else:
-        url = 'file://' + os.path.abspath(path)
+        url = "file://" + os.path.abspath(path)
 
     return url
 
+
 ####################################################################################
-def setDirectoryPermissions( dir, groupID):
+def setDirectoryPermissions(dir, groupID):
     try:
-        os.chown( dir, -1, groupID)
-        os.chmod( dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_ISUID | stat.S_ISGID )
+        os.chown(dir, -1, groupID)
+        os.chmod(dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_ISUID | stat.S_ISGID)
     except:
-        log('Warning - failed to set permissions on directory ' + dir, echo=True)
+        log(
+            "Warning - failed to set permissions on directory " + dir, echo=True
+        )
 
 
-def setFilePermissions( file, groupID):
+def setFilePermissions(file, groupID):
     try:
-        os.chown( file, -1, groupID)
-        os.chmod( file, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
+        os.chown(file, -1, groupID)
+        os.chmod(
+            file, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP
+        )
     except:
-        log('Warning - failed to set permissions on file ' + file, echo=True)
+        log("Warning - failed to set permissions on file " + file, echo=True)
+
 
 ####################################################################################
 # Routine to delete sandbox dirs in the current dir
@@ -302,83 +372,106 @@ def clean_old_sandboxes():
                 print("Removing %s" % (name))
                 shutil.rmtree(name)
 
+
 ####################################################################################
 # Routine to delete ats log  in the current dir
 ####################################################################################
 def clean_old_ats_log_dirs():
     names = os.listdir(".")
     for name in names:
-        if name.startswith("blueos_3") or name.startswith("toss_4_x86_64_ib") or name.startswith("toss_3_x86_64_ib"):
+        if (
+            name.startswith("blueos_3")
+            or name.startswith("toss_4_x86_64_ib")
+            or name.startswith("toss_3_x86_64_ib")
+        ):
             if name.endswith("logs"):
                 if os.path.isdir(name):
                     print("Removing %s" % (name))
                     shutil.rmtree(name)
 
+
 ####################################################################################
 # Set the interactive partition, which may vary across machines
 ####################################################################################
 def get_interactive_partition():
-    temp_uname   = os.uname()
-    host         = temp_uname[1]
+    temp_uname = os.uname()
+    host = temp_uname[1]
     interactive_partition = "pdebug"
-    if 'muir' in host:
+    if "muir" in host:
         interactive_partition = "views"
-    elif 'rzwhamo' in host:
+    elif "rzwhamo" in host:
         interactive_partition = "nvidia"
 
     return interactive_partition
+
 
 ####################################################################################
 # set command MACHINT_TYPES based on SYS_TYPE
 ####################################################################################
 def set_machine_type_based_on_sys_type():
-    temp_uname   = os.uname()
-    host         = temp_uname[1]
+    temp_uname = os.uname()
+    host = temp_uname[1]
 
     print(host)
 
     try:
-        if host.startswith('rzalastor'):
-            os.environ['MACHINE_TYPE'] = 'slurm20'
+        if host.startswith("rzalastor"):
+            os.environ["MACHINE_TYPE"] = "slurm20"
 
-        elif host.startswith('rzgenie') or host.startswith('rztopaz') or host.startswith('rztrona'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
+        elif (
+            host.startswith("rzgenie")
+            or host.startswith("rztopaz")
+            or host.startswith("rztrona")
+        ):
+            os.environ["MACHINE_TYPE"] = "slurm36"
 
-        elif host.startswith('borax') or host.startswith('quartz') or host.startswith('agate'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
+        elif (
+            host.startswith("borax")
+            or host.startswith("quartz")
+            or host.startswith("agate")
+        ):
+            os.environ["MACHINE_TYPE"] = "slurm36"
 
-        elif host.startswith('jade'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
+        elif host.startswith("jade"):
+            os.environ["MACHINE_TYPE"] = "slurm36"
 
-        elif host.startswith('mica'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
+        elif host.startswith("mica"):
+            os.environ["MACHINE_TYPE"] = "slurm36"
 
-        elif host.startswith('herd'):
-            os.environ['MACHINE_TYPE'] = 'slurm32'
+        elif host.startswith("herd"):
+            os.environ["MACHINE_TYPE"] = "slurm32"
 
-        elif host.startswith('catalyst'):
-            os.environ['MACHINE_TYPE'] = 'slurm24'
+        elif host.startswith("catalyst"):
+            os.environ["MACHINE_TYPE"] = "slurm24"
 
-        elif host.startswith('sierra') or host.startswith('aztec'):
-            os.environ['MACHINE_TYPE'] = 'slurm12'
+        elif host.startswith("sierra") or host.startswith("aztec"):
+            os.environ["MACHINE_TYPE"] = "slurm12"
 
-        elif host.startswith('rzzeus'):
-            os.environ['MACHINE_TYPE'] = 'slurm8'
+        elif host.startswith("rzzeus"):
+            os.environ["MACHINE_TYPE"] = "slurm8"
 
-        elif host.startswith('rzmerl') or host.startswith('cab') or host.startswith('surface'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif (
+            host.startswith("rzmerl")
+            or host.startswith("cab")
+            or host.startswith("surface")
+        ):
+            os.environ["MACHINE_TYPE"] = "slurm16"
 
-        elif host.startswith('syrah') or host.startswith('max') or host.startswith('pinot'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif (
+            host.startswith("syrah")
+            or host.startswith("max")
+            or host.startswith("pinot")
+        ):
+            os.environ["MACHINE_TYPE"] = "slurm16"
 
-        elif host.startswith('zin'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif host.startswith("zin"):
+            os.environ["MACHINE_TYPE"] = "slurm16"
 
-        elif os.environ['SYS_TYPE'] in ['bgqos_0']:
-            os.environ['MACHINE_TYPE'] = 'bgqos_0_ASQ'
+        elif os.environ["SYS_TYPE"] in ["bgqos_0"]:
+            os.environ["MACHINE_TYPE"] = "bgqos_0_ASQ"
 
-        elif os.environ['SYS_TYPE'] in ['blueos_3_ppc64le_ib']:
-            os.environ['MACHINE_TYPE'] = 'blueos_3_ppc64le_ib'
+        elif os.environ["SYS_TYPE"] in ["blueos_3_ppc64le_ib"]:
+            os.environ["MACHINE_TYPE"] = "blueos_3_ppc64le_ib"
 
     except KeyError:
         pass
@@ -399,15 +492,23 @@ def set_machine_type_based_on_sys_type():
 #     sandbox   - array of values (1 for each test, same length as codes array)
 #
 ####################################################################################
-def create_ats_file_version_001(independent, checker, test_ats, nprocs, codes, args, sandbox):
+def create_ats_file_version_001(
+    independent, checker, test_ats, nprocs, codes, args, sandbox
+):
 
     if len(codes) != len(args):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of args array (%d)" % (len(codes), len(args)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of args array (%d)"
+            % (len(codes), len(args))
+        )
 
     if len(codes) != len(sandbox):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of sandbox array (%d)" % (len(codes), len(args)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of sandbox array (%d)"
+            % (len(codes), len(args))
+        )
 
-    ofp = open(test_ats, 'w')
+    ofp = open(test_ats, "w")
 
     ofp.write("import os\n")
 
@@ -418,26 +519,42 @@ def create_ats_file_version_001(independent, checker, test_ats, nprocs, codes, a
 
     ofp.write("glue(keep=True)\n")
 
-    if (checker.startswith('/')):
-        ofp.write("my_checker = '%s'\n" % (checker))                  # Handle absolute path
+    if checker.startswith("/"):
+        ofp.write("my_checker = '%s'\n" % (checker))  # Handle absolute path
     else:
-        ofp.write("my_checker = '%s/%s'\n" % (os.getcwd(), checker))  # Hancle checker in current dir
+        ofp.write(
+            "my_checker = '%s/%s'\n" % (os.getcwd(), checker)
+        )  # Hancle checker in current dir
 
     test_num = 1
 
     for nproc in nprocs:
         args_ndx = 0
         for code in codes:
-            ofp.write("t%d=test  (executable = '%s', clas = '%s', label='%s_%d', np=%d, sandbox=%s)\n" % \
-                (test_num,code,args[args_ndx],code,test_num,nproc,sandbox[args_ndx]))
+            ofp.write(
+                "t%d=test  (executable = '%s', clas = '%s', label='%s_%d', np=%d, sandbox=%s)\n"
+                % (
+                    test_num,
+                    code,
+                    args[args_ndx],
+                    code,
+                    test_num,
+                    nproc,
+                    sandbox[args_ndx],
+                )
+            )
             test_num = test_num + 1
-            ofp.write("t%d=testif(t%d, executable = %s, clas = t%d.outname)\n" % (test_num,test_num - 1, 'my_checker',test_num - 1))
+            ofp.write(
+                "t%d=testif(t%d, executable = %s, clas = t%d.outname)\n"
+                % (test_num, test_num - 1, "my_checker", test_num - 1)
+            )
             test_num = test_num + 1
             args_ndx = args_ndx + 1
 
     ofp.close()
 
     print("Most Excellent! Created ats test file %s\n" % test_ats)
+
 
 ####################################################################################
 # Routine to create test.ats type files based on generic input
@@ -454,15 +571,23 @@ def create_ats_file_version_001(independent, checker, test_ats, nprocs, codes, a
 #     sandbox   - array of values (1 for each test, same length as codes array)
 #
 ####################################################################################
-def create_ats_file_version_001_nosrun_on_checker(independent, checker, test_ats, nprocs, codes, args, sandbox):
+def create_ats_file_version_001_nosrun_on_checker(
+    independent, checker, test_ats, nprocs, codes, args, sandbox
+):
 
     if len(codes) != len(args):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of args array (%d)" % (len(codes), len(args)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of args array (%d)"
+            % (len(codes), len(args))
+        )
 
     if len(codes) != len(sandbox):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of sandbox array (%d)" % (len(codes), len(args)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of sandbox array (%d)"
+            % (len(codes), len(args))
+        )
 
-    ofp = open(test_ats, 'w')
+    ofp = open(test_ats, "w")
 
     ofp.write("import os\n")
 
@@ -473,26 +598,42 @@ def create_ats_file_version_001_nosrun_on_checker(independent, checker, test_ats
 
     ofp.write("glue(keep=True)\n")
 
-    if (checker.startswith('/')):
-        ofp.write("my_checker = '%s'\n" % (checker))                  # Handle absolute path
+    if checker.startswith("/"):
+        ofp.write("my_checker = '%s'\n" % (checker))  # Handle absolute path
     else:
-        ofp.write("my_checker = '%s/%s'\n" % (os.getcwd(), checker))  # Hancle checker in current dir
+        ofp.write(
+            "my_checker = '%s/%s'\n" % (os.getcwd(), checker)
+        )  # Hancle checker in current dir
 
     test_num = 1
 
     for nproc in nprocs:
         args_ndx = 0
         for code in codes:
-            ofp.write("t%d=test  (executable = '%s', clas = '%s', label='%s_%d', np=%d, sandbox=%s)\n" % \
-                (test_num,code,args[args_ndx],code,test_num,nproc,sandbox[args_ndx]))
+            ofp.write(
+                "t%d=test  (executable = '%s', clas = '%s', label='%s_%d', np=%d, sandbox=%s)\n"
+                % (
+                    test_num,
+                    code,
+                    args[args_ndx],
+                    code,
+                    test_num,
+                    nproc,
+                    sandbox[args_ndx],
+                )
+            )
             test_num = test_num + 1
-            ofp.write("t%d=testif(t%d, executable = %s, clas = t%d.outname, nosrun=True)\n" % (test_num,test_num - 1, 'my_checker',test_num - 1))
+            ofp.write(
+                "t%d=testif(t%d, executable = %s, clas = t%d.outname, nosrun=True)\n"
+                % (test_num, test_num - 1, "my_checker", test_num - 1)
+            )
             test_num = test_num + 1
             args_ndx = args_ndx + 1
 
     ofp.close()
 
     print("Most Excellent! Created ats test file %s\n" % test_ats)
+
 
 ####################################################################################
 # Routine to create test.ats type files based on generic input
@@ -502,18 +643,29 @@ def create_ats_file_version_001_nosrun_on_checker(independent, checker, test_ats
 # This one does not have a checker, just run the tests.
 # This one has a 'stdin' file argument
 ####################################################################################
-def create_ats_file_version_002(independent, test_ats, nprocs, codes, args, stdin_file, sandbox):
+def create_ats_file_version_002(
+    independent, test_ats, nprocs, codes, args, stdin_file, sandbox
+):
 
     if len(codes) != len(args):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of args array (%d)" % (len(codes), len(args)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of args array (%d)"
+            % (len(codes), len(args))
+        )
 
     if len(codes) != len(sandbox):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of sandbox array (%d)" % (len(codes), len(args)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of sandbox array (%d)"
+            % (len(codes), len(args))
+        )
 
     if len(codes) != len(stdin_file):
-        sys.exit("Bummer! length of codes array (%d) must be same as length of stdin_file  array (%d)" % (len(codes), len(stdin_file)))
+        sys.exit(
+            "Bummer! length of codes array (%d) must be same as length of stdin_file  array (%d)"
+            % (len(codes), len(stdin_file))
+        )
 
-    ofp = open(test_ats, 'w')
+    ofp = open(test_ats, "w")
 
     ofp.write("import os\n")
 
@@ -529,8 +681,18 @@ def create_ats_file_version_002(independent, test_ats, nprocs, codes, args, stdi
     for nproc in nprocs:
         args_ndx = 0
         for code in codes:
-            ofp.write("t%d=test  (executable = '%s', clas = '%s', stdin='%s', label='%d', np=%d, sandbox=%s)\n" % \
-                (test_num,code,args[args_ndx],stdin_file[args_ndx],test_num,nproc,sandbox[args_ndx]))
+            ofp.write(
+                "t%d=test  (executable = '%s', clas = '%s', stdin='%s', label='%d', np=%d, sandbox=%s)\n"
+                % (
+                    test_num,
+                    code,
+                    args[args_ndx],
+                    stdin_file[args_ndx],
+                    test_num,
+                    nproc,
+                    sandbox[args_ndx],
+                )
+            )
             test_num = test_num + 1
             args_ndx = args_ndx + 1
 
@@ -558,9 +720,11 @@ def create_ats_file_version_002(independent, test_ats, nprocs, codes, args, stdi
 #  ** sandbox   - single value
 #
 ####################################################################################
-def create_ats_file_version_003(independent, checker, test_ats, nprocs, code, args, sandbox):
+def create_ats_file_version_003(
+    independent, checker, test_ats, nprocs, code, args, sandbox
+):
 
-    ofp = open(test_ats, 'w')
+    ofp = open(test_ats, "w")
 
     ofp.write("import os\n")
 
@@ -571,26 +735,34 @@ def create_ats_file_version_003(independent, checker, test_ats, nprocs, code, ar
 
     ofp.write("glue(keep=True)\n")
 
-    if (checker.startswith('/')):
-        ofp.write("my_checker = '%s'\n" % (checker))                  # Handle absolute path
+    if checker.startswith("/"):
+        ofp.write("my_checker = '%s'\n" % (checker))  # Handle absolute path
     else:
-        ofp.write("my_checker = '%s/%s'\n" % (os.getcwd(), checker))  # Hancle checker in current dir
+        ofp.write(
+            "my_checker = '%s/%s'\n" % (os.getcwd(), checker)
+        )  # Hancle checker in current dir
 
     test_num = 1
 
     for nproc in nprocs:
         args_ndx = 0
         for arg in args:
-            ofp.write("t%d=test  (executable = '%s', clas = '%s', label='%s_%d', np=%d, sandbox=%s)\n" % \
-                (test_num,code,arg,code,test_num,nproc,sandbox))
+            ofp.write(
+                "t%d=test  (executable = '%s', clas = '%s', label='%s_%d', np=%d, sandbox=%s)\n"
+                % (test_num, code, arg, code, test_num, nproc, sandbox)
+            )
             test_num = test_num + 1
-            ofp.write("t%d=testif(t%d, executable = %s, clas = t%d.outname, nosrun=True)\n" % (test_num,test_num - 1, 'my_checker',test_num - 1))
+            ofp.write(
+                "t%d=testif(t%d, executable = %s, clas = t%d.outname, nosrun=True)\n"
+                % (test_num, test_num - 1, "my_checker", test_num - 1)
+            )
             test_num = test_num + 1
             args_ndx = args_ndx + 1
 
     ofp.close()
 
     print("Most Excellent! Created ats test file %s\n" % test_ats)
+
 
 ####################################################################################
 # Routine to create test.ats type files based on generic input
@@ -619,16 +791,29 @@ def create_ats_file_version_003(independent, checker, test_ats, nprocs, code, ar
 #     init_test_num    - optional argument
 #
 ####################################################################################
-def create_ats_file_version_004(independent, checker, test_ats, nprocs, nprocs_code_args, code, args, sandbox, init_test_num=0):
+def create_ats_file_version_004(
+    independent,
+    checker,
+    test_ats,
+    nprocs,
+    nprocs_code_args,
+    code,
+    args,
+    sandbox,
+    init_test_num=0,
+):
 
     if len(nprocs) != len(nprocs_code_args):
-        sys.exit("Bummer! length of nprocs array (%d) must be same as length of nprocs_code_args array (%d)" % (len(nprocs), len(nprocs_code_args)))
+        sys.exit(
+            "Bummer! length of nprocs array (%d) must be same as length of nprocs_code_args array (%d)"
+            % (len(nprocs), len(nprocs_code_args))
+        )
 
     test_num = 1
 
-    if (init_test_num < 1):
+    if init_test_num < 1:
 
-        ofp = open(test_ats, 'w')
+        ofp = open(test_ats, "w")
 
         ofp.write("import os\n")
 
@@ -639,12 +824,14 @@ def create_ats_file_version_004(independent, checker, test_ats, nprocs, nprocs_c
 
         ofp.write("glue(keep=True)\n")
 
-        if (checker.startswith('/')):
-            ofp.write("my_checker = '%s'\n" % (checker))                  # Handle absolute path
+        if checker.startswith("/"):
+            ofp.write("my_checker = '%s'\n" % (checker))  # Handle absolute path
         else:
-            ofp.write("my_checker = '%s/%s'\n" % (os.getcwd(), checker))  # Hancle checker in current dir
+            ofp.write(
+                "my_checker = '%s/%s'\n" % (os.getcwd(), checker)
+            )  # Hancle checker in current dir
     else:
-        ofp = open(test_ats, 'a')
+        ofp = open(test_ats, "a")
         test_num = init_test_num
 
     nprocs_ndx = 0
@@ -653,10 +840,24 @@ def create_ats_file_version_004(independent, checker, test_ats, nprocs, nprocs_c
         args_ndx = 0
         nprocs_code_arg = nprocs_code_args[nprocs_ndx]
         for arg in args:
-            ofp.write("t%d=test  (executable = '%s', clas = '%s %s', label='%s_%d', np=%d, sandbox=%s)\n" % \
-                (test_num,code,nprocs_code_arg, arg,code,test_num,nproc,sandbox))
+            ofp.write(
+                "t%d=test  (executable = '%s', clas = '%s %s', label='%s_%d', np=%d, sandbox=%s)\n"
+                % (
+                    test_num,
+                    code,
+                    nprocs_code_arg,
+                    arg,
+                    code,
+                    test_num,
+                    nproc,
+                    sandbox,
+                )
+            )
             test_num = test_num + 1
-            ofp.write("t%d=testif(t%d, executable = %s, clas = t%d.outname, nosrun=True)\n" % (test_num,test_num - 1, 'my_checker',test_num - 1))
+            ofp.write(
+                "t%d=testif(t%d, executable = %s, clas = t%d.outname, nosrun=True)\n"
+                % (test_num, test_num - 1, "my_checker", test_num - 1)
+            )
             test_num = test_num + 1
             args_ndx = args_ndx + 1
 
@@ -688,15 +889,34 @@ def create_ats_file_version_004(independent, checker, test_ats, nprocs, nprocs_c
 #     checker_err_logs - array of args for the checker   (1 for each test, same length as code args)
 #
 ####################################################################################
-def create_ats_file_version_005(independent, sandbox, ignoreReturnCode, nosrun, test_ats, checker1, checker2, code, code_args, tobedeleted, checker_out_logs, checker_err_logs):
+def create_ats_file_version_005(
+    independent,
+    sandbox,
+    ignoreReturnCode,
+    nosrun,
+    test_ats,
+    checker1,
+    checker2,
+    code,
+    code_args,
+    tobedeleted,
+    checker_out_logs,
+    checker_err_logs,
+):
 
     if len(code_args) != len(checker_out_logs):
-        sys.exit("Bummer! length of code_args array (%d) must be same as length of checker_out_logs array (%d)" % (len(code_args), len(checker_out_logs)))
+        sys.exit(
+            "Bummer! length of code_args array (%d) must be same as length of checker_out_logs array (%d)"
+            % (len(code_args), len(checker_out_logs))
+        )
 
     if len(code_args) != len(checker_err_logs):
-        sys.exit("Bummer! length of code_args array (%d) must be same as length of checker_err_logs array (%d)" % (len(code_args), len(checker_err_logs)))
+        sys.exit(
+            "Bummer! length of code_args array (%d) must be same as length of checker_err_logs array (%d)"
+            % (len(code_args), len(checker_err_logs))
+        )
 
-    ofp = open(test_ats, 'w')
+    ofp = open(test_ats, "w")
 
     ofp.write("import os\n")
 
@@ -704,44 +924,99 @@ def create_ats_file_version_005(independent, sandbox, ignoreReturnCode, nosrun, 
 
     ofp.write("glue(keep=True)\n")
 
-    if (checker1.startswith('/')):
-        ofp.write("my_checker1 = '%s'\n" % (checker1))                  # Handle absolute path to code
-        my_checker1= checker1                                           # Handle absolute path to code
+    if checker1.startswith("/"):
+        ofp.write(
+            "my_checker1 = '%s'\n" % (checker1)
+        )  # Handle absolute path to code
+        my_checker1 = checker1  # Handle absolute path to code
     else:
-        ofp.write("my_checker1 = '%s/%s'\n" % (os.getcwd(), checker1))  # Handle path relative to current dir
-        my_checker1 = '%s/%s' % (os.getcwd(), checker1)                 # Handle path relative to current dir
+        ofp.write(
+            "my_checker1 = '%s/%s'\n" % (os.getcwd(), checker1)
+        )  # Handle path relative to current dir
+        my_checker1 = "%s/%s" % (
+            os.getcwd(),
+            checker1,
+        )  # Handle path relative to current dir
 
-    if (checker2.startswith('/')):
-        ofp.write("my_checker2 = '%s'\n" % (checker2))                  # Handle absolute path to code
-        my_checker2= checker2                                           # Handle absolute path to code
+    if checker2.startswith("/"):
+        ofp.write(
+            "my_checker2 = '%s'\n" % (checker2)
+        )  # Handle absolute path to code
+        my_checker2 = checker2  # Handle absolute path to code
     else:
-        ofp.write("my_checker2 = '%s/%s'\n" % (os.getcwd(), checker2))  # Handle path relative to current dir
-        my_checker2 = '%s/%s' % (os.getcwd(), checker2)                 # Handle path relative to current dir
+        ofp.write(
+            "my_checker2 = '%s/%s'\n" % (os.getcwd(), checker2)
+        )  # Handle path relative to current dir
+        my_checker2 = "%s/%s" % (
+            os.getcwd(),
+            checker2,
+        )  # Handle path relative to current dir
 
-    if (code.startswith('/')):
-        my_code = code                                                # Handle absolute path to code
+    if code.startswith("/"):
+        my_code = code  # Handle absolute path to code
     else:
-        my_code = '%s/%s' % (os.getcwd(), code)                       # Handle parth relative to current dir
+        my_code = "%s/%s" % (
+            os.getcwd(),
+            code,
+        )  # Handle parth relative to current dir
 
     test_num = 1
     args_ndx = 0
 
     for code_arg in code_args:
 
-        ofp.write("t%d=test  (executable = '%s', clas = '%s %s', label='%s', np=%d, sandbox=%s, nosrun=%s, ignoreReturnCode=%s)\n" % \
-            (test_num, my_code, code_args[args_ndx], tobedeleted[args_ndx], code_args[args_ndx], 1, sandbox, nosrun, ignoreReturnCode) )
+        ofp.write(
+            "t%d=test  (executable = '%s', clas = '%s %s', label='%s', np=%d, sandbox=%s, nosrun=%s, ignoreReturnCode=%s)\n"
+            % (
+                test_num,
+                my_code,
+                code_args[args_ndx],
+                tobedeleted[args_ndx],
+                code_args[args_ndx],
+                1,
+                sandbox,
+                nosrun,
+                ignoreReturnCode,
+            )
+        )
         test_num = test_num + 1
 
-        ofp.write("t%d=testif(t%d, executable = %s, clas = t%d.outname + ' %s', label='%s_out_checker', np=1, nosrun=True)\n" % \
-            (test_num, test_num - 1, 'my_checker1', test_num - 1, checker_out_logs[args_ndx], code_args[args_ndx]) )
+        ofp.write(
+            "t%d=testif(t%d, executable = %s, clas = t%d.outname + ' %s', label='%s_out_checker', np=1, nosrun=True)\n"
+            % (
+                test_num,
+                test_num - 1,
+                "my_checker1",
+                test_num - 1,
+                checker_out_logs[args_ndx],
+                code_args[args_ndx],
+            )
+        )
         test_num = test_num + 1
 
-        ofp.write("t%d=testif(t%d, executable = %s, clas = t%d.errname + ' %s', label='%s_err_checker', np=1, nosrun=True)\n\n" % \
-            (test_num, test_num - 2, 'my_checker1', test_num - 2, checker_err_logs[args_ndx], code_args[args_ndx]) )
+        ofp.write(
+            "t%d=testif(t%d, executable = %s, clas = t%d.errname + ' %s', label='%s_err_checker', np=1, nosrun=True)\n\n"
+            % (
+                test_num,
+                test_num - 2,
+                "my_checker1",
+                test_num - 2,
+                checker_err_logs[args_ndx],
+                code_args[args_ndx],
+            )
+        )
         test_num = test_num + 1
 
-        ofp.write("t%d=testif(t%d, executable = %s, clas =  '%s', label='%s_inp_checker', np=1, nosrun=True)\n\n" % \
-            (test_num, test_num - 3, 'my_checker2', tobedeleted[args_ndx], code_args[args_ndx]) )
+        ofp.write(
+            "t%d=testif(t%d, executable = %s, clas =  '%s', label='%s_inp_checker', np=1, nosrun=True)\n\n"
+            % (
+                test_num,
+                test_num - 3,
+                "my_checker2",
+                tobedeleted[args_ndx],
+                code_args[args_ndx],
+            )
+        )
         test_num = test_num + 1
 
         args_ndx = args_ndx + 1
@@ -751,6 +1026,7 @@ def create_ats_file_version_005(independent, sandbox, ignoreReturnCode, nosrun, 
     print("Most Excellent! Created ats test file %s\n" % test_ats)
 
     return test_num
+
 
 ####################################################################################
 # end of file

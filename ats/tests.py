@@ -1,17 +1,33 @@
 import os
 import re
 import time
-from ats import configuration
-from ats.log import log
-from ats.atsut import INVALID, PASSED, FAILED, SKIPPED, BATCHED, RUNNING,\
-                  CREATED, FILTERED, TIMEDOUT, HALTED, EXPECTED, \
-                  is_valid_file, debug, AtsError, abspath
 
-from ats.times import hms, curDateTime, Duration
+from ats import configuration
+from ats.atsut import (
+    BATCHED,
+    CREATED,
+    EXPECTED,
+    FAILED,
+    FILTERED,
+    HALTED,
+    INVALID,
+    PASSED,
+    RUNNING,
+    SKIPPED,
+    TIMEDOUT,
+    AtsError,
+    abspath,
+    debug,
+    is_valid_file,
+)
 from ats.executables import Executable
+from ats.log import log
+from ats.times import Duration, curDateTime, hms
+
 
 class AtsTestGroup(list):
     "A group of tests."
+
     def __init__(self, number):
         self.number = number
         self.isBlocking = False
@@ -64,22 +80,25 @@ class AtsTestGroup(list):
         for t in self:
             t.recordOutput(groupFailure)
 
+
 def serialNumberSort(t1, t2):
     return t1.serialNumber - t2.serialNumber
+
 
 # This class is not directly exposed to the public
 # Instances of it are created by the manager functions test, testif
 # or by user subclassing.
 
-class AtsTest (object):
+
+class AtsTest(object):
     "One test script to run, and how to run it."
-    stuck = {} # test options that pertain to any new instance, file persistant
-    glued = {} # test options that pertain to any new instance, persistant.
-    tacked = {} # test options that pertain to any new instance, and which
-                # pertain to instances created before end of current source.
-    grouped = {} # test options that apply within the current group only.
-    serialNumber = 0 #counter
-    waitUntil = [] # list of tests that must be disposed of first
+    stuck = {}  # test options that pertain to any new instance, file persistant
+    glued = {}  # test options that pertain to any new instance, persistant.
+    tacked = {}  # test options that pertain to any new instance, and which
+    # pertain to instances created before end of current source.
+    grouped = {}  # test options that apply within the current group only.
+    serialNumber = 0  # counter
+    waitUntil = []  # list of tests that must be disposed of first
     waitUntilAccumulatorStack = []
     waitUntilAccumulator = []
     group = None
@@ -87,18 +106,18 @@ class AtsTest (object):
 
     def setName(self, name):
         """Set the name of this test.
-           Set namebase to a version without special chars or blanks.
+        Set namebase to a version without special chars or blanks.
         """
         self.name = name
-        self.namebase = re.sub('\W', '_', name)
-        #print "DEBUG setName = %s\n" % self.name
+        self.namebase = re.sub("\W", "_", name)
+        # print "DEBUG setName = %s\n" % self.name
 
-    def __init__ (self, *fixedargs, **options):
+    def __init__(self, *fixedargs, **options):
         "Must not throw an exception -- object must always get created."
         super(AtsTest, self).__init__()
         AtsTest.serialNumber += 1
         AtsTest.waitUntilAccumulator.append(self)
-# populate attributes
+        # populate attributes
         self.serialNumber = AtsTest.serialNumber
         if AtsTest.group is None:
             AtsTest.groupCounter += 1
@@ -108,7 +127,9 @@ class AtsTest (object):
         self.group.append(self)
         self.groupNumber = self.group.number
         self.groupSerialNumber = len(self.group)
-        self.waitUntil = AtsTest.waitUntil  #never modify this, it may be shared.
+        self.waitUntil = (
+            AtsTest.waitUntil
+        )  # never modify this, it may be shared.
         self.runOrder = 0  # to aid in diagnosis of wait, priority
         self.depends_on = None
         self.dependents = []
@@ -121,39 +142,39 @@ class AtsTest (object):
         self.totalPriority = -1
         self.startDateTime = curDateTime()
         self.endDateTime = curDateTime()
-        self.output = []  #magic output, newlines and magic removed.
-        self.notes = []  #note from the run
-        self.block = ''
-# these will all get changed below but want them set to something for getResults
+        self.output = []  # magic output, newlines and magic removed.
+        self.notes = []  # note from the run
+        self.block = ""
+        # these will all get changed below but want them set to something for getResults
         self.level = 0
         self.independent = False
         self.np = 1
         self.priority = 1
         self.totalPriority = 1
-        self.directory = ''
+        self.directory = ""
         self.batch = False
-        self.clas = ''
+        self.clas = ""
 
         self.combineOutput = False
-        self.outname = ''
-        self.shortoutname = ''
-        self.errname = ''
+        self.outname = ""
+        self.shortoutname = ""
+        self.errname = ""
         self.outhandle = None
         self.errhandle = None
 
-        self.commandList = ['not run']
-# this is just used for documentation
-        self.commandLine = 'not run'
+        self.commandList = ["not run"]
+        # this is just used for documentation
+        self.commandLine = "not run"
 
-        rootdict = dict(ATSROOT = configuration.ATSROOT)
+        rootdict = dict(ATSROOT=configuration.ATSROOT)
 
-# Combine the options: first the defaults, then the glued, then the tacked,
-# then the stuck, then the test options.
+        # Combine the options: first the defaults, then the glued, then the tacked,
+        # then the stuck, then the test options.
         self.options = {
-            "script": '',
+            "script": "",
             "clas": [],
-            "executable": '',
-            "directory": '',
+            "executable": "",
+            "directory": "",
         }
         try:
             self.options.update(configuration.options.testDefaults)
@@ -163,26 +184,24 @@ class AtsTest (object):
             self.options.update(AtsTest.grouped)
             self.options.update(options)
         except Exception as e:
-            self.set(INVALID, 'Bad options: ' + e)
+            self.set(INVALID, "Bad options: " + e)
             return
 
-        self.level = self.options['level']
-        self.np = self.options['np']
-        self.priority = self.options.get('priority', max(1, self.np))
+        self.level = self.options["level"]
+        self.np = self.options["np"]
+        self.priority = self.options.get("priority", max(1, self.np))
         self.totalPriority = self.priority
 
-        self.testStdout = self.options['testStdout']
-        outOpts = ['file', 'terminal', 'both']
+        self.testStdout = self.options["testStdout"]
+        outOpts = ["file", "terminal", "both"]
         if not self.testStdout in outOpts:
-            msg = 'Invalid setting for option testStdout: ' + self.testStdout
+            msg = "Invalid setting for option testStdout: " + self.testStdout
             raise AtsError(msg)
-
 
         if configuration.options.allInteractive:
             self.batch = False
         else:
-            self.batch = self.options['batch']
-
+            self.batch = self.options["batch"]
 
         if configuration.options.combineOutErr:
             self.combineOutput = True
@@ -195,38 +214,40 @@ class AtsTest (object):
         # positional
         lc = len(fixedargs)
         if lc > 2:
-            self.set(INVALID, 'Too many positional arguments to test command.')
+            self.set(INVALID, "Too many positional arguments to test command.")
             return
         elif lc == 2:
-            self.options['script'] = fixedargs[0]
-            self.options['clas'] = fixedargs[1]
+            self.options["script"] = fixedargs[0]
+            self.options["clas"] = fixedargs[1]
         elif lc == 1:
-            self.options['script'] = fixedargs[0]
-        script = self.options['script']
-        clas = self.options['clas']
+            self.options["script"] = fixedargs[0]
+        script = self.options["script"]
+        clas = self.options["clas"]
         if isinstance(clas, str):
             clas = configuration.machine.split(clas)
         self.clas = [c % self.options for c in clas]
-        executable = str(self.options.get('executable'))
-        self.directory = self.options['directory']
+        executable = str(self.options.get("executable"))
+        self.directory = self.options["directory"]
 
-        if executable == '1':
+        if executable == "1":
             if not script:
                 self.set(INVALID, "executable = 1 requires a first argument.")
                 return
 
-            script = script.replace('$ATSROOT', configuration.ATSROOT)
-            if len(configuration.ATSROOT)==0:
-                script= script[1:]           # remove leading "/" or "\"
+            script = script.replace("$ATSROOT", configuration.ATSROOT)
+            if len(configuration.ATSROOT) == 0:
+                script = script[1:]  # remove leading "/" or "\"
             script = script % rootdict
             self.executable = Executable(script)
-            if self.directory== '':
+            if self.directory == "":
                 self.directory = os.getcwd()
             path = self.executable.path
             _, filename = os.path.split(path)
         else:
             if executable:
-                executable = executable.replace('$ATSROOT', configuration.ATSROOT)
+                executable = executable.replace(
+                    "$ATSROOT", configuration.ATSROOT
+                )
                 self.executable = Executable(executable % rootdict)
             else:
                 self.executable = configuration.defaultExecutable
@@ -234,19 +255,19 @@ class AtsTest (object):
             if script:
                 script = abspath(script) % self.options
                 self.clas.insert(0, script)
-                if self.directory== '':
+                if self.directory == "":
                     self.directory, filename = os.path.split(script)
             else:
-                if self.directory== '':
+                if self.directory == "":
                     self.directory = os.getcwd()
                 _, filename = os.path.split(self.executable.path)
 
         name, _ = os.path.splitext(filename)
-        self.setName(self.options.get('name', name))
-        label = self.options.get('label', '')
+        self.setName(self.options.get("name", name))
+        label = self.options.get("label", "")
         if label:
             label = str(label).strip()
-            self.setName(self.name +  '(' + label + ')')
+            self.setName(self.name + "(" + label + ")")
 
         if debug():
             log("Results of parsing test arguments", echo=False)
@@ -261,7 +282,7 @@ class AtsTest (object):
             log("Directory:", self.directory, echo=False)
             log.dedent()
 
-        self.independent = self.options.get('independent', False)
+        self.independent = self.options.get("independent", False)
         if not self.independent:
             # the lower() is due to peculiarities on at least the Mac
             # where os.chdir() seems to change case partially.
@@ -272,17 +293,17 @@ class AtsTest (object):
             return
 
         if not os.path.isdir(self.directory):
-            self.set(INVALID, 'Directory not valid: %s' % self.directory)
+            self.set(INVALID, "Directory not valid: %s" % self.directory)
 
         if script and not is_valid_file(script):
-            self.set(INVALID, "Script %s does not exist."%script)
+            self.set(INVALID, "Script %s does not exist." % script)
             return
 
         self.fileOutNamesSet()
 
-        #set the timelimit
+        # set the timelimit
         try:
-            tl = options.get('timelimit', None)
+            tl = options.get("timelimit", None)
             if tl is None:
                 self.timelimit = configuration.timelimit
             else:
@@ -292,7 +313,7 @@ class AtsTest (object):
             return
 
         if self.priority <= 0:
-            self.set(SKIPPED, 'Test has priority <= zero.')
+            self.set(SKIPPED, "Test has priority <= zero.")
             return
 
         # if the test ends up BATCHED, such jobs are legal.
@@ -314,14 +335,17 @@ class AtsTest (object):
             problem = configuration.machine.canRun(self)
             if not problem:
                 self.set(CREATED, "Ready to run interactively.")
-            elif configuration.options.allInteractive or \
-               configuration.options.nobatch or \
-               self.groupNumber:
+            elif (
+                configuration.options.allInteractive
+                or configuration.options.nobatch
+                or self.groupNumber
+            ):
                 self.set(SKIPPED, problem)
             else:
                 self.set(BATCHED, problem)
-                self.notes.append(\
-                    "Changed to batch since unable to run interactively on this machine.")
+                self.notes.append(
+                    "Changed to batch since unable to run interactively on this machine."
+                )
 
     def __hash__(self):
         return hash(self.serialNumber)
@@ -344,10 +368,10 @@ class AtsTest (object):
     def __ne__(self, other):
         return self.serialNumber != other.serialNumber
 
-    def __invert__ (self):
+    def __invert__(self):
         """Responds to the ~ operator by setting the expected status FAILED,
-           returning this test object. Note unusual alteration of an operand.
-           This lets us specify that a test should fail.
+        returning this test object. Note unusual alteration of an operand.
+        This lets us specify that a test should fail.
         """
         self.expectedResult = FAILED
         return self
@@ -355,12 +379,19 @@ class AtsTest (object):
     def addDependent(self, d):
         "Add a dependent test to this one."
         if self.status is FILTERED:
-            d.set(FILTERED, "depends on %s that has been filtered out." % self.name)
+            d.set(
+                FILTERED,
+                "depends on %s that has been filtered out." % self.name,
+            )
         elif self.status is SKIPPED:
-            d.set(SKIPPED, "Ancestor %s status is %s" %(self.name, self.status))
+            d.set(
+                SKIPPED, "Ancestor %s status is %s" % (self.name, self.status)
+            )
         elif self.expectedResult is not PASSED:
-            d.set(SKIPPED,
-                "depends on %s that is not expected to pass." % self.name)
+            d.set(
+                SKIPPED,
+                "depends on %s that is not expected to pass." % self.name,
+            )
         elif self.status is BATCHED:
             d.set(BATCHED, "Child of batch job must be batch also.")
 
@@ -371,15 +402,15 @@ class AtsTest (object):
 
     def getResults(self):
         "Return a dictionary containing the essential information about this test."
-        if not hasattr(self, 'timelimit'):
-            self.timelimit= None
+        if not hasattr(self, "timelimit"):
+            self.timelimit = None
         if self.depends_on is None:
             ds = 0
         else:
             ds = self.depends_on.serialNumber
 
         if self.output:
-            out = ['Captured output, see log.']
+            out = ["Captured output, see log."]
         else:
             out = []
 
@@ -413,49 +444,49 @@ class AtsTest (object):
             "totalPriority": self.totalPriority,
             "depends_on_serial": ds,
             "dependents_serial": [d.serialNumber for d in self.dependents],
-            "waitUntil_serial": [t.serialNumber for t in self.waitUntil]
+            "waitUntil_serial": [t.serialNumber for t in self.waitUntil],
         }
         return result
 
-    def __str__ (self):
-        return str(self.status) + ' ' + self.name + ' ' + self.message
+    def __str__(self):
+        return str(self.status) + " " + self.name + " " + self.message
 
     def __repr__(self):
-        return "Test #%d %s %s" %(self.serialNumber, self.name, self.status)
+        return "Test #%d %s %s" % (self.serialNumber, self.name, self.status)
 
-    def __bool__ (self):
+    def __bool__(self):
         "It is not proper to test the truth of a test."
-        self.set(FAILED, 'if test(...) not allowed.')
+        self.set(FAILED, "if test(...) not allowed.")
         log(self, echo=True)
         return False
 
     def setStartDateTime(self):
         "Sets date and time in the form of yyyy-mm-dd hh:mm:ss for database"
         self.startDateTime = curDateTime()
-        self.startTime= time.time()
+        self.startTime = time.time()
 
     def setEndDateTime(self):
         "Sets date and time in the form of yyyy-mm-dd hh:mm:ss for database"
         self.endDateTime = curDateTime()
-        self.endTime= time.time()
+        self.endTime = time.time()
 
     def elapsedTime(self):
         "Returns formatted elapsed time of the run."
         try:
             e = self.endTime
             s = self.startTime
-            elapsed = e-s
+            elapsed = e - s
         except AttributeError as foo:
             elapsed = 0.0
 
         if elapsed < 60.0:
-            fmtStr = '%.2f sec' % elapsed
+            fmtStr = "%.2f sec" % elapsed
         else:
             fmtStr = hms(elapsed)
 
         return fmtStr
 
-    def set (self, status, message):
+    def set(self, status, message):
         "Set a new status."
         self.status = status
         self.message = str(message)
@@ -468,34 +499,37 @@ class AtsTest (object):
                 self.notes.append("Test unexpectedly PASSED, setting to FAIL")
                 self.status = FAILED
                 return
-# Didn't pass, skip the dependents. (One could argue about this.)
+        # Didn't pass, skip the dependents. (One could argue about this.)
         for d in self.dependents:
             if d.status is CREATED:
                 d.set(SKIPPED, "Ancestor test %s %s" % (self.name, status))
-# Didn't pass, but is that ok?
+        # Didn't pass, but is that ok?
         if status is self.expectedResult:
             self.notes.append("Expected status achieved, %s" % status)
             self.status = EXPECTED
 
-    def stick (cls, **options):
-        """Add keyword/value pairs for subsequent tests in this file.
-        """
+    def stick(cls, **options):
+        """Add keyword/value pairs for subsequent tests in this file."""
         cls.stuck.update(options)
+
     stick = classmethod(stick)
 
     def waitNewSource(cls):
         cls.waitUntilAccumulatorStack.append(cls.waitUntilAccumulator[:])
+
     waitNewSource = classmethod(waitNewSource)
 
     def waitEndSource(cls):
         s = cls.waitUntilAccumulatorStack.pop()
         cls.waitUntilAccumulator = s[:]
         cls.waitUntil = s[:]
+
     waitEndSource = classmethod(waitEndSource)
 
     def wait(cls):
         "Create a wait boundary"
         cls.waitUntil = cls.waitUntilAccumulator[:]
+
     wait = classmethod(wait)
 
     def newGroup(cls, independent=False, **kw):
@@ -504,16 +538,18 @@ class AtsTest (object):
         cls.groupCounter += 1
         cls.group = AtsTestGroup(cls.groupCounter)
         cls.grouped = kw
-        cls.grouped['independent'] = independent
+        cls.grouped["independent"] = independent
+
     newGroup = classmethod(newGroup)
 
     def endGroup(cls):
         "End this group"
         cls.group = None
         cls.grouped = {}
+
     endGroup = classmethod(endGroup)
 
-    def unstick (cls, *kw):
+    def unstick(cls, *kw):
         "Remove the named sticky options. With no arg, remove all."
         if kw:
             for k in kw:
@@ -521,16 +557,18 @@ class AtsTest (object):
                     del cls.stuck[k]
         else:
             cls.stuck.clear()
+
     unstick = classmethod(unstick)
 
-    def tack (cls, **options):
+    def tack(cls, **options):
         """Add keyword/value pairs for subsequent tests in descendent files.
-           A current tacked value overrules glue
+        A current tacked value overrules glue
         """
         cls.tacked.update(options)
+
     tack = classmethod(tack)
 
-    def untack (cls, *kw):
+    def untack(cls, *kw):
         "Remove the named tacked options"
         if kw:
             for k in kw:
@@ -538,16 +576,18 @@ class AtsTest (object):
                     del cls.tacked[k]
         else:
             cls.tacked.clear()
+
     untack = classmethod(untack)
 
-    def glue (cls, **options):
+    def glue(cls, **options):
         """Add keyword/value pairs for subsequent tests in ANY file.
-           A current sticky value overrules glue
+        A current sticky value overrules glue
         """
         cls.glued.update(options)
+
     glue = classmethod(glue)
 
-    def unglue (cls, *kw):
+    def unglue(cls, *kw):
         "Remove the named glued options"
         if kw:
             for k in kw:
@@ -555,11 +595,12 @@ class AtsTest (object):
                     del cls.glued[k]
         else:
             cls.glued.clear()
+
     unglue = classmethod(unglue)
 
-    def checkGlue (cls, *kw):
+    def checkGlue(cls, *kw):
         """Returns the value of the named glue options.
-           If the named options does not exists, None is returned.
+        If the named options does not exists, None is returned.
         """
         if kw:
             for k in kw:
@@ -567,13 +608,13 @@ class AtsTest (object):
                     return cls.glued[k]
                 else:
                     return None
+
     checkGlue = classmethod(checkGlue)
 
-
-    def getOptions (cls):
+    def getOptions(cls):
         """Returns the dictionary of effective value of the test options
-           outside of any test. Useful for debugging option problems.
-           Class method.
+        outside of any test. Useful for debugging option problems.
+        Class method.
         """
         opt = configuration.options
         options = {
@@ -585,9 +626,9 @@ class AtsTest (object):
             "testStdout": opt.testStdout,
             "globalPrerunScript": opt.globalPrerunScript,
             "globalPostrunScript": opt.globalPostrunScript,
-            "script": '',
-            "clas": '',
-            "executable": '',
+            "script": "",
+            "clas": "",
+            "executable": "",
         }
         options.update(AtsTest.glued)
         options.update(AtsTest.tacked)
@@ -596,7 +637,7 @@ class AtsTest (object):
 
     getOptions = classmethod(getOptions)
 
-    def restart (self):
+    def restart(self):
         AtsTest.stuck = {}
         AtsTest.glued = {}
         AtsTest.tacked = {}
@@ -607,39 +648,40 @@ class AtsTest (object):
         AtsTest.waitUntil = []
         AtsTest.waitUntilAccumulator = []
         AtsTest.waitUntilAccumulatorStack = []
+
     restart = classmethod(restart)
 
-
-    def recordOutput (self, groupFailure):
+    def recordOutput(self, groupFailure):
         """Standard recorder for test. Some tests have a very large amount of output,
-           so this does direct output rather than keep it in the test object.
-           groupFailure is used if one member of a group died.
+        so this does direct output rather than keep it in the test object.
+        groupFailure is used if one member of a group died.
         """
         failures = [FAILED, TIMEDOUT, HALTED]
         # What we're going to do with the output file:
-        checkit = self.options.get('check', False)
-        keep = self.options.get('keep')
-        magic = self.options.get('magic', '#ATS:')
+        checkit = self.options.get("check", False)
+        keep = self.options.get("keep")
+        magic = self.options.get("magic", "#ATS:")
 
         if checkit:
-            self.notes.append('Please check the results of this test manually.')
-            log('Please check the results of this test manually.', echo=True)
+            self.notes.append("Please check the results of this test manually.")
+            log("Please check the results of this test manually.", echo=True)
 
         if configuration.options.skip:
             return
 
-
-        if self.testStdout != 'terminal':
+        if self.testStdout != "terminal":
             try:
-                f = open(self.outname, 'r')
+                f = open(self.outname, "r")
             except IOError as e:
-                self.notes = ['Missing output file.']
-                log('Missing output file', self.outname, e)
+                self.notes = ["Missing output file."]
+                log("Missing output file", self.outname, e)
                 return
 
-            if magic is not None:# Check for output that starts with magic phrase
+            if (
+                magic is not None
+            ):  # Check for output that starts with magic phrase
                 n = 0
-                M=len(magic)
+                M = len(magic)
                 for line in f:
                     n += 1
                     if line.startswith(magic):
@@ -648,16 +690,17 @@ class AtsTest (object):
 
         failed = self.status in failures
         lookatit = checkit or failed
-        keepit = (keep>0) or lookatit or groupFailure
-        hideIt = self.options.get('hideOutput')
-        if keepit and (self.testStdout != 'terminal'):
+        keepit = (keep > 0) or lookatit or groupFailure
+        hideIt = self.options.get("hideOutput")
+        if keepit and (self.testStdout != "terminal"):
             log.indent()
             if magic is not None:
-                log('%d lines of output in %s' % (n, self.shortoutname),
-                    echo=lookatit)
+                log(
+                    "%d lines of output in %s" % (n, self.shortoutname),
+                    echo=lookatit,
+                )
             else:
-                log('Output in %s' % self.shortoutname,
-                        echo=lookatit)
+                log("Output in %s" % self.shortoutname, echo=lookatit)
             log.dedent()
 
         else:
@@ -670,23 +713,21 @@ class AtsTest (object):
                 log(line, echo=False, logging=True)
             log.dedent()
 
-
     # =============================================================
     def stdOutLocGet(self):
         return self.testStdout
 
     def fileHandleGet(self):
         if self.outhandle is None:
-            self.outhandle = open(self.outname, 'w')
+            self.outhandle = open(self.outname, "w")
 
         if self.combineOutput:
             self.errhandle = self.outhandle
         else:
             if self.errhandle is None:
-                self.errhandle = open(self.errname, 'w')
+                self.errhandle = open(self.errname, "w")
 
         return self.outhandle, self.errhandle
-
 
     def fileHandleClose(self):
         if self.outhandle is not None:
@@ -700,31 +741,49 @@ class AtsTest (object):
 
     def fileOutNamesSet(self):
         logdir = log.directory
-        fileName = ("%04d" % self.serialNumber) + "." + self.namebase +'.log'
-        prerunScript = ("%04d" % self.serialNumber) + "." + self.namebase +'_global_prerun.log'
-        postrunScript = ("%04d" % self.serialNumber) + "." + self.namebase +'_global_postrun.log'
+        fileName = ("%04d" % self.serialNumber) + "." + self.namebase + ".log"
+        prerunScript = (
+            ("%04d" % self.serialNumber)
+            + "."
+            + self.namebase
+            + "_global_prerun.log"
+        )
+        postrunScript = (
+            ("%04d" % self.serialNumber)
+            + "."
+            + self.namebase
+            + "_global_postrun.log"
+        )
 
-        self.outname=os.path.join(logdir, fileName)
-        self.globalPrerunScript_outname=os.path.join(logdir, prerunScript)
-        self.globalPostrunScript_outname=os.path.join(logdir, postrunScript)
+        self.outname = os.path.join(logdir, fileName)
+        self.globalPrerunScript_outname = os.path.join(logdir, prerunScript)
+        self.globalPostrunScript_outname = os.path.join(logdir, postrunScript)
         self.shortoutname = fileName
 
         if self.combineOutput:
-            self.errname=self.outname
+            self.errname = self.outname
         else:
-            self.errname=self.outname+'.err'
+            self.errname = self.outname + ".err"
 
     def fileOutDelete(self):
         if os.path.exists(self.outname):
             try:
                 os.unlink(self.outname)
             except:
-                log('Not able to delete %s' % self.outname, echo=True, logging=True)
+                log(
+                    "Not able to delete %s" % self.outname,
+                    echo=True,
+                    logging=True,
+                )
 
         if not self.combineOutput:
             if os.path.exists(self.errname):
                 try:
                     os.unlink(self.errname)
                 except:
-                    log('Not able to delete %s' % self.errname, echo=True, logging=True)
+                    log(
+                        "Not able to delete %s" % self.errname,
+                        echo=True,
+                        logging=True,
+                    )
         pass

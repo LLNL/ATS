@@ -7,29 +7,29 @@
 
 
 import sys
-from ats import machines, debug, atsut
-from ats import log, terminal
-from ats import configuration
+
+from ats import atsut, configuration, debug, log, machines, terminal
 from ats.atsMachines import utils
 from ats.atsut import RUNNING, TIMEDOUT
 
-class noSrunMachine (machines.Machine):
+
+class noSrunMachine(machines.Machine):
     """
     Run without srun or batch.
     """
 
     def checkForAtsProc(self):
-        rshCommand= 'ps uwww'
-        returnCode, runOutput= utils.runThisCommand(rshCommand)
-        theLines= runOutput.split('\n')
-        foundAts= False
+        rshCommand = "ps uwww"
+        returnCode, runOutput = utils.runThisCommand(rshCommand)
+        theLines = runOutput.split("\n")
+        foundAts = False
         for aline in theLines:
-            #if 'srun' in aline and 'defunct' in aline:
-            if 'salloc ' in aline:
+            # if 'srun' in aline and 'defunct' in aline:
+            if "salloc " in aline:
                 # NO ats running.
                 return 0
-            if 'bin/ats ' in aline:
-                foundAts= True
+            if "bin/ats " in aline:
+                foundAts = True
 
         if foundAts:
             # Found ats running.
@@ -37,12 +37,10 @@ class noSrunMachine (machines.Machine):
         # NO ats running.
         return 0
 
-
     def getNumberOfProcessors(self):
         # Maximum number of processors available. Number of nodes times
         # number of procs per node.
         return self.numberMaxProcessors
-
 
     def examineOptions(self, options):
         "Examine options from command line, possibly override command line choices."
@@ -65,7 +63,6 @@ class noSrunMachine (machines.Machine):
             # Number of nodes to use
             self.numNodes = options.numNodes
 
-
         # Maximum number of processors available
         self.numberMaxProcessors = self.npMax * self.numNodes
 
@@ -76,13 +73,17 @@ class noSrunMachine (machines.Machine):
         # This needs to be set for the manager for filter the jobs correctly.
         self.numberTestsRunningMax = self.numberMaxProcessors
 
-
     def addOptions(self, parser):
 
         "Add options needed on this machine."
-        parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
-            default = 1,
-            help="Number of nodes to use")
+        parser.add_option(
+            "--numNodes",
+            action="store",
+            type="int",
+            dest="numNodes",
+            default=1,
+            help="Number of nodes to use",
+        )
         pass
 
     def getResults(self):
@@ -91,7 +92,9 @@ class noSrunMachine (machines.Machine):
 
     def label(self):
         return "noSrunMachine: %d nodes, %d processors per node." % (
-            self.numNodes, self.npMax)
+            self.numNodes,
+            self.npMax,
+        )
 
     def calculateCommandList(self, test):
 
@@ -104,42 +107,56 @@ class noSrunMachine (machines.Machine):
         if self.is_sequential:
             num_nodes = 1
         else:
-            num_nodes = test.options.get('nn', -1)
+            num_nodes = test.options.get("nn", -1)
         test.num_nodes = num_nodes
 
-        tasks_per_node      = np / num_nodes
+        tasks_per_node = np / num_nodes
         test.tasks_per_node = tasks_per_node
 
         tasks_per_node_modulo = np % num_nodes
         if not tasks_per_node_modulo == 0:
             print(test)
             print("ERROR np=%i nn=%i" % (np, num_nodes))
-            print("      Number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes))
-            print("      %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo))
+            print(
+                "      Number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"
+                % (np, num_nodes)
+            )
+            print(
+                "      %i modulo %i = %i "
+                % (np, num_nodes, tasks_per_node_modulo)
+            )
             sys.exit(1)
 
         cpus_per_task_modulo = self.npMax % tasks_per_node
         if not cpus_per_task_modulo == 0:
             print(test)
-            print("ERROR np=%i nn=%i tasks_per_node=%i cpus_on_node=%i" % (np, num_nodes, tasks_per_node, self.npMax))
-            print("      Number of cpus_on_node (%i) is not evenly divisible by tasks_per_node (%i)" % (self.npMax, tasks_per_node))
-            print("      %i modulo %i = %i " % (self.npMax, tasks_per_node, cpus_per_task_modulo))
+            print(
+                "ERROR np=%i nn=%i tasks_per_node=%i cpus_on_node=%i"
+                % (np, num_nodes, tasks_per_node, self.npMax)
+            )
+            print(
+                "      Number of cpus_on_node (%i) is not evenly divisible by tasks_per_node (%i)"
+                % (self.npMax, tasks_per_node)
+            )
+            print(
+                "      %i modulo %i = %i "
+                % (self.npMax, tasks_per_node, cpus_per_task_modulo)
+            )
             sys.exit(1)
 
-#         test.cpus_per_task = 1
+        #         test.cpus_per_task = 1
 
         return commandList
 
-
     def canRun(self, test):
         """Is this machine able to run the test interactively when resources become available?
-           If so return ''.  Otherwise return the reason it cannot be run here.
+        If so return ''.  Otherwise return the reason it cannot be run here.
         """
         np = max(test.np, 1)
         if np > self.numberMaxProcessors:
             return "Too many processors needed (%d)" % np
 
-        return ''
+        return ""
 
     def canRunNow(self, test):
         "Is this machine able to run this test now? Return True/False"
@@ -151,18 +168,24 @@ class noSrunMachine (machines.Machine):
         np = max(test.np, 1)
         self.numProcsAvailable -= np
 
-
     def noteEnd(self, test):
-        """A test has finished running. """
+        """A test has finished running."""
         np = max(test.np, 1)
         self.numProcsAvailable += np
 
     def periodicReport(self):
         "Report on current status of tasks"
         if len(self.running):
-            terminal("CURRENTLY RUNNING %d tests:" % len(self.running),
-                     " ".join([t.name for t in self.running]) )
-        terminal("-"*80)
-        terminal("CURRENTLY UTILIZING %d of %d processors." % (
-            self.numberMaxProcessors - self.numProcsAvailable, self.numberMaxProcessors) )
-        terminal("-"*80)
+            terminal(
+                "CURRENTLY RUNNING %d tests:" % len(self.running),
+                " ".join([t.name for t in self.running]),
+            )
+        terminal("-" * 80)
+        terminal(
+            "CURRENTLY UTILIZING %d of %d processors."
+            % (
+                self.numberMaxProcessors - self.numProcsAvailable,
+                self.numberMaxProcessors,
+            )
+        )
+        terminal("-" * 80)

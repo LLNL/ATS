@@ -2,14 +2,14 @@
 import os
 import sys
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) != 2:
         sys.exit(1)
 
     LOGFILE = sys.argv[1]
 
     if os.path.exists(LOGFILE):
-        with open(LOGFILE, 'r') as f:
+        with open(LOGFILE, "r") as f:
             LOGFILE_CONTENTS = f.read()
 
         if "SUCCESS" in LOGFILE_CONTENTS:

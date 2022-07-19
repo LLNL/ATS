@@ -2,21 +2,22 @@ import os
 
 statuses = {}
 
+
 class _StatusCode:
 
     _StatusCodesAbr = {
-       "CREATED": "INIT",
-       "INVALID": "INVD",
-       "PASSED": "PASS",
-       "FAILED": "FAIL",
-       "SKIPPED": "SKIP",
-       "RUNNING": 'EXEC',
-       "FILTERED": 'FILT',
-       "TIMEDOUT": 'TIME',
-       "BATCHED": "BACH",
-       "HALTED": "HALT",
-       "EXPECTED": "EXPT",
-       "LSFERROR": "LSFE",
+        "CREATED": "INIT",
+        "INVALID": "INVD",
+        "PASSED": "PASS",
+        "FAILED": "FAIL",
+        "SKIPPED": "SKIP",
+        "RUNNING": "EXEC",
+        "FILTERED": "FILT",
+        "TIMEDOUT": "TIME",
+        "BATCHED": "BACH",
+        "HALTED": "HALT",
+        "EXPECTED": "EXPT",
+        "LSFERROR": "LSFE",
     }
 
     def __init__(self, name):
@@ -40,14 +41,16 @@ class _StatusCode:
     def __repr__(self):
         return "StatusCode(%s)" % repr(self.name)
 
+
 def StatusCode(name):
-    "Return a status code so that they compare with 'is'. "
+    "Return a status code so that they compare with 'is'."
     try:
         return statuses[name]
     except KeyError:
         new = _StatusCode(name)
         statuses[name] = new
         return new
+
 
 CREATED = StatusCode("CREATED")
 INVALID = StatusCode("INVALID")
@@ -62,12 +65,15 @@ HALTED = StatusCode("HALTED")
 EXPECTED = StatusCode("EXPECTED")
 LSFERROR = StatusCode("LSFERROR")
 
-class AtsError (Exception):
-    "Exception class for Ats."
-    def __init__ (self, msg):
-        Exception.__init__ (self, msg)
 
-def expandpath (path):
+class AtsError(Exception):
+    "Exception class for Ats."
+
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
+
+
+def expandpath(path):
     "Return a normalized, variable and ~-expanded version of path"
     path = str(path)
     path = os.path.expanduser(path)
@@ -75,11 +81,14 @@ def expandpath (path):
     path = os.path.normpath(path)
     return path
 
+
 def abspath(path):
     "Return an absolute, expanded path."
     return os.path.abspath(expandpath(path))
 
+
 _debug = 0
+
 
 def debug(value=None):
     "Return the debug flag; if value given, set it."
@@ -89,15 +98,18 @@ def debug(value=None):
     else:
         _debug = int(value)
 
-def is_valid_file (path):
+
+def is_valid_file(path):
     "Does path represent a valid file?"
     path = abspath(path)
     return os.path.isfile(path)
 
-def is_valid_executable (path):
+
+def is_valid_executable(path):
     "Does path represent a valid executable?"
     path = abspath(path)
     return is_valid_file(path) and os.access(path, os.X_OK)
+
 
 if __name__ == "__main__":
     print(locals())

@@ -8,6 +8,6 @@ ATS_PATCH = 106
 # This version, constructed from the above,  is used internally by ATS
 #
 
-version = '%d.%d.%d' % (ATS_MAJOR, ATS_MINOR, ATS_PATCH)
+version = "%d.%d.%d" % (ATS_MAJOR, ATS_MINOR, ATS_PATCH)
 
 # end of file

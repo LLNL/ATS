@@ -37,19 +37,33 @@ subclassing but must not be used directly -- creation of a test must go through
 the ``test`` or ``testif`` commands, and groups via ``group`` and ``endgroup``.
 
 """
-from ats import times
-from ats import configuration
-from ats.management import manager, testEnvironment   # manager.main() to execute
-from ats.tests import AtsTest, AtsTestGroup
-# for possible use in driver scripts or unit testing
-from ats.atsut import AtsError, \
-                  StatusCode, statuses, debug, \
-                  CREATED, INVALID, PASSED, FAILED, HALTED, EXPECTED, LSFERROR, \
-                  SKIPPED, BATCHED, RUNNING, FILTERED, TIMEDOUT
-from ats.configuration import SYS_TYPE, MACHINE_TYPE, BATCH_TYPE, MACHINE_DIR
-from ats.log import log, terminal
+from ats import configuration, times
 
+# for possible use in driver scripts or unit testing
+from ats.atsut import (
+    BATCHED,
+    CREATED,
+    EXPECTED,
+    FAILED,
+    FILTERED,
+    HALTED,
+    INVALID,
+    LSFERROR,
+    PASSED,
+    RUNNING,
+    SKIPPED,
+    TIMEDOUT,
+    AtsError,
+    StatusCode,
+    debug,
+    statuses,
+)
+from ats.configuration import BATCH_TYPE, MACHINE_DIR, MACHINE_TYPE, SYS_TYPE
+from ats.log import log, terminal
+from ats.management import manager, testEnvironment  # manager.main() to execute
+from ats.tests import AtsTest, AtsTestGroup
 from ats.times import Duration
+
 # make statuses available as their abbreviations, too.
 for key, value in statuses.items():
     exec("%s = %s" % (value.abr, key))

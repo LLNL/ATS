@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 import os
-import sys
 import subprocess
+import sys
 
 import ats
-from ats.util.generic_utils import execute, clean_old_sandboxes, clean_old_ats_log_dirs, \
-                      set_machine_type_based_on_sys_type, get_interactive_partition
+from ats.util.generic_utils import (
+    clean_old_ats_log_dirs,
+    clean_old_sandboxes,
+    execute,
+    get_interactive_partition,
+    set_machine_type_based_on_sys_type,
+)
 
 myats = os.path.join(sys.exec_prefix, 'bin', 'ats')
 if os.path.exists(myats):

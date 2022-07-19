@@ -147,4 +147,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
     def remainingCapacity(self):
         """Returns the number of free cores in the flux instance."""
-        return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
+        return (
+            flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
+        )

@@ -2,7 +2,7 @@
 import os
 import sys
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     assert len(sys.argv) < 2, "Expected 1 argument or none."
 
     logfile = sys.argv[1]

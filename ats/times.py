@@ -1,10 +1,13 @@
 "times: everything to do with timing"
-import os, time
+import os
+import time
+
 from ats.atsut import AtsError
+
 _times_at_start = os.times()
 _localtime = time.localtime()
-atsStartTime = time.strftime("%y%m%d%H%M%S",_localtime)
-atsStartTimeLong = time.strftime('%B %d, %Y %H:%M:%S', _localtime)
+atsStartTime = time.strftime("%y%m%d%H%M%S", _localtime)
+atsStartTimeLong = time.strftime("%B %d, %Y %H:%M:%S", _localtime)
 
 
 def datestamp(long_format=False):
@@ -12,52 +15,57 @@ def datestamp(long_format=False):
     time_format = '%B %d, %Y %H:%M:%S' if long_format else '%H:%M:%S'
     return time.strftime(time_format)
 
-def hms (t):
+def hms(t):
     "Returns t seconds in h:m:s.xx"
-    #print "DEBUG SAD 000"
-    #print t
-    #print "DEBUG SAD 010"
-    h = int(int(t)/3600.)
-    m = int((int(t)-h*3600)/60.)
-    s = int((int(t)-h*3600-m*60))
-    return "%d:%02d:%02d" %(h,m,s)
+    # print "DEBUG SAD 000"
+    # print t
+    # print "DEBUG SAD 010"
+    h = int(int(t) / 3600.0)
+    m = int((int(t) - h * 3600) / 60.0)
+    s = int((int(t) - h * 3600 - m * 60))
+    return "%d:%02d:%02d" % (h, m, s)
 
-def hm (t):
+
+def hm(t):
     "Returns t minutes in h:m - used for tM option in batch"
-    #print "DEBUG hm 100"
-    #print t
-    #print "DEBUG hm 110"
-    h = int(int(t)/60.)
-    m = int(int(t)-h*60)
-    return "%d:%02d" %(h,m)
+    # print "DEBUG hm 100"
+    # print t
+    # print "DEBUG hm 110"
+    h = int(int(t) / 60.0)
+    m = int(int(t) - h * 60)
+    return "%d:%02d" % (h, m)
+
 
 def curDateTime():
     "Return formatted date and time yyyy/mm/dd hh:mm:ss for database"
-    return time.strftime('%Y-%m-%d %H:%M:%S')
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+
 
 def wallTimeSecs():
     "Return the wall time used so far in seconds"
     times_at_end = os.times()
     return times_at_end[4] - _times_at_start[4]
 
+
 def wallTime():
     "Return the wall time used so far in h:mm:ss"
     return hms(wallTimeSecs())
 
+
 class Duration(object):
     """A duration of time in seconds.
 
-You can create a Duration from, or compare one to, an integer or
-string specification such as 1m20s
+    You can create a Duration from, or compare one to, an integer or
+    string specification such as 1m20s
 
-Example::
+    Example::
 
-    t1 = Duration("12s")
-    if t1 < 20:
-       ...
+        t1 = Duration("12s")
+        if t1 < 20:
+           ...
+    """
 
-"""
-    def __init__ (self, value=0):
+    def __init__(self, value=0):
         self.value = timeSpecToSec(value)
 
     def __hash__(self):
@@ -93,48 +101,50 @@ Example::
             return self.value != other.value
         return self.value != timeSpecToSec(other)
 
-    def __str__ (self):
+    def __str__(self):
         "This time as a string."
         return timeSecToSpec(self.value)
 
     def __repr__(self):
         return "Duration('%s')" % timeSecToSpec(self.value)
 
+
 def timeSecToSpec(value):
     h, r = divmod(value, 3600)
     m, s = divmod(r, 60)
-    return "%dh%dm%ds" % (h,m,s)
+    return "%dh%dm%ds" % (h, m, s)
+
 
 def timeSpecToSec(spec):
     "Return minutes from an integer or string spec of the form nn h nn m nn s"
     specIn = str(spec)
     spec = str(spec).strip().lower()
-    posH = spec.find('h')
-    posM = spec.find('m')
-    posS = spec.find('s')
+    posH = spec.find("h")
+    posM = spec.find("m")
+    posS = spec.find("s")
 
     if posH == -1 and posM == -1 and posS == -1:
-        spec = spec + 'm'
-        posM = spec.find('m')
+        spec = spec + "m"
+        posM = spec.find("m")
 
     try:
         h = int(spec[0:posH]) if posH > 0 else 0
 
         if posM > posH:
-            m =  int(spec[posH+1:posM])
+            m = int(spec[posH + 1 : posM])
         else:
             m = 0
             posM = posH
 
         if posS > posM:
-            s =  int(spec[posM+1:posS])
+            s = int(spec[posM + 1 : posS])
         else:
-            sp = spec[posM+1:]
+            sp = spec[posM + 1 :]
             if not sp:
                 s = 0
             else:
                 s = int(sp)
 
-        return (h*3600 + 60 * m + s)
+        return h * 3600 + 60 * m + s
     except Exception as e:
         raise AtsError("Bad time specification: %s" % specIn)

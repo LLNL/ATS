@@ -1,21 +1,25 @@
-import sys, os
+import os
+import sys
+
 from ats.atsut import abspath
 
 class AtsLog:
     "Log and stderr echo facility"
-    def __init__(self, directory = '', name='',
-                 echo=True, logging = False, indentation='   '):
-        super(AtsLog, self).__init__ ()
+
+    def __init__(
+        self, directory="", name="", echo=True, logging=False, indentation="   "
+    ):
+        super(AtsLog, self).__init__()
         self.reset()
-        self.echo=echo
-        self.leading = ''
-        self.indentation=indentation
+        self.echo = echo
+        self.leading = ""
+        self.indentation = indentation
         self.mode = "w"
-        self.logging = False  #temporary
-        self.set(directory=directory, name = name)
+        self.logging = False  # temporary
+        self.set(directory=directory, name=name)
         self.logging = logging
 
-    def set(self, directory = '', name = ''):
+    def set(self, directory="", name=""):
         "Set the name and directory of the log file."
         if not directory:
             directory = os.getcwd()
@@ -40,12 +44,12 @@ class AtsLog:
 
     def putlist(self, linelist, **kw):
         """Write a list of lines that include newline at end.
-           Keywords echo and logging.
+        Keywords echo and logging.
         """
-# doesn't seem worth it to check for bad keywords
-        echo = kw.get('echo', self.echo)
-        logging = kw.get('logging', self.logging)
-        indentation=self.leading
+        # doesn't seem worth it to check for bad keywords
+        echo = kw.get("echo", self.echo)
+        logging = kw.get("logging", self.logging)
+        indentation = self.leading
         if logging:
             d = self._open(self.name, self.mode)
             self.mode = 'a'
@@ -62,25 +66,26 @@ class AtsLog:
 
     def write(self, *items, **kw):
         "Write one line, like a print. Keywords echo and logging."
-        echo = kw.get('echo', self.echo)
-        logging = kw.get('logging', self.logging)
+        echo = kw.get("echo", self.echo)
+        logging = kw.get("logging", self.logging)
         if not echo and not logging:
             return
 
-        content = self.leading + ' '.join([str(k) for k in items])
+        content = self.leading + " ".join([str(k) for k in items])
 
         #
         # 2017-12-07 SAD try to keep the terminal sane on blueos (rzmanta)
         #
         from ats import configuration
-        if configuration.SYS_TYPE.startswith('blueos'):
-            #print ("DEBUg stty sane")
+
+        if configuration.SYS_TYPE.startswith("blueos"):
+            # print ("DEBUg stty sane")
             os.system("stty sane")
 
         # printing of long lines is causing errors on some systems.  Split the line into smaller lines
-        if configuration.SYS_TYPE.startswith('somesystemxxx'):
+        if configuration.SYS_TYPE.startswith("somesystemxxx"):
             n = 200
-            lines = [content[i:i+n] for i in range(0, len(content), n)]
+            lines = [content[i : i + n] for i in range(0, len(content), n)]
         else:
             lines = [content]
 
@@ -90,7 +95,7 @@ class AtsLog:
         if logging:
             if not os.path.isdir(self.directory):
                 os.makedirs(self.directory)
-            with open(self.name, 'a') as log_file:
+            with open(self.name, "a") as log_file:
                 print(indented_lines, file=log_file)
 
     __call__ = write
@@ -108,32 +113,34 @@ class AtsLog:
     def fatal_error(self, msg):
         "Issue message and die."
         try:
-            self('Fatal error:', msg, echo=True)
+            self("Fatal error:", msg, echo=True)
         except Exception:
             print(msg, file=sys.stderr)
         raise SystemExit(1)
+
 
 log = AtsLog(name="ats.log")
 terminal = AtsLog(echo=True, logging=False)
 
 if __name__ == "__main__":
-    log = AtsLog(logging=True, directory='test.logs')
+    log = AtsLog(logging=True, directory="test.logs")
     print("%s%s%s" % (log.directory, log.name, log.shortname))
-    log('a','b','c')
+    log("a", "b", "c")
     log.indent()
-    log('this should be indented')
-    log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    log("this should be indented")
+    log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     log.dedent()
-    list1 =  ['unindent here',
-        'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-        'ccccccccccccc',
-        'ddddddddddddddddddddddddddddddddddddddd',
-        'ddddddddddddddddddddddddddddddddddddddd',
-        'ddddddddddddddddddddddddddddddddddddddd',
-        'ddddddddddddddddddddddddddddddddddddddd',
-        'ddddddddddddddddddddddddddddddddddddddd',
-        'ddddddddddddddddddddddddddddddddddddddd'
-        ]
+    list1 = [
+        "unindent here",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "ccccccccccccc",
+        "ddddddddddddddddddddddddddddddddddddddd",
+        "ddddddddddddddddddddddddddddddddddddddd",
+        "ddddddddddddddddddddddddddddddddddddddd",
+        "ddddddddddddddddddddddddddddddddddddddd",
+        "ddddddddddddddddddddddddddddddddddddddd",
+        "ddddddddddddddddddddddddddddddddddddddd",
+    ]
     for line in list1:
         log(line)
-    terminal('this to terminal')
+    terminal("this to terminal")
