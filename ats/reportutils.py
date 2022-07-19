@@ -66,7 +66,7 @@ def getTestStatusLists(testlist):
     return passed,failed,timedout,skipped,filtered,invalid,running
 
 
-def atsrToJUnit(atsrFile=None,junitOut=None,build=True ):
+def atsrToJUnit(atsrFile=None, junitOut=None, build=True):
     '''Takes an atsr.py file and outputs the results in JUnit format.
        Useful for reading in test reports in tools like Jenkins or Bamboo.
        The build option is used to record passed builds - if there's an atsr.py then the build step
@@ -80,23 +80,22 @@ def atsrToJUnit(atsrFile=None,junitOut=None,build=True ):
     if not atsrFile:
         atsrFile = './atsr.py'
     state = getStateFromFile(atsrFile)
-    passed,failed,timedout,skipped,filtered,invalid,running = getTestStatusLists(state.testlist)
-    outf = open(junitOut,'w')
-    # Start the xml file with needed tags
-    outf.write('<?xml version="1.0" encoding="UTF-8"?> <testsuites>')
-    outf.write('    <testsuite name="nightly">')
-    writePassedBuild(outf)
-    for test in passed:
-        writePassedTestCase(outf,test)
-    for test in failed:
-        # You need the log dir in order to dump the .err output into the xml
-        errlogpath = os.path.dirname(atsrFile)
-        writeFailedCodeTestCase(outf,test,errlogpath)
+    passed, failed, timedout, skipped, filtered, invalid, _ = getTestStatusLists(state.testlist)
+    with open(junitOut, 'w') as outf:
+        # Start the xml file with needed tags
+        outf.write('<?xml version="1.0" encoding="UTF-8"?> <testsuites>')
+        outf.write('    <testsuite name="nightly">')
+        writePassedBuild(outf)
+        for test in passed:
+            writePassedTestCase(outf, test)
+        for test in failed:
+            # You need the log dir in order to dump the .err output into the xml
+            errlogpath = os.path.dirname(atsrFile)
+            writeFailedCodeTestCase(outf, test, errlogpath)
 
-    # Finish off the xml file
-    outf.write('    </testsuite>')
-    outf.write("</testsuites>")
-    outf.close()
+        # Finish off the xml file
+        outf.write('    </testsuite>')
+        outf.write("</testsuites>")
 
 
 def cleanTestCaseName( test ):
@@ -152,26 +151,24 @@ def writeSkippedTestCase( f, test):
     testname = cleanTestCaseName(test)
     f.write('    <testcase status="skipped" classname="%s" name="%s"/>\n' % (cname, testname) )
 
-def writeOtherStatusTestCase( f, test):
+def writeOtherStatusTestCase(f, test):
     cname = test.name.replace('&','and') # & is reserved in xml
-    testname = cleanTestCaseName(test)
     f.write('    <testcase time="%.3f" classname="%s" name="%s">\n' % (elapsedTime(test),
                                                                      cname,
                                                                      test.name) )
     f.write('      <failure type="%s"> Other failure </failure>\n' % (test.status))
     f.write('    </testcase>\n')
 
-def writeStatusTestCase( f, test, status):
+def writeStatusTestCase(f, test, status):
     '''This case is used for those test status's other than Passed or Failed.  The status is part of the failure message. '''
     cname = test.name.replace('&','and') # & is reserved in xml
-    testname = cleanTestCaseName(test)
     f.write('    <testcase time="%.3f" classname="%s" name="%s">\n' % (elapsedTime(test),
                                                                      cname,
                                                                      test.name) )
     f.write('      <failure type="%s"> ATS set test case to %s.  See ats.log for details. </failure>\n' % (test.status,status))
     f.write('    </testcase>\n')
 
-def writePassedTestCase( f, test):
+def writePassedTestCase(f, test):
     cname = test.name.replace('&','and') # & is reserved in xml
     testname = cleanTestCaseName(test)
     f.write('    <testcase status="run" time="%.3f" classname="%s" name="%s"/>\n' % ( elapsedTime(test),
@@ -183,6 +180,6 @@ def elapsedTime( test ):
     try:
         e = test.endTime
         s = test.startTime
-    except AttributeError as foo:
+    except AttributeError:
         return (0)
     return (e-s)

@@ -9,10 +9,8 @@ atsStartTimeLong = time.strftime('%B %d, %Y %H:%M:%S', _localtime)
 
 def datestamp(long_format=False):
     "Return formatted date and time. Shorter version is just time."
-    if long_format:
-        return time.strftime('%B %d, %Y %H:%M:%S')
-    else:
-        return time.strftime('%H:%M:%S')
+    time_format = '%B %d, %Y %H:%M:%S' if long_format else '%H:%M:%S'
+    return time.strftime(time_format)
 
 def hms (t):
     "Returns t seconds in h:m:s.xx"
@@ -68,38 +66,32 @@ Example::
     def __gt__(self, other):
         if isinstance(other, Duration):
             return self.value > other.value
-        else:
-            return self.value > timeSpecToSec(other)
+        return self.value > timeSpecToSec(other)
 
     def __ge__(self, other):
         if isinstance(other, Duration):
             return self.value >= other.value
-        else:
-            return self.value >= timeSpecToSec(other)
+        return self.value >= timeSpecToSec(other)
 
     def __lt__(self, other):
         if isinstance(other, Duration):
             return self.value < other.value
-        else:
-            return self.value < timeSpecToSec(other)
+        return self.value < timeSpecToSec(other)
 
     def __le__(self, other):
         if isinstance(other, Duration):
             return self.value <= other.value
-        else:
-            return self.value <= timeSpecToSec(other)
+        return self.value <= timeSpecToSec(other)
 
     def __eq__(self, other):
         if isinstance(other, Duration):
             return self.value == other.value
-        else:
-            return self.value == timeSpecToSec(other)
+        return self.value == timeSpecToSec(other)
 
     def __ne__(self, other):
         if isinstance(other, Duration):
             return self.value != other.value
-        else:
-            return self.value != timeSpecToSec(other)
+        return self.value != timeSpecToSec(other)
 
     def __str__ (self):
         "This time as a string."
@@ -126,10 +118,7 @@ def timeSpecToSec(spec):
         posM = spec.find('m')
 
     try:
-        if posH > 0:
-            h = int(spec[0:posH])
-        else:
-            h = 0
+        h = int(spec[0:posH]) if posH > 0 else 0
 
         if posM > posH:
             m =  int(spec[posH+1:posM])

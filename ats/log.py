@@ -1,7 +1,7 @@
 import sys, os
 from ats.atsut import abspath
 
-class AtsLog(object):
+class AtsLog:
     "Log and stderr echo facility"
     def __init__(self, directory = '', name='',
                  echo=True, logging = False, indentation='   '):
@@ -49,15 +49,15 @@ class AtsLog(object):
         if logging:
             d = self._open(self.name, self.mode)
             self.mode = 'a'
-            for line in linelist:
-                print(indentation + line, file=d)
+            for _line in linelist:
+                print(f"{indentation}{_line}", file=d)
             print('', file=d)
             d.close()
 
         if echo:
             d = sys.stderr
-            for line in linelist:
-                print(indentation + line, file=d)
+            for _line in linelist:
+                print(f"{indentation}{_line}", file=d)
             print('', file=d)
 
     def write(self, *items, **kw):
