@@ -6,13 +6,14 @@
 #ATS:slurm24                 SELF SlurmProcessorScheduled 24
 #ATS:slurm32                 SELF SlurmProcessorScheduled 32
 #ATS:slurm36                 SELF SlurmProcessorScheduled 36
+#ATS:slurm56                 SELF SlurmProcessorScheduled 56
 #ATS:toss_3_x86_64_ib        SELF SlurmProcessorScheduled 36
 #ATS:toss_3_x86_64           SELF SlurmProcessorScheduled 36
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64
 
 import inspect
 import math
-import sys, os, time, subprocess
+import re, sys, os, time, subprocess
 
 from ats import machines, debug, atsut
 from ats import log, terminal
@@ -46,7 +47,7 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
         tarray=tstr.split() 
         SlurmProcessorScheduled.slurm_version_str=tarray[1]
         log('SLURM VERSION STRING', SlurmProcessorScheduled.slurm_version_str)
-        tarray=SlurmProcessorScheduled.slurm_version_str.split('.')
+        tarray=re.split('[\.\-]',SlurmProcessorScheduled.slurm_version_str);
         SlurmProcessorScheduled.slurm_version_int=(int(tarray[0]) * 1000) + (int(tarray[1]) * 100) + (int(tarray[2]))
         log('SLURM VERSION NUMBER', SlurmProcessorScheduled.slurm_version_int)
 
@@ -202,6 +203,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         self.salloc    = options.salloc
         self.toss_nn   = options.toss_nn
         self.strict_nn = options.strict_nn
+        self.useMinNodes = options.useMinNodes
         self.timelimit = options.timelimit
 
         if SlurmProcessorScheduled.debugClass:
@@ -385,6 +387,9 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
                 srun_nodes="--nodes=%i-%i" % (num_nodes, self.numNodes)
             else:
                 srun_nodes="--nodes=%i-%i" % (num_nodes, num_nodes)
+
+        elif self.useMinNodes == True:
+            srun_nodes="--nodes=%i-%i" % (minNodes, minNodes)
 
         # ----------------------------------------------------------------------------------------------------------------------------
         # 
