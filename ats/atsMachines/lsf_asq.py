@@ -162,6 +162,8 @@ class lsfMachine (machines.Machine):
         self.cpusPerTask      = options.cpusPerTask
         self.timelimit        = options.timelimit
         self.mpi_um           = options.mpi_um
+        self.smpi_off         = options.smpi_off
+        self.smpi_show        = options.smpi_show
 
         #if self.lrun_pack and self.lrun_pack == False:
         #    print("DBG 101 self.lrun_pack = False")
@@ -313,6 +315,8 @@ class lsfMachine (machines.Machine):
         test.lrun_jsrun_args = self.lrun_jsrun_args
         test.ompProcBind     = self.ompProcBind
         test.mpi_um          = self.mpi_um
+        test.smpi_off        = self.smpi_off
+        test.smpi_show       = self.smpi_show
 
         if lsfMachine.debugJsrun:
             print("JSRUN 020 DEBUG lsf_asq test.jsrun_omp          =  %s " % test.jsrun_omp)
@@ -340,9 +344,17 @@ class lsfMachine (machines.Machine):
         # The input deck setting has priority.  Fall back to ATS command line option.
         test.ngpu  = test.options.get('ngpu', -1)
 
-        # Always run with --smpiargs=-gpu.  So many projects use cudaMallocManaged memory
-        # with MPI that it should be enabled.
-        str_smpi = "--smpiargs=\"-gpu\""
+        # Option to run with --smpiargs=-gpu.  Useful if cudaMallocManaged memory is used
+        # within MPI operations.
+        if test.smpi_off == True:
+            str_smpi = "--smpiargs=off"
+        elif test.smpi_show == True:
+            str_smpi = "--smpiargs=-show"
+        elif test.mpi_um == True:
+            str_smpi = "--smpiargs=\"-gpu\""
+        else:
+            str_smpi = " "
+
 
         str_lrun_jsrun_args = "unset"
 
@@ -706,8 +718,7 @@ class lsfMachine (machines.Machine):
                     lsfMachine.canRunNow_saved_string = string
                     return False
 
-        sequential = configuration.options.get('sequential', False)
-        if sequential == True:
+        if configuration.options.sequential:
             if (self.numProcsAvailable < self.numberMaxProcessors):
                 if configuration.options.verbose:
                     string = "%d_%d" % (self.numProcsAvailable, self.numberMaxProcessors)

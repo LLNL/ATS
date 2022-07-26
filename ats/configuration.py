@@ -58,7 +58,12 @@ MACHINE_DIR.append(atsMachines.__path__[0])
 #if MACHINE_OVERRIDE_DIR:
 #    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
 
-MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
+
+if (my_hostname.startswith('ruby')):
+    MACHINE_TYPE = os.environ.get('MACHINE_TYPE', 'slurm56')
+else:
+    MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
+
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
 
 class OptionParserWrapper(ArgumentParser):
@@ -118,25 +123,29 @@ def add_starting_options(parser):
     parser.add_option('--strict_nn', action='store_true',
                       help='''Strictly observe test "nn" options, this may
                       result in reduced througput or even slurm srun hangs.''')
-    parser.add_option('--m_gpu', action='store_true', dest='mpi_um',
-                      help='''Blueos option: Deprecated option. --smpiargs=-gpu
-                      will be added by default to support MPI access to unified
-                      memory. Synonym with --smpi_gpu''')
-    parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um',
-                      help='''Blueos option: Deprecated option. --smpiargs=-gpu
-                      will be added by default to support MPI access to unified
-                      memory. Synonym with --m_gpu''')
     parser.add_option('--bypassSerialMachineCheck', action='store_true',
                       help='''Bypass check which prohibits ATS from running on
                       serial machines such as rztrona or borax.''')
     parser.add_option('--share', action='store_false', dest='exclusive',
                       help='''Toss 3 option: Use --share rather than the
                       default --exclusive on srun commands''')
-    parser.add_option('--exclusive', action='store_true', dest='exclusive',
-                      help='Toss 3 option: Use --exclusive on srun commands')
 
 
 def add_blueos_only_options(parser):
+    parser.add_option('--m_gpu', action='store_true', dest='mpi_um', default=True,
+                      help='''Blueos option: Deprecated option. --smpiargs=-gpu
+                      will be added by default to support MPI access to unified
+                      memory. Synonym with --smpi_gpu''')
+    parser.add_option('--smpi_gpu', action='store_true', dest='mpi_um', default=True,
+                      help='''Blueos option: Deprecated option. --smpiargs=-gpu
+                      will be added by default to support MPI access to unified
+                      memory. Synonym with --m_gpu''')
+    parser.add_option('--smpi_off', action='store_true',
+                      help='''Blueos option:  Add --smpiargs=show to the
+                      lrun/jsrun line. Disables --smpiargs=-gpu''')
+    parser.add_option('--smpi_show', action='store_true',
+                      help='''Blueos option: Add --smpiargs=show to the
+                      lrun/jsrun line. Disables --smpiargs=-gpu''')
     parser.add_option('--old_defaults', action='store_true',
                       dest='blueos_old_defaults', help='''Blueos option: Use
                       older default (prior to ATS version 5.9.98) settings
@@ -211,8 +220,13 @@ def add_blueos_only_options(parser):
 
 
 def add_toss3_only_options(parser):
+    parser.add_option('--useMinNodes', action='store_true',
+                      help='''Toss 3 option: Pass slurm the minimum number
+                      of nodes needed to run the test case.''')
     parser.add_option('--unbuffered', action='store_true',
                       help='Toss3 option: Pass srun the --unbuffered option.')
+    parser.add_option('--exclusive', action='store_true', dest='exclusive',
+                      help='Toss 3 option: Use --exclusive on srun commands')
     parser.add_option('--mpibind', default='off',
                       help='''Toss3 option: Specify slurm --mpibind plugin
                       options to use. By default, ATS specifies --mpibind=off
@@ -233,9 +247,12 @@ def add_toss3_only_options(parser):
 
 def add_more_options(parser):
     # TODO: Review options for better organization
-    parser.add_option('--sleepBeforeSrun', type='int', default=0,
-                      help='''Number of seconds to sleep before each srun.
-                      Default is 0 on all systems.''')
+    parser.add_option('--sleepBeforeRun', type='float', default=0.0,
+                      help='''Number of seconds to sleep before each run.
+                      Default is 0.0.''')
+    parser.add_option('--sleepBeforeSrun', type='float', default=0.0, dest='sleepBeforeRun',
+                      help='''Deprecated.  Renamed to sleepBeforeRun
+                      Will treat as sleepBeforeRun.''')
     parser.add_option('--continueFreq', type='float', default=None,
                       help='''Frequency in minutes to write a continuation
                       file. The default is to only write a continuation file at

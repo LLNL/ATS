@@ -270,7 +270,12 @@ call noteEnd for machine-specific part.
             print("DEBUG MachineCore.testEnded invoked cwd= %s " % (os.getcwd()))
 
         globalPostrunScript_outname = test.globalPostrunScript_outname
+
         globalPostrunScript         = test.options.get('globalPostrunScript', None)
+        # Strip quotes which are somehow added to the string in Python3
+        # Otherwise we can't verify the file exists or execute it.
+        globalPostrunScript=globalPostrunScript.replace('"', '')
+
         #verbose                     = test.options.get('verbose', False)
         verbose                     = configuration.options.debug
 
@@ -520,7 +525,12 @@ The subprocess part of launch. Also the part that might fail.
         # See if user specified a file to use as stdin to the test problem.
         stdin_file                  = test.options.get('stdin', None)
         globalPrerunScript_outname  = test.globalPrerunScript_outname
+
         globalPrerunScript          = test.options.get('globalPrerunScript', None)
+        # Strip quotes which are somehow added to the string in Python3
+        # Otherwise we can't verify the file exists or execute it.
+        globalPrerunScript=globalPrerunScript.replace('"', '')
+
         #verbose                     = test.options.get('verbose', False)
         verbose                     = configuration.options.debug
 
@@ -572,20 +582,20 @@ The subprocess part of launch. Also the part that might fail.
             # Starting jobs too fast confuses slurm and MPI.  Short wait between each job submittal
             # This showsd up with my atsHello test program
             # Default sleep is 1 on toss, 0 on other systems, may be set by user on command line
+            #
             # 2016-12-02
             # Default sleep is now 0 on all systems.
-            if hasattr(test, 'runningWithinSalloc'):
-                if configuration.options.sleepBeforeSrun > 0:
+
+            # 2021-Sep-21  
+            # Per project request.  If nosrun is on, do not sleep (as we are not using MPI in that scenario)
+            #
+            nosrun  = test.options.get('nosrun', False)
+            if nosrun == False:
+                if configuration.options.sleepBeforeRun > 0.0:
                     if MachineCore.printSleepBeforeSrunNotice:
                         MachineCore.printSleepBeforeSrunNotice = False
-                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
-                    time.sleep(configuration.options.sleepBeforeSrun)
-            else:
-                if configuration.options.sleepBeforeSrun > 0:
-                    if MachineCore.printSleepBeforeSrunNotice:
-                        MachineCore.printSleepBeforeSrunNotice = False
-                        print("ATS Info: MachineCore._launch Will sleep %d seconds before each srun " % configuration.options.sleepBeforeSrun)
-                    time.sleep(configuration.options.sleepBeforeSrun)
+                        print("ATS Info: MachineCore._launch Will sleep %f seconds before each srun " % configuration.options.sleepBeforeRun)
+                    time.sleep(configuration.options.sleepBeforeRun)
 
 
             if testStdout == 'file':
