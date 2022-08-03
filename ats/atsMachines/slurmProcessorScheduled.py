@@ -161,6 +161,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
             print("%s options.skip                = %s " % (DEBUG_SLURM, options.skip))
             print("%s options.exclusive           = %s " % (DEBUG_SLURM, options.exclusive))
+            print("%s options.enable_gpu          = %s " % (DEBUG_SLURM, options.enable_gpu))
             print("%s options.mpibind             = %s " % (DEBUG_SLURM, options.mpibind))
             print("%s options.combineOutErr       = %s " % (DEBUG_SLURM, options.combineOutErr))
             print("%s options.allInteractive      = %s " % (DEBUG_SLURM, options.allInteractive))
@@ -199,6 +200,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         self.numberTestsRunningMax = self.numberMaxProcessors
 
         self.exclusive = options.exclusive
+        self.enable_gpu = options.enable_gpu
         self.mpibind   = options.mpibind
         self.salloc    = options.salloc
         self.toss_nn   = options.toss_nn
@@ -309,6 +311,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         srun_ex_or_sh = '--comment="noexclusive"'
         if self.exclusive == True:
             srun_ex_or_sh = "--exclusive"
+
+        srun_enable_gpu = '--comment="no_enable_gpu"'
+        if self.enable_gpu == True:
+            srun_enable_gpu = "--gpu-bind=closest"
 
         # 2021-07-14 SAD Old logic where we were using overlap for newer SchedMD slurm update
         #                May not be needed now, but leave this in for a bit in case
@@ -475,10 +481,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             # End of Coding suggested by Chris Scroeder
 
             if self.salloc :
-                return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+                return ["salloc", srun_partition, srun_ex_or_sh, srun_enable_gpu, srun_nodes] + commandList
             else:
                 return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
-                    srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
+                    srun_partition, srun_ex_or_sh, srun_enable_gpu, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
                     "--ntasks=%i" % np \
                    ] + commandList
 
@@ -510,10 +516,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("SAD DEBUG SRUN800 ")
 
         if self.salloc :
-            return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+            return ["salloc", srun_partition, srun_ex_or_sh, srun_enable_gpu, srun_nodes] + commandList
         else:
             return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
-               srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
+               srun_partition, srun_ex_or_sh, srun_enable_gpu, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
                "--ntasks=%i" % np \
                ] + commandList
 

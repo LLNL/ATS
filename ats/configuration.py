@@ -129,7 +129,8 @@ def add_starting_options(parser):
     parser.add_option('--share', action='store_false', dest='exclusive',
                       help='''Toss 3 option: Use --share rather than the
                       default --exclusive on srun commands''')
-
+    parser.add_option('--enable_gpu', action='store_true',
+                      help='''Toss 4 option: Add srun options to enable GPU access''')
 
 def add_blueos_only_options(parser):
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um', default=True,
