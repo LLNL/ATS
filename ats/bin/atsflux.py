@@ -114,7 +114,7 @@ def main():
             "-o,-S,log-filename=out",
         ]
     )
-    os.environ["SYS_TYPE"] = "flux00"
+    os.environ["MACHINE_TYPE"] = "flux00"
     cmd.append(myats)
     cmd.extend(extra_args)
     print("Executing: " + " ".join(cmd))

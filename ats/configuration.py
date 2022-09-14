@@ -49,22 +49,22 @@ if "MACHINE_DIR" in os.environ.keys():
 
 MACHINE_DIR.append(atsMachines.__path__[0])
 
-#print "DEBUG 100"
-#print MACHINE_DIR
-#print "DEBUG 200"
-
+# print("DEBUG MACHINE_DIR ", MACHINE_DIR)
 
 #MACHINE_OVERRIDE_DIR = os.environ.get('MACHINE_OVERRIDE_DIR')
 #if MACHINE_OVERRIDE_DIR:
 #    MACHINE_OVERRIDE_DIR = abspath(MACHINE_OVERRIDE_DIR)
-
 
 if (my_hostname.startswith('ruby')):
     MACHINE_TYPE = os.environ.get('MACHINE_TYPE', 'slurm56')
 else:
     MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
 
+# print("DEBUG MACHINE_TYPE ", MACHINE_TYPE)
+
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
+
+# print("DEBUG BATCH_TYPE ", BATCH_TYPE)
 
 class OptionParserWrapper(ArgumentParser):
     """ArgumentParser wrapper to help transition away from OptionParser."""
