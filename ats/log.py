@@ -86,7 +86,11 @@ class AtsLog(object):
 
         indented_lines = "\n    ".join(lines)
         if echo:
-            print(indented_lines, file=sys.stderr)
+            # if len(indented_lines) < 512:
+            #     print(indented_lines, file=sys.stderr)
+            # else:
+            #     print(indented_lines[0:512], file=sys.stderr)
+            print(indented_lines[0:4096], file=sys.stderr)
         if logging:
             if not os.path.isdir(self.directory):
                 os.makedirs(self.directory)

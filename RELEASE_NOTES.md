@@ -1,6 +1,10 @@
 # ATS Release Notes
 
-## 7.0.Next
+## 7.0.110
+
+    Initial Flux support for MPI only on Toss3 systems.
+
+## 7.0.105
 
     Update sleepBeforeRun option.
     Renamed from sleepBeforeSrun.
@@ -40,10 +44,6 @@
     --smpi_off
     --smpi_show
 
-
-## 7.0.106
-
-* Updating version to 7.0.106 for alpha testing.
 
 ## 7.0.100
 
