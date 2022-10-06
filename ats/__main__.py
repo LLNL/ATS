@@ -1,6 +1,9 @@
+"""
+'python -m ats' module entry point to run via 'python -m'
+"""
 import sys
-import ats
 
+import ats
 
 def main():
     result = ats.manager.main()

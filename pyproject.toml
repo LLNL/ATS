@@ -1,6 +1,36 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.2.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "ats"
+authors = ["Shawn A. Dawson <dawson6@llnl.gov>"]
+description = "Automated Testing System"
+documentation = "https://ats.readthedocs.io/en/latest"
+packages = [
+  { include = "ats" }
+]
+license = "BSD-3-Clause"
+publish = false
+readme = "README.md"
+repository = "https://github.com/LLNL/ATS"
+version = "7.0.106"
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = "^1.18"
+
+[tool.poetry.dev-dependencies]
+black = ">=22.6"
+isort = ">=5.10"
+
+[tool.poetry.scripts]
+ats = "ats.__main__:main"
+ats3 = "ats.tools.ats_summary:main"
+atsflux = "ats.tools.atsflux:main"
+atsformat = "ats.tools.atsformat:main"
+atslite1 = "ats.tools.atslite1:main"
+atslite3 = "ats.tools.atslite3:main"
 
 [tool.black]
 line-length = 80
