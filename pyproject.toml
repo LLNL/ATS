@@ -27,7 +27,7 @@ isort = ">=5.10"
 [tool.poetry.scripts]
 ats = "ats.__main__:main"
 ats3 = "ats.tools.ats_summary:main"
-atsflux_backend = "ats.tools.atsflux_backend:main"
+atsflux = "ats.tools.atsflux:main"
 atsformat = "ats.tools.atsformat:main"
 atslite1 = "ats.tools.atslite1:main"
 atslite3 = "ats.tools.atslite3:main"
