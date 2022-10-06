@@ -1,4 +1,0 @@
-#!/bin/sh
-/bin/rm -fr *.logs build docs/build dist
-
-
