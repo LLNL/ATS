@@ -10,16 +10,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  hello_ats:
+  install_ats:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ats-tool: [ats, ats3, atsflux, atsformat, atslite1, atslite3]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
-      - name: Install dependencies
-        run: |
-          python -m pip install .
-          which ats ats3 atslite1 atslite3
+          python-version: ${{ matrix.python-version }}
+      - name: Install ATS
+        run: python -m pip install .
+      - name: which ATS tools
+        run: which ${{ matrix.ats-tool }}
