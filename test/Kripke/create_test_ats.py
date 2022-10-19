@@ -73,22 +73,30 @@ if __name__ == "__main__":
     last_t = create_ats_file(nprocs, nprocs_code_args, code, code_args)
 
     # Define parallel test runs
-    nprocs = [2, 4, 8, 16, 16]
+    nprocs = [2, 4, 8, 16, 16, 32, 64, 128]
     nprocs_code_args = [
         '--procs 2,1,1',
         '--procs 2,2,1',
         '--procs 2,2,2',
         '--procs 2,2,4',
         '--procs 4,4,1',
+        '--procs 4,4,2',
+        '--procs 4,4,4',
+        '--procs 4,4,8',
     ]
     code_args = [
         '--layout dgz ',
         '--layout dzg ',
+        '--layout dzg --pmethod bj --niter 20',
         '--layout gdz ',
         '--layout gzd ',
+        '--layout gzd --pmethod bj --niter 20',
         '--layout zdg ',
+        '--layout zdg --pmethod bj --niter 20',
         '--layout zgd ',
-        '--layout dgz  --pmethod bj',
+        '--layout zgd --niter 20',
+        '--layout dgz',
+        '--layout dgz  --pmethod bj --niter 20 ',
     ]
 
     # Append parallel tests into the same test.ats file
