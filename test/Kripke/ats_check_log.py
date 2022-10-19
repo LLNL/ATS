@@ -3,7 +3,8 @@ import os
 import sys
 
 if __name__ == '__main__':
-    assert len(sys.argv) < 2, "Expected 1 argument or none."
+
+    assert len(sys.argv) == 2, "Expected 1 argument."
 
     logfile = sys.argv[1]
     assert os.path.exists(logfile), f"File '{logfile}' not found."

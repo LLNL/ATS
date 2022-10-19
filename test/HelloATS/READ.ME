@@ -39,26 +39,22 @@ It may also present some which are HALTED if errors are detected in slurm
 or mpi init by ATS.
 
 --------------------------------------------------------------------------------
--- Flux testing notes (2019-Sep-06) from SAD
--- Flux testing is not working at this time
+Whippet compilation notes (as of 2022 October 12)
+Whippet test run notes using flux
 --------------------------------------------------------------------------------
+mpicc hello_ats.c  -L /usr/lib64/flux -lpmi2 
+LD_LIBRARY_PATH=/usr/lib64/flux ldd a.out | grep pmi2
 
-In the ats_hello script one will run, search for 'Flux testing' to see comments
-on the current state of flux.
+flux help mini
+flux mini run -n 20 ./a.out
+flux mini submit -N 2 -n 2 --output=job_1.out ./a.out
 
-There is a flux_direct.py module coded up by a developer with assistance from
-Tom Scogland.  One may use this module by uncommenting this line in the ats_hello
-script
+export MACHINE_TYPE=flux00
+create_test_ats.py
+flux mini submit -N 3 --output=job_hello.out /usr/gapps/ats/toss_4_x86_64_ib/7.0.110/bin/ats test.ats
 
-    os.environ['MACHINE_TYPE'] = "flux"
-
-ATS will then use this wrapper, as evidenced by the lines put to stdout:
-
-    from flux_direct import FluxDirect as Machine
-
-But the import of flux fails.  This is where we need to start the work.  Update
-the flux_direct.py file so that it can import flux. Then move on from there to
-make flux work.
+atsflux --flux test.ats 
+ 
 
 --------------------------------------------------------------------------------
 --  Notes on running

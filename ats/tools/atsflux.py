@@ -5,14 +5,19 @@ Author: William Hobbs
         <hobbs17@llnl.gov>
         David Bloss
         <bloss1@llnl.gov>
+        Shawn Dawson 
+        <dawson6@llnl.gov>
 """
 
 import argparse
+import multiprocessing
 import os
 import shutil
 import subprocess
 import sys
 
+# Python 3 method for querying number of CPUS on the node
+num_cpus = multiprocessing.cpu_count()
 
 def _parse_args() -> argparse.Namespace:
     """Parse arguments for formatting ATS python files."""
@@ -23,6 +28,13 @@ def _parse_args() -> argparse.Namespace:
         default=3,
         type=int,
         help="Number of nodes allocated to atsflux.",
+    )
+    parser.add_argument(
+        "-n",
+        "--npMax",
+        default=num_cpus,
+        type=int,
+        help="Max number of cores per node. Overrides default ATS detection of cores per node",
     )
     parser.add_argument(
         "--exclusive",
@@ -44,6 +56,11 @@ def _parse_args() -> argparse.Namespace:
         type=str,
         help="Partition in which to run atsflux jobs.",
     )
+    parser.add_argument(
+        "--flux",
+        action="store_true",
+        help="Machine uses flux as the native scheduler.",
+    )
     return parser.parse_known_args()
 
 
@@ -54,10 +71,14 @@ def main():
     Available command-line arguments:
         --numNodes=, -N
           Specify a number of nodes to use, will default to use 3.
-        --bank=
+        --npMax=, -n
+          Max number of cores per node. Overrides default ATS detection of cores per node
+        --account=, -A
           Specify a project bank to charge, will default to use whatever your default bank is.
-        --partition=
+        --partition=, -p
           Specify either the debug or batch partition, will default to use debug.
+        --flux
+          Machine uses flux as the native scheduler.  Do not use salloc and srun.
     """
 
     """Argument parsing logic goes first."""
@@ -86,38 +107,62 @@ def main():
             """
         )
 
-    slurm_job_id = os.getenv("SLURM_JOB_ID")
-    cmd = []
+    # Total cores is number of nodes * number of cores per node
+    total_cores = args.numNodes * args.npMax
 
-    if slurm_job_id == None:  ## if this is on login node
-        cmd = [
-            "salloc",
-            f"--nodes={args.numNodes}",
-            f"--partition={args.partition}",
-            f"--account={args.account}",
-            "--exclusive",
-            "--time=60",
-        ]
+    if args.flux:
+        print("running flux natively")
+
+        # Need to detect if run on a pre-allocated node here.
+        # for now just code up the login node command
+        cmd = []
+        if True:
+            cmd = [
+                "flux", "mini", "alloc", 
+                "-N", f"{args.numNodes}",
+                "-n", f"{total_cores}",
+                "--output=atsflux.log"
+            ]
+
+
+    else:
+        print("running flux under slurm")
+
+        slurm_job_id = os.getenv("SLURM_JOB_ID")
+        cmd = []
+
+        if slurm_job_id == None:  ## if this is on login node
+            cmd = [
+                "salloc",
+                f"--nodes={args.numNodes}",
+                f"--partition={args.partition}",
+                f"--account={args.account}",
+                "--exclusive",
+                "--time=60",
+            ]
+    
+        cmd.extend(
+            [
+                "srun",
+                f"-N{args.numNodes}",
+                f"-n{args.numNodes}",
+                "--pty",
+                shutil.which("flux"),
+                "start",
+                "-o,-S,log-filename=out",
+            ]
+        )
 
     """Get the path to an .ats file and find the test file."""
     """Find the proper ATS implementation to pass the complete path."""
     myats = os.path.join(sys.exec_prefix, "bin", "ats")
+    
 
-    cmd.extend(
-        [
-            "srun",
-            f"-N{args.numNodes}",
-            f"-n{args.numNodes}",
-            "--pty",
-            shutil.which("flux"),
-            "start",
-            "-o,-S,log-filename=out",
-        ]
-    )
     os.environ["MACHINE_TYPE"] = "flux00"
     cmd.append(myats)
     cmd.extend(extra_args)
     print("Executing: " + " ".join(cmd))
+    #sys.exit("debug")
 
     subprocess.run(cmd, text=True)
 

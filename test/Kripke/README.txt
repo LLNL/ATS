@@ -2,12 +2,14 @@
 
 Testing ATS with Kripke.
 
-1) Retrieve Kripke from github from this location.
+Kripke is open source and is on GitHub at this location:
 
+    https://github.com/LLNL/Kripke/releases
 
-https://github.com/LLNL/Kripke/releases
+This testing was based on the tarfile kripke-v1.2.5-20e9ea9.tar.gz from here:
 
-This testing was based on the tarfile kripke-v1.2.5-20e9ea9.tar.gz from the above location.
+    https://github.com/LLNL/Kripke/releases/download/v1.2.5/kripke-v1.2.5-20e9ea9.tar.gz
+
 
 1) Build Kripke in this directory (test/Kripke)
 
@@ -24,7 +26,21 @@ popd
 2) Run Kripke under ATS.  Some examples are:
 
 
-/usr/apps/ats/7.0.4/bin/atslite1.py
-/usr/apps/ats/7.0.4/bin/atslite1.py --postrunScript=`pwd`/postrun.py
-/usr/apps/ats/7.0.4/bin/atslite1.py --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+atslite1.py
+atslite1.py --postrunScript=`pwd`/postrun.py
+atslite1.py --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+
+
+===== Special Whippet Build and Run Notes as of 2022 October 12 ======
+
+LD_LIBRARY_PATH=/usr/lib64/flux
+
+Use this cmake line when configuring and building on whippet:
+
+    cmake .. -C../host-configs/llnl-toss4-intel-classic.cmake  -DCMAKE_BUILD_TYPE=Release
+
+Run Kripke using atsflux 
+
+    ./create_test_ats.py
+    atsflux --flux test.ats --verbose
 
