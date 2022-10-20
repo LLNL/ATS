@@ -1,0 +1,20 @@
+glue(independent=True)
+glue(sandbox=False)
+glue(keep=True)
+
+#
+# Run with 
+#   ats long_test_name.ats
+#
+# Verifies that ATS can handle long test names.
+# This was reported as an issue by Tom Stitt
+#
+
+Triple_Point_splitword_3D_Q2Q1_LAG_HVISC_PA_GPU = test(executable='/usr/bin/echo',
+    label='echo',
+    clas='',
+    directory='/g/g16/dawson/wci/Dump',
+    np=1,
+    ngpu=0,
+    nn=0
+)
