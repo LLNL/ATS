@@ -60,7 +60,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         ret = "flux mini run".split()
         np = test.options.get("np", 1)
-        nn = test.options.get("nn", 1)
+        nn = test.options.get("nn", 0)
 
         max_time = self.timelimit
         ret.append(f"-t{max_time}")

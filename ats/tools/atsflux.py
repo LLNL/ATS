@@ -19,6 +19,13 @@ import sys
 # Python 3 method for querying number of CPUS on the node
 num_cpus = multiprocessing.cpu_count()
 
+# Get hostname to set defaults for if Flux is the native scheduler
+my_hostname = os.environ.get("HOSTNAME", "unset")
+if (my_hostname.startswith('rzwhip')):
+    flux_native = True
+else:
+    flux_native = False
+
 def _parse_args() -> argparse.Namespace:
     """Parse arguments for formatting ATS python files."""
     parser = argparse.ArgumentParser(description="ATS with Flux!")
@@ -58,6 +65,7 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--flux",
+        default=flux_native,
         action="store_true",
         help="Machine uses flux as the native scheduler.",
     )
@@ -121,6 +129,7 @@ def main():
                 "flux", "mini", "alloc", 
                 "-N", f"{args.numNodes}",
                 "-n", f"{total_cores}",
+                "--exclusive",
                 "--output=atsflux.log"
             ]
 

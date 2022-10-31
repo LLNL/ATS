@@ -38,6 +38,8 @@ LD_LIBRARY_PATH=/usr/lib64/flux
 Use this cmake line when configuring and building on whippet:
 
     cmake .. -C../host-configs/llnl-toss4-intel-classic.cmake  -DCMAKE_BUILD_TYPE=Release
+or
+    cmake .. -C../host-configs/llnl-toss4-intel-2022.1.0.cmake  -DCMAKE_BUILD_TYPE=Release
 
 Run Kripke using atsflux 
 

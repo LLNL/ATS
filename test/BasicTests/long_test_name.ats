@@ -10,7 +10,7 @@ glue(keep=True)
 # This was reported as an issue by Tom Stitt
 #
 
-Triple_Point_splitword_3D_Q2Q1_LAG_HVISC_PA_GPU = test(executable='/usr/bin/echo',
+Triple = test(executable='/usr/bin/echo',
     label='echo',
     clas='',
     directory='/g/g16/dawson/wci/Dump',
