@@ -16,9 +16,6 @@ def datestamp(long_format=False):
 
 def hms (t):
     "Returns t seconds in h:m:s.xx"
-    #print "DEBUG SAD 000"
-    #print t
-    #print "DEBUG SAD 010"
     h = int(int(t)/3600.)
     m = int((int(t)-h*3600)/60.)
     s = int((int(t)-h*3600-m*60))
@@ -26,9 +23,6 @@ def hms (t):
 
 def hm (t):
     "Returns t minutes in h:m - used for tM option in batch"
-    #print "DEBUG hm 100"
-    #print t
-    #print "DEBUG hm 110"
     h = int(int(t)/60.)
     m = int(int(t)-h*60)
     return "%d:%02d" %(h,m)

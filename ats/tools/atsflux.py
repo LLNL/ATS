@@ -23,8 +23,10 @@ num_cpus = multiprocessing.cpu_count()
 my_hostname = os.environ.get("HOSTNAME", "unset")
 if (my_hostname.startswith('rzwhip')):
     flux_native = True
+    time_limit = 240
 else:
     flux_native = False
+    time_limit = 240
 
 def _parse_args() -> argparse.Namespace:
     """Parse arguments for formatting ATS python files."""
@@ -42,6 +44,13 @@ def _parse_args() -> argparse.Namespace:
         default=num_cpus,
         type=int,
         help="Max number of cores per node. Overrides default ATS detection of cores per node",
+    )
+    parser.add_argument(
+        "-t",
+        "--time",
+        default=time_limit,
+        type=int,
+        help="Job allocation time limit in minutes",
     )
     parser.add_argument(
         "--exclusive",
@@ -129,6 +138,7 @@ def main():
                 "flux", "mini", "alloc", 
                 "-N", f"{args.numNodes}",
                 "-n", f"{total_cores}",
+                "-t", f"{args.time}m",
                 "--exclusive",
                 "--output=atsflux.log"
             ]
@@ -147,7 +157,7 @@ def main():
                 f"--partition={args.partition}",
                 f"--account={args.account}",
                 "--exclusive",
-                "--time=60",
+                f"--time={args.time}",
             ]
     
         cmd.extend(
@@ -165,7 +175,6 @@ def main():
     """Get the path to an .ats file and find the test file."""
     """Find the proper ATS implementation to pass the complete path."""
     myats = os.path.join(sys.exec_prefix, "bin", "ats")
-    
 
     os.environ["MACHINE_TYPE"] = "flux00"
     cmd.append(myats)

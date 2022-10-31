@@ -606,17 +606,12 @@ The subprocess part of launch. Also the part that might fail.
                 self.log_prepend(test, test.outhandle)
 
                 if stdin_file is None:
-                # SAD ambyr
-                #print "DEBUG MachineCore._launch 050 "
                 #print "DEBUG MachineCore._launch %s " % test.commandList
                 #print E
                 #test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E, text=True)
                     test.child = subprocess.Popen(test.commandList, universal_newlines=True, cwd=test.directory, stdout=outhandle, stderr=errhandle, env=E, text=True)
                     #test.child.wait()
                 else:
-                    #print "DEBUG MachineCore._launch 110 "
-                    #print testStdin
-                    #print "DEBUG MachineCore._launch 120 test.directory = %s" % test.directory
                     test.child = subprocess.Popen(test.commandList, cwd=test.directory, stdout = outhandle, stderr = errhandle, env=E, stdin=testStdin, text=True)
 
             elif testStdout == 'terminal':
