@@ -1131,7 +1131,7 @@ class TestLike(dict):
     def __init__ (self, aDict):
         dict.__init__(self, **aDict)
         n = self.groupNumber
-        if not state.groups.has_key(n):
+        if n not in state.groups:
             state.groups[n] = AtsTestGroup(n)
         self.group = state.groups[n]
         self.group.append(self)
