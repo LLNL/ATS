@@ -6,7 +6,7 @@ Sample use of lightweight ATS wrapper script
 
 How to use:
 
-    export PATH=/usr/gapps/ats/toss_3_x86_64_ib/7.0.106/bin:$PATH
+    export PATH=/usr/gapps/ats/toss_3_x86_64_ib/7.0.111/bin:$PATH
     (or put the python with ATS you are working on in your upath, wherever that is)
 
     ats_hello               <- Lightweight wrapper to ATS for your project
@@ -49,12 +49,9 @@ flux help mini
 flux mini run -n 20 ./a.out
 flux mini submit -N 2 -n 2 --output=job_1.out ./a.out
 
-export MACHINE_TYPE=flux00
-create_test_ats.py
-flux mini submit -N 3 --output=job_hello.out /usr/gapps/ats/toss_4_x86_64_ib/7.0.110/bin/ats test.ats
+./create_test_ats.py
+atsflux test.ats
 
-atsflux --flux test.ats 
- 
 
 --------------------------------------------------------------------------------
 --  Notes on running

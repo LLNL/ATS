@@ -129,10 +129,15 @@ def main():
     if args.flux:
         print("running flux natively")
 
-        # Need to detect if run on a pre-allocated node here.
-        # for now just code up the login node command
         cmd = []
-        if True:
+
+
+        # If FLUX_JOB_ID exists, assume we are already in a flux allocation.
+        if "FLUX_JOB_ID" in os.environ:
+            print("looks like we are already in a flux allocation")
+
+        # else start flux from the login node
+        else:
             cmd = [
                 "flux", "mini", "alloc", 
                 "-N", f"{args.numNodes}",
