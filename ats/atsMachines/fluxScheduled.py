@@ -41,6 +41,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.coresPerNode = self.maxCores // self.numNodes
         self.numberTestsRunningMax = self.maxCores
 
+        super(FluxScheduled, self).init()
+
+    def kill(self, test):
+        """
+        Final cleanup if any. Not implemented for Flux yet.
+        """
+
     def examineOptions(self, options):
         """
         Optparse (soon argparse) parameters from command-line options

@@ -46,8 +46,7 @@ def _parse_args() -> argparse.Namespace:
         help="Max number of cores per node. Overrides default ATS detection of cores per node",
     )
     parser.add_argument(
-        "-t",
-        "--time",
+        "--job_time",
         default=time_limit,
         type=int,
         help="Job allocation time limit in minutes",
@@ -138,7 +137,7 @@ def main():
                 "flux", "mini", "alloc", 
                 "-N", f"{args.numNodes}",
                 "-n", f"{total_cores}",
-                "-t", f"{args.time}m",
+                "-t", f"{args.job_time}m",
                 "--exclusive",
                 "--output=atsflux.log"
             ]
@@ -157,7 +156,7 @@ def main():
                 f"--partition={args.partition}",
                 f"--account={args.account}",
                 "--exclusive",
-                f"--time={args.time}",
+                f"--time={args.job_time}",
             ]
     
         cmd.extend(
