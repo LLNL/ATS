@@ -223,7 +223,9 @@ class StandardScheduler (object):
                 msg = '%s #%4d r=%d, N=%d-%d, np=%s, %s, %s' % \
                   (m1, test.serialNumber, test.srunRelativeNode, test.numberOfNodesNeeded, test.numNodesToUse, test.np, time.asctime(), test.name)
             else:
-                msg = '%s #%4d %s, %s nn=%i, np=%i, nt=%i, ngpu=%i %s' % \
+                # msg = '%s #%4d %s, %s nn=%i, np=%i, nt=%i, ngpu=%i %s (remaining capacity=%i)' % \
+                #   (m1, test.serialNumber, test.name, msgHosts, my_nn, test.np, my_nt, my_ngpu, time.asctime(), machine.remainingCapacity())
+                msg = '%s #%4d %s, %s nn=%i, np=%i, nt=%i, ngpu=%i %s ' % \
                   (m1, test.serialNumber, test.name, msgHosts, my_nn, test.np, my_nt, my_ngpu, time.asctime())
         else:
             if (test.srunRelativeNode >= 0):

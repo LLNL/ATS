@@ -126,6 +126,8 @@ def main():
     # Total cores is number of nodes * number of cores per node
     total_cores = args.numNodes * args.npMax
 
+    os.environ["NP_MAX"] = str(args.npMax)
+
     if args.flux:
         print("running flux natively")
 

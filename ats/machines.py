@@ -55,29 +55,36 @@ class MachineCore(object):
         end time is set if time elapsed exceeds time limit """
         from ats import configuration
         timeNow= time.time()
-        timePassed= timeNow - test.startTime
+        # Add small increment to flags jobs that 
+        # are close to timing out as timing out. Without this
+        # they were occasionally mis categorized as FAILED in
+        # later processing.
+        timePassed= (timeNow - test.startTime) + 0.2
         cut = configuration.cuttime
         fraction = timePassed / test.timelimit.value
 
-        #print "DEBUG checkForTimeOut 000"
-        #print timeNow
-        #print timePassed
-        #print test.timelimit.value
-        #print cut
-        #print fraction
-        #print "DEBUG checkForTimeOut 100"
+        # print("DEBUG checkForTimeOut 000")
+        # print(timeNow)
+        # print(timePassed)
+        # print(test.timelimit.value)
+        # print(cut)
+        # print(fraction)
         if (timePassed < 0):         # system clock change, reset start time
+            # print("DEBUG checkForTimeOut 600")
             test.setStartTimeDate()
         elif (timePassed >= test.timelimit.value):   # process timed out
+            # print("DEBUG checkForTimeOut 700 returning 1, timePassed=%f test.timelimit.value=%f" % (timePassed, test.timelimit.value))
             return 1, fraction
         elif cut is not None and timePassed >= cut.value:
+            # print("DEBUG checkForTimeOut 800 returning -1, timePassed=%f cut=%f fraction=%f" % (timePassed, cut, fraction))
             return -1, fraction
+        # print("DEBUG checkForTimeOut 999 returning 0")
         return 0, fraction
 
     def checkRunning(self):
         """Find those tests still running. getStatus checks for timeout.
         """
-        # print "DEBUG checkRunning 100\n"
+        # print("DEBUG checkRunning 100\n")
         from ats import configuration
         time.sleep(self.naptime)
         stillRunning = []

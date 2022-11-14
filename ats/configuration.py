@@ -121,13 +121,13 @@ def add_starting_options(parser):
     parser.add_option('--combineOutErr', action='store_true',
                       help='For each test, combine its log and err files.')
     parser.add_option('--strict_nn', action='store_true',
-                      help='''Strictly observe test "nn" options, this may
+                      help='''Slurm option: Strictly observe test "nn" options, this may
                       result in reduced througput or even slurm srun hangs.''')
     parser.add_option('--bypassSerialMachineCheck', action='store_true',
                       help='''Bypass check which prohibits ATS from running on
                       serial machines such as rztrona or borax.''')
     parser.add_option('--share', action='store_false', dest='exclusive',
-                      help='''Toss 3 option: Use --share rather than the
+                      help='''Slurm option: Use --share rather than the
                       default --exclusive on srun commands''')
 
 
@@ -221,24 +221,24 @@ def add_blueos_only_options(parser):
 
 def add_toss3_only_options(parser):
     parser.add_option('--useMinNodes', action='store_true',
-                      help='''Toss 3 option: Pass slurm the minimum number
+                      help='''Slurm option: Pass slurm the minimum number
                       of nodes needed to run the test case.''')
     parser.add_option('--unbuffered', action='store_true',
-                      help='Toss3 option: Pass srun the --unbuffered option.')
+                      help='Slurm option: Pass srun the --unbuffered option.')
     parser.add_option('--exclusive', action='store_true', dest='exclusive',
-                      help='Toss 3 option: Use --exclusive on srun commands')
+                      help='Slurm or Flux  option: Use --exclusive when submiting jobs')
     parser.add_option('--mpibind', default='off',
-                      help='''Toss3 option: Specify slurm --mpibind plugin
+                      help='''Slurm option: Specify slurm --mpibind plugin
                       options to use. By default, ATS specifies --mpibind=off
                       on Toss 3 systems, but projects may want other options.
                       Common options are none, on, off.  srun --mpibind=help
                       will show further options.''')
     parser.add_option('--kmpAffinity', default='granularity=core',
-                      help='''Toss3 option: Specify KMP_AFFINITY env var on
+                      help='''Slurm option: Specify KMP_AFFINITY env var on
                       Toss3. By default ATS sets this to "granularity=core",
                       but end users may provide an arbitrary string''')
     parser.add_option('--nn', dest='toss_nn', type='int', default=-1,
-                      help='''Toss3 option: -nn option. Over-rides test
+                      help='''Slurm or Flux option: -nn option. Over-rides test
                       specific settings of nn (number of nodes). Setting this
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
@@ -316,20 +316,20 @@ def add_more_options(parser):
                       help='''OMP_NUM_THREADS env setting ATS will set before
                       test run.''')
     parser.add_option('--cpusPerTask', type='int', default=-1,
-                      help='''Slurm set -cpus_per_task option. Lrun set -c
+                      help='''Slurm set -cpus_per_task option. Lrun set -c. Flux set -c. 
                       option. Jsrun ignored.''')
     parser.add_option('--sequential', action='store_true',
                        help='''Run each test consecutively. Do not run
                        concurrent test jobs.''')
     parser.add_option('--nosrun', action='store_true',
-                      help='Run the code without srun.')
+                      help='Slurm option: Run the code without srun.')
     parser.add_option('--salloc', action='store_true',
-                      help='Run the code with salloc rather than srun.')
+                      help='Slurm option: Run the code with salloc rather than srun.')
     parser.add_option('--showGroupStartOnly', action='store_true',
                       help='''Only show start of first test in group, not
                       subsequent steps.''')
     parser.add_option('--checkForAtsProc', action='store_true',
-                      help='''Attempt to determine if slurm thinks 1 processor
+                      help='''Slurm option:Attempt to determine if slurm thinks 1 processor
                       should be reserved for ATS -- may reduce total number of
                       MPI processes by 1.''')
     parser.add_option('--skip', action='store_true',

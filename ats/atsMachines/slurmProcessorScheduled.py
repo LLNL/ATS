@@ -22,7 +22,6 @@ from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, CREATED, SKIPPED, HALTE
 from ats.atsMachines import utils
 from ats.atsMachines import lcMachines
 
-
 MY_SYS_TYPE = os.environ.get('SYS_TYPE', sys.platform)
 
 class SlurmProcessorScheduled(lcMachines.LCMachineCore):
