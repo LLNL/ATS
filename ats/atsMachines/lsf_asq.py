@@ -832,17 +832,18 @@ class lsfMachine (machines.Machine):
         msg = '%s #%4d %s, %s nn=%d, np=%d, nt=%d, ngpu=%d %s' % \
             ("Stop ", test.serialNumber, test.name, msgHosts, test.num_nodes, my_np, my_nt, my_ngpu, time.asctime())
 
-        os.system("stty sane")  # Keep the terminal sane on blueos
+        if "ENVIRONMENT" in os.environ.keys():
+            my_environment = os.environ.get("ENVIRONMENT", 'novalue')
+
+        if my_environment == "INTERACTIVE":
+            os.system("stty sane")  # Keep the interactive terminal sane on blueos
+
         print(msg)
-        os.system("stty sane")  # Keep the terminal sane on blueos
 
-        #print "DEBUG noteEnd 100 test.name = %s test.num_nodes = %i np = %i nt = %i num_procs_used = %i" % (test.name, test.num_nodes, my_np, my_nt, test.num_procs_used)
-        #print "DEBUG noteEnd 100 increasing self.numProcsAvailable from %d to %d" % (self.numProcsAvailable, self.numProcsAvailable + test.num_procs_used)
+        if my_environment == "INTERACTIVE":
+            os.system("stty sane")  # Keep the interactive terminal sane on blueos
+
         self.numProcsAvailable          += test.num_procs_used
-
-        #print test.rs_filename
-        #print test.rs_nodesToUse
-        #print self.nodesInUse
 
         if hasattr(test, 'rs_nodesToUse'):
             cntNumNodes = 0

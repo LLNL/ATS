@@ -997,7 +997,6 @@ BATCHED = ats.BATCHED
             timeNow= time.time()
             timePassed= timeNow - timeStatusReport
             if timePassed >= configuration.options.reportFreq*60:
-                #os.system("stty sane")
                 terminal("ATS REPORT AT ELAPSED TIME", wallTime())
                 # log("ATS REPORT AT ELAPSED TIME", wallTime(), echo=True)
 

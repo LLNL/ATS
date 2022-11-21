@@ -74,8 +74,13 @@ class AtsLog(object):
         #
         from ats import configuration
         if configuration.SYS_TYPE.startswith('blueos'):
-            #print ("DEBUg stty sane")
-            os.system("stty sane")
+
+            if "ENVIRONMENT" in os.environ.keys():
+                my_environment = os.environ.get("ENVIRONMENT", 'novalue')
+
+            if my_environment == "INTERACTIVE":
+                # print ("SAD DEBUG calling stty sane. ENVIRONMENT variable is '%s'" % (my_environment))
+                os.system("stty sane") # Keep interactive terminal sane
 
         # printing of long lines is causing errors on some systems.  Split the line into smaller lines
         if configuration.SYS_TYPE.startswith('somesystemxxx'):
