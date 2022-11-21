@@ -159,6 +159,7 @@ def main():
         if slurm_job_id == None:  ## if this is on login node
             cmd = [
                 "salloc",
+                f"--mpibind=off",
                 f"--nodes={args.numNodes}",
                 f"--partition={args.partition}",
                 f"--account={args.account}",
