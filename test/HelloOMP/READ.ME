@@ -40,18 +40,13 @@ How to run omp_test by hand:
 
 Sample ATS runs of the code
 
-   ./create_test_ats.py                         <- create the test.ats file
-
-   /usr/apps/ats/7.0.111/bin/atslite1           <- pre-allocate node and run on the allocation
-                                                   Throughput mode, run tests concurrently.
-
-   /usr/apps/ats/7.0.111/bin/atslite1 --smpi_off    <- blueos version
-
-   /usr/apps/ats/7.0.111/bin/ats test.ats --verbose --exclusive      
-                                                
-                                                ^- run ats on login node, let each test have private allocation
-                                                   This is especially useful for performance testing OpenMP
-                                                   codes
+   ./create_test_ats.py                     <- create the test.ats file
+   atslite1                                 <- toss3 version
+   atslite1 --exclusive                     <- toss4 version
+   atslite1 --smpi_off                      <- blueos version
+   ats test.ats --verbose --exclusive       <- run ats on login node, let each test have private allocation
+                                               This is especially useful for performance testing OpenMP
+                                                codes
 
 
 --------------------------------------------------------------------------------
