@@ -24,7 +24,11 @@ an a.out executable in this directory like so:
 
 Run the ats_hello wrapper script like so:
 
-    ./ats_hello
+  ./create_test_ats.py 
+
+   atslite1  test.ats               <- toss3 testing
+
+   atslite1 --smpi_off test.ats     <- blueos testing
 
 If run from a login node (such as Alastor), it will run tests which pass and
 fail, as well as checker scripts, some which pass, fail, are skipped.
