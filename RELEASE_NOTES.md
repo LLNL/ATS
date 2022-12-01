@@ -1,8 +1,19 @@
 # ATS Release Notes
 
-## 7.0.110
+## 7.0.111
+    Inital Flux support on Toss 4 systems where flux is 
+    the native scheduler.   
 
-    Initial Flux support for MPI only on Toss3 systems.
+    Initial Flux support on Toss 3 systems.
+
+    Only call 'stty sane' if ENVIRONMENT env var is INTERACTIVE
+    This call results in warnings and such if in a BATCH
+    environment.
+
+    pip installs ats with poetry, not setuptools (#97)
+    * pip installs ats with poetry, not setuptools
+    * remove outdated bin dir files
+    * rename back to atsflux
 
 ## 7.0.105
 
