@@ -664,7 +664,7 @@ int main (int argc, char *argv[]) {
 
     if ((my_size % 2) == 0) { exit(0); }    // If run with an even number of nodes, exit with 0
 
-    exit(-1);   // if run with odd number of nodes exit with -1
+    exit(0);   // if run with odd number of nodes still exit with 0
 }
 
 //----------------------------------------------------------------------------------------------------------------------
