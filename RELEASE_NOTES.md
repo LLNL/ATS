@@ -4,8 +4,6 @@
     Inital Flux support on Toss 4 systems where flux is 
     the native scheduler.   
 
-    Initial Flux support on Toss 3 systems.
-
     Only call 'stty sane' if ENVIRONMENT env var is INTERACTIVE
     This call results in warnings and such if in a BATCH
     environment.
