@@ -511,20 +511,6 @@ See manual for discussion of these arguments.
 #        if not self.groups.has_key(testobj.groupNumber):
 #            self.groups[testobj.groupNumber] = testobj.group
 
-# ambyr
-        #print 'SAD DEBUG BEGIN'
-        #print clas
-        #print testobj
-        #print testobj.status
-        #print testobj.clas
-        #print testobj.np
-        #print testobj.__dict__
-        #if 'UltraCheck' in testobj.name:
-        #    print "CHECKER YES"
-        #else:
-        #    print "CHECKER NO"
-        #print 'SAD END'
-
         SYSTEMS = testobj.options.get('SYSTEMS', [self.machine.name])
 
         if testobj.status in (CREATED, BATCHED):
