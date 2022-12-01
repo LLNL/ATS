@@ -1,5 +1,10 @@
 # ATS Release Notes
 
+The 'python3' branch is now obsolete.
+
+Use branch 7.0.111 or later, which are the up-to-date python3 branches.
+
+
 ## 7.0.105
 
 Merge updates from the python 2 branch
