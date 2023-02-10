@@ -30,6 +30,19 @@ atslite1.py
 atslite1.py --postrunScript=`pwd`/postrun.py
 atslite1.py --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
 
+===== BlueOS Lassen Testing ==============================================
+
+pushd .
+tar -xvzf kripke-v1.2.5-20e9ea9.tar.gz
+cd kripke-v1.2.5-20e9ea9
+mkdir build
+cd build
+cmake .. -C../host-configs/llnl-blueos-V100-nvcc-clang.cmake  -DCMAKE_BUILD_TYPE=Release
+make -j 8
+popd
+
+atslite1  --lrun --smpi_off --verbose
+
 
 ===== Special Whippet Build and Run Notes as of 2022 October 12 ======
 
