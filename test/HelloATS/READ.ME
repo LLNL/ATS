@@ -29,10 +29,6 @@ Run the ats_hello wrapper script like so:
 
    atslite1  test.ats               <- toss3 testing
 
-   atslite1 --exclusive  test.ats   <- toss4 (including toss4_cray) testing
-
-   atslite1 --smpi_off test.ats     <- blueos testing
-
 If run from a login node (such as Alastor), it will run tests which pass and
 fail, as well as checker scripts, some which pass, fail, are skipped.
 
@@ -46,19 +42,54 @@ It may also present some which are HALTED if errors are detected in slurm
 or mpi init by ATS.
 
 --------------------------------------------------------------------------------
+Toss 3 (rzgenie, etc.).  Only use Slurm
+--------------------------------------------------------------------------------
+   mpicc hello_ats.c        <- build the code
+   ./create_test_ats.py     <- create the ats test file
+   atslite1 test.ats        <- test using slurm
+
+--------------------------------------------------------------------------------
+Toss 4 (rzalastor, etc.).  Additional 'flux' testing on toss4
+--------------------------------------------------------------------------------
+
+   mpicc hello_ats.c        <- build the code
+   ./create_test_ats.py     <- create the ats test file
+   atslite1 test.ats        <- test using slurm
+   atsflux  test.ats        <- test using flux within a slurm allocation
+
+--------------------------------------------------------------------------------
+Blueos (rzansel)  Uses LSF
+--------------------------------------------------------------------------------
+
+    mpicc hello_ats.c        <- build the code
+    ./create_test_ats.py     <- create the ats test file
+                             +- various lsf run options testing
+                             v                             
+    atslite1 test.ats   
+    atslite1 --smpi_off test.ats   
+    atslite1 --lrun test.ats 
+    atslite1 --lrun --lrun_pack test.ats
+    atslite1 --lrun --lrun_pack --lrun_np 10 --verbose test.ats
+
+    atslite1 --jsrun --jsrun_exclusive test.ats 
+    atslite1 --jsrun test.ats 
+    atslite1 --jsrun --jsrun_np 20 test.ats
+    atslite1 --jsrun --jsrun_np 20 test.ats
+    atslite1 --jsrun --jsrun_np 20 --verbose test.ats
+
+--------------------------------------------------------------------------------
 Whippet compilation notes (as of 2022 October 12)
 Whippet test run notes using flux
 --------------------------------------------------------------------------------
-mpicc hello_ats.c  -L /usr/lib64/flux -lpmi2 
-LD_LIBRARY_PATH=/usr/lib64/flux ldd a.out | grep pmi2
+    mpicc hello_ats.c  -L /usr/lib64/flux -lpmi2 
+    LD_LIBRARY_PATH=/usr/lib64/flux ldd a.out | grep pmi2
 
-flux help mini
-flux mini run -n 20 ./a.out
-flux mini submit -N 2 -n 2 --output=job_1.out ./a.out
+    flux help mini
+    flux mini run -n 20 ./a.out
+    flux mini submit -N 2 -n 2 --output=job_1.out ./a.out
 
-./create_test_ats.py
-atsflux test.ats
-
+    ./create_test_ats.py
+    atsflux test.ats
 
 --------------------------------------------------------------------------------
 --  Notes on running

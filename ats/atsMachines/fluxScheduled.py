@@ -1,4 +1,4 @@
-#ATS:flux00             SELF FluxScheduled 3
+#ATS:flux00             SELF FluxScheduled 2
 
 """
 This module defines the ``FluxScheduled`` class.
