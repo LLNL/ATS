@@ -1,10 +1,10 @@
 CXX=mpicxx
 
 # Toss Build
-#CXFLAGS=-g -qopenmp -pthread -O2
+CXFLAGS=-g -qopenmp -pthread -O2
 
 # Blueos Build and Toss4 Cray
-CXFLAGS=-g -fopenmp -O2
+#CXFLAGS=-g -fopenmp -O2
 
 
 #CXFLAGS=-openmp -pthread -O2 -axcore-avx2,mic-avx512

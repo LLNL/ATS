@@ -7,8 +7,8 @@ Sample use of lightweight ATS wrapper script
 How to use:
 
     export PATH=/usr/gapps/ats/toss_3_x86_64_ib/7.0.111/bin:$PATH
-
-    (or put the python with ATS you are working on in your upath, wherever that is)
+    or
+    export PATH=/usr/gapps/ats/toss_3_x86_64_ib/7.0.${USER}/bin:$PATH
 
     omp_test.c             <- Simple executable -- will be your projects exectuable(s)
     create_test_ats.py     <- Python script which will create the test.ats file
