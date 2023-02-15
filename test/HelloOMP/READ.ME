@@ -40,13 +40,77 @@ How to run omp_test by hand:
 
 Sample ATS runs of the code
 
-   ./create_test_ats.py                     <- create the test.ats file
-   atslite1                                 <- toss3 version
    atslite1 --exclusive                     <- toss4 version
    atslite1 --smpi_off                      <- blueos version
-   ats test.ats --verbose --exclusive       <- run ats on login node, let each test have private allocation
-                                               This is especially useful for performance testing OpenMP
-                                                codes
+
+--------------------------------------------------------------------------------
+Toss 3 (rzgenie, etc.).  
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.8.2
+        // Modify this line to be the ats install you are testing
+    export PATH=/usr/gapps/ats/toss_3_x86_64_ib/7.0.${USER}/bin:$PATH
+
+    mpicxx -g -qopenmp -pthread -O2 -o omp_test omp_test.cc
+    ./create_test_ats.py 
+    atslite1 test.ats   
+
+      # run ats on login node, let each test have
+      # private allocation. This is especially 
+      # useful for performance testing OpenMP
+
+    ats test.ats --verbose --exclusive  --numNodes=3 
+
+--------------------------------------------------------------------------------
+Toss 4 (rzalastor, etc.). 
+    exporting explicit MACHINE_TYPE as Toss 4 systems will have from 20 to 112 
+    cores per node.  Alastor has 20, so use slurm20 when testing slurm runs.
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.9.12
+    export PATH=/usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}/bin:$PATH
+
+    mpicxx -g -qopenmp -pthread -O2 -o omp_test omp_test.cc
+
+    ./create_test_ats.py
+
+    export MACHINE_TYPE=slurm20
+
+    atslite1 test.ats   
+    ats test.ats --verbose --exclusive  --numNodes=3 
+
+    export -n MACHINE_TYPE
+
+        # Test with atsflux, will run flux under salloc on toss4 
+    atsflux test.ats
+
+--------------------------------------------------------------------------------
+Blueos (rzansel)  Uses LSF
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.8.2
+    export PATH=/usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin:$PATH
+
+    mpicxx -g -fopenmp -O2 -o omp_test omp_test.cc
+    ./create_test_ats.py
+    atslite1 test.ats
+    atslite1 --smpi_off test.ats
+    atslite1 --jsrun_exclusive --verbose  test.ats 
+
+--------------------------------------------------------------------------------
+Whippet compilation notes (as of 2022 October 12)
+Whippet test run notes using flux
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.9.12
+    export PATH=/usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}/bin:$PATH
+
+    mpicc -g -qopenmp -pthread -O2 -o omp_test omp_test.cc -L /usr/lib64/flux -lpmi2
+    LD_LIBRARY_PATH=/usr/lib64/flux
+    ldd omp_test | grep pmi2
+
+    ./create_test_ats.py
+    atsflux test.ats
 
 
 --------------------------------------------------------------------------------
