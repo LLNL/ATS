@@ -1,3 +1,25 @@
+export PATH=${PATH}:/usr/gapps/ats/scripts
+module load python/3.8.2
+export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+
+--------------------------------------------------------------------------------
+Blueos (rzansel)  Uses LSF
+--------------------------------------------------------------------------------
+
+mpixlc-gpu -fopenmp -DHAVE_OPENMP -DHAVE_OPENMP_4 hello_gpu.cc
+
+/usr/apps/ats/7.0.111/bin/atslite1
+/usr/apps/ats/7.0.111/bin/atslite1 --smpi_off
+/usr/apps/ats/7.0.111/bin/atslite1 --lrun -verbose -verbose
+/usr/apps/ats/7.0.111/bin/atslite1 --lrun --lrun_pack -verbose
+/usr/apps/ats/7.0.111/bin/atslite1 --jsrun_exclusive  -verbose
+
+
+--------------------------------------------------------------------------------
+Older Notes: Let's just test the GPU build for now, as noted above.
+--------------------------------------------------------------------------------
+
 Sample Compile for MPI only:
     mpiclang++-gpu hello_gpu.cc
     mpicxx hello_gpu.cc
@@ -20,10 +42,11 @@ Sample ATS runs of the code
     /usr/apps/ats/7.0.111/bin/atslite1 --smpi_off --jsrun
     /usr/apps/ats/7.0.111/bin/atslite1 --smpi_off --jsrun --jsrun_exclusive
     /usr/apps/ats/7.0.111/bin/atslite1 --smpi_off --jsrun --jsrun_exclusive --jsrun_np 4 --jsrun_ngpu 4
-
     
 Clean 
     rm -rf a.out blueos_3* 
  
-# end of file
+--------------------------------------------------------------------------------
+- end of file
+--------------------------------------------------------------------------------
 

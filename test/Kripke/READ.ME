@@ -1,0 +1,127 @@
+2022 May 24
+
+Testing ATS with Kripke.
+
+Kripke is open source and is on GitHub at this location:
+
+    https://github.com/LLNL/Kripke/releases
+
+This testing was based on the tarfile kripke-v1.2.5-20e9ea9.tar.gz from here:
+
+    https://github.com/LLNL/Kripke/releases/download/v1.2.5/kripke-v1.2.5-20e9ea9.tar.gz
+
+--------------------------------------------------------------------------------
+Toss 3 (rzgenie, etc.)
+--------------------------------------------------------------------------------
+export PATH=${PATH}:/usr/gapps/ats/scripts
+module load python/3.8.2
+export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+1) Build Kripke in this directory (test/Kripke)
+
+pushd .
+tar -xvf kripke-v1.2.5-20e9ea9.tar
+cd kripke-v1.2.5-20e9ea9
+mkdir build
+cd build
+cmake .. -C../host-configs/llnl-toss3-gcc8.1.cmake -DCMAKE_BUILD_TYPE=Release
+make -j 8
+popd
+
+
+2) Run Kripke under ATS.  Some examples are:
+
+atslite1
+atslite1 --postrunScript=`pwd`/postrun.py
+atslite1 --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+
+
+--------------------------------------------------------------------------------
+Toss 4 (rzalastor, etc.).  Additional 'flux' testing on toss4
+--------------------------------------------------------------------------------
+export PATH=${PATH}:/usr/gapps/ats/scripts
+module load python/3.9.12
+export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+1) Build Kripke in this directory (test/Kripke)
+
+pushd .
+tar -xvf kripke-v1.2.5-20e9ea9.tar
+cd kripke-v1.2.5-20e9ea9
+mkdir build
+cd build
+cmake .. -C../host-configs/llnl-toss4-intel-classic.cmake -DCMAKE_BUILD_TYPE=Release
+make -j 8
+popd
+
+
+2) Run Kripke under ATS, using slurm
+
+export MACHINE_TYPE=slurm20
+
+
+atslite1
+atslite1 --postrunScript=`pwd`/postrun.py
+atslite1 --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+
+export -n MACHINE_TYPE
+
+3) Run Kripke under ATS, using Flux
+
+./create_test_ats.py 
+atsflux test.ats
+atsflux test.ats  --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+
+--------------------------------------------------------------------------------
+Blueos (rzansel)  Uses LSF
+--------------------------------------------------------------------------------
+export PATH=${PATH}:/usr/gapps/ats/scripts
+module load python/3.8.2
+export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+1) Build Kripke in this directory (test/Kripke)
+
+pushd .
+tar -xvf kripke-v1.2.5-20e9ea9.tar
+cd kripke-v1.2.5-20e9ea9
+mkdir build
+cd build
+cmake .. -C../host-configs/llnl-blueos-V100-nvcc-clang.cmake  -DCMAKE_BUILD_TYPE=Release
+make 
+popd
+
+2) Run Kripke under ATS, using LSF
+
+./create_test_ats.py
+atslite1 test.ats --numNodes=3 --jsrun_exclusive 
+
+--------------------------------------------------------------------------------
+Whippet compilation notes (as of 2022 October 12)
+Whippet test run notes using flux
+--------------------------------------------------------------------------------
+export PATH=${PATH}:/usr/gapps/ats/scripts
+module load python/3.9.12
+export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+1) Build Kripke in this directory (test/Kripke)
+
+pushd .
+tar -xvf kripke-v1.2.5-20e9ea9.tar
+cd kripke-v1.2.5-20e9ea9
+mkdir build
+cd build
+cmake .. -C../host-configs/llnl-toss4-intel-classic.cmake  -DCMAKE_BUILD_TYPE=Release
+make -j 8
+popd
+
+LD_LIBRARY_PATH=/usr/lib64/flux
+
+./create_test_ats.py
+atsflux test.ats --verbose
+atsflux test.ats --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+
