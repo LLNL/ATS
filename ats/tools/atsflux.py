@@ -34,7 +34,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "-N",
         "--numNodes",
-        default=3,
+        default=2,
         type=int,
         help="Number of nodes allocated to atsflux.",
     )
@@ -133,9 +133,8 @@ def main():
 
         cmd = []
 
-
         # If FLUX_JOB_ID exists, assume we are already in a flux allocation.
-        if "FLUX_JOB_ID" in os.environ:
+        if "FLUX_JOB_ID" in os.environ or "FLUX_CONNECTOR_PATH" in os.environ or "FLUX_TERMINUS_SESSION" in os.environ:
             print("looks like we are already in a flux allocation")
 
         # else start flux from the login node
