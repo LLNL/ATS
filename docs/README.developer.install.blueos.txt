@@ -11,15 +11,16 @@ export PATH=/usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin:$PATH
 git clone git@github.com:LLNL/ATS.git /usr/workspace/wsrzd/${USER}/Git-ATS-GitHub-${USER}
 cd /usr/workspace/wsrzd/${USER}/Git-ATS-GitHub-${USER}
 git branch feature/${USER}/mydevbranch
-git push --set-upstream origin feature/dawson/mydevbranch 
+git push --set-upstream origin feature/${USER}/mydevbranch 
 git checkout feature/${USER}/mydevbranch
 
     // install ats
+cd /usr/workspace/wsrzd/${USER}/Git-ATS-GitHub-${USER}
 /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin/python -m pip install `pwd`
 set.permissions.noworld /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER} atsb
 
     # Install of ATS extensions from GitLAB
-cd /g/g16/dawson/wci/Git-ATS-GitLab-${USER}
+cd /g/g16/${USER}/wci/Git-ATS-GitLab-${USER}
 ./scripts/update-version-llnl.x
 /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin/python -m pip install `pwd` 
 ./setup.fix 3.8 ${USER} 

@@ -82,11 +82,8 @@ Whippet compilation notes (as of 2022 October 12)
 Whippet test run notes using flux
 --------------------------------------------------------------------------------
     mpicc hello_ats.c  -L /usr/lib64/flux -lpmi2 
-    LD_LIBRARY_PATH=/usr/lib64/flux ldd a.out | grep pmi2
-
-    flux help mini
-    flux mini run -n 20 ./a.out
-    flux mini submit -N 2 -n 2 --output=job_1.out ./a.out
+    LD_LIBRARY_PATH=/usr/lib64/flux 
+    ldd a.out | grep pmi2
 
     ./create_test_ats.py
     atsflux test.ats
