@@ -54,12 +54,13 @@ Toss 4 (rzalastor, etc.).  Additional 'flux' testing on toss4
     module load python/3.9.12
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_ats.c        <- build the code
-    ./create_test_ats.py     <- create the ats test file
-    export MACHINE_TYPE=slurm20
-    atslite1 test.ats        <- test using slurm
+    mpicc hello_ats.c           <- build the code
+    ./create_test_ats.py        <- create the ats test file
+    export MACHINE_TYPE=slurm20 <- if on alastor with 20 cores per cpu
+    export MACHINE_TYPE=slurm36 <- if on genie or another 36 core machine
+    atslite1 test.ats           <- test using slurm
     export -n MACHINE_TYPE
-    atsflux  test.ats        <- test using flux within a slurm allocation
+    atsflux  test.ats           <- test using flux within a slurm allocation
 
     # POODLE TEST LINE (or any other system without cross node MPI)
     atslite1 test.ats --numNodes=1

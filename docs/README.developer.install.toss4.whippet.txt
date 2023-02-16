@@ -10,11 +10,11 @@ Set this as appropriate for you
 
     # Install an ATS version of python based on the public version.
 
-ls -la  /usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}
-rm -rf /usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}
+ls -la  /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}
+rm -rf /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}
 module load python/3.9.12
-python3 -m virtualenv --system-site-packages --python=python3.9 /usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}
-export PATH=/usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}/bin:$PATH
+python3 -m virtualenv --system-site-packages --python=python3.9 /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}
+export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
     # these lines are only necessary if you have not yet cloned the ATS repo.
     # If you have, you may want to do a 'git clean' to cleanup prior installs from other systems.
@@ -26,17 +26,17 @@ git checkout feature/${USER}/mydevbranch
 
     # Install of ATS
 cd ${CLONE_SPACE}/${USER}/Git-ATS-GitHub-${USER}
-/usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}/bin/python -m pip install `pwd`
-set.permissions.noworld /usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER} atsb
+/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin/python -m pip install `pwd`
+set.permissions.noworld /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
 
 
 # Install of ATS from GitLab
-git clone git@github.com:LLNL/ATS.git ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
+git clone ssh://git@czgitlab.llnl.gov:7999/dawson/atsllnl.git ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
 cd ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
 ./scripts/update-version-llnl.x
-/usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER}/bin/python -m pip install `pwd`
+/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin/python -m pip install `pwd`
 ./setup.fix 3.9 ${USER} 
-set.permissions /usr/gapps/ats/toss_4_x86_64_ib/7.0.${USER} atsb
+set.permissions /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
 
 
 

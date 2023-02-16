@@ -61,7 +61,8 @@ popd
 
 2) Run Kripke under ATS, using slurm
 
-export MACHINE_TYPE=slurm20
+export MACHINE_TYPE=slurm20 <- if on alastor with 20 cores per cpu
+export MACHINE_TYPE=slurm36 <- if on genie or another 36 core machine
 
 ./create_test_ats.py 
 atslite1

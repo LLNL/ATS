@@ -74,7 +74,8 @@ Toss 4 (rzalastor, etc.).
 
     ./create_test_ats.py
 
-    export MACHINE_TYPE=slurm20
+    export MACHINE_TYPE=slurm20 <- if on alastor with 20 cores per cpu
+    export MACHINE_TYPE=slurm36 <- if on genie or another 36 core machine
 
     atslite1 test.ats   
     ats test.ats --verbose --exclusive  --numNodes=3 
