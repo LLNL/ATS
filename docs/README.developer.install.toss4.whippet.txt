@@ -6,10 +6,7 @@ Set this as appropriate for you
     export CLONE_SPACE="/usr/workspace/wsrzd"
     export CLONE_SPACE="/usr/workspace/wsb"
 
-# Install ATS from GitHub
-
     # Install an ATS version of python based on the public version.
-
 ls -la  /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}
 rm -rf /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}
 module load python/3.9.12
@@ -36,7 +33,7 @@ cd ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
 ./scripts/update-version-llnl.x
 /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin/python -m pip install `pwd`
 ./setup.fix 3.9 ${USER} 
-set.permissions /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
+set.permissions.noworld /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
 
 
 

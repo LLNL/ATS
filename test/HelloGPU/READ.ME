@@ -9,11 +9,10 @@ Blueos (rzansel)  Uses LSF
 
 mpixlc-gpu -fopenmp -DHAVE_OPENMP -DHAVE_OPENMP_4 hello_gpu.cc
 
-/usr/apps/ats/7.0.111/bin/atslite1
 /usr/apps/ats/7.0.111/bin/atslite1 --smpi_off
-/usr/apps/ats/7.0.111/bin/atslite1 --lrun -verbose -verbose
-/usr/apps/ats/7.0.111/bin/atslite1 --lrun --lrun_pack -verbose
-/usr/apps/ats/7.0.111/bin/atslite1 --jsrun_exclusive  -verbose
+/usr/apps/ats/7.0.111/bin/atslite1 --smpi_off --lrun -verbose -verbose
+/usr/apps/ats/7.0.111/bin/atslite1 --smpi_off --lrun --lrun_pack -verbose
+/usr/apps/ats/7.0.111/bin/atslite1 --smpi_off --jsrun_exclusive  -verbose
 
 
 --------------------------------------------------------------------------------

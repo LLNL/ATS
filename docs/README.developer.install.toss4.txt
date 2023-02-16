@@ -28,7 +28,7 @@ git checkout feature/${USER}/mydevbranch
     # Install of ATS
 cd ${CLONE_SPACE}/${USER}/Git-ATS-GitHub-${USER}
 /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin/python -m pip install `pwd`
-set.permissions.nogroup.write /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
+set.permissions.noworld /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
 
     # Install of ATS extensions from GitLAB
 git clone ssh://git@czgitlab.llnl.gov:7999/dawson/atsllnl.git ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
@@ -36,7 +36,7 @@ cd ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
 ./scripts/update-version-llnl.x
 /usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin/python -m pip install `pwd` 
 ./setup.fix 3.9 ${USER} 
-set.permissions.nogroup.write /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
+set.permissions.noworld /usr/gapps/ats/${SYS_TYPE}/7.0.${USER} atsb
 
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------

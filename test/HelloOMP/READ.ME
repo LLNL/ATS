@@ -98,9 +98,8 @@ Blueos (rzansel)  Uses LSF
 
     mpicxx -g -fopenmp -O2 -o omp_test omp_test.cc
     ./create_test_ats.py
-    atslite1 test.ats
     atslite1 --smpi_off test.ats
-    atslite1 --jsrun_exclusive --verbose  test.ats 
+    atslite1 --smpi_off --jsrun_exclusive --verbose  test.ats 
 
 --------------------------------------------------------------------------------
 Whippet compilation notes (as of 2022 October 12)

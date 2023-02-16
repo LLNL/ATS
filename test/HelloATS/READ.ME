@@ -75,18 +75,19 @@ Blueos (rzansel)  Uses LSF
 
     mpicc hello_ats.c        <- build the code
     ./create_test_ats.py     <- create the ats test file
-                             v                             
-    atslite1 test.ats   
-    atslite1 --smpi_off test.ats   
-    atslite1 --lrun test.ats 
-    atslite1 --lrun --lrun_pack test.ats
-    atslite1 --lrun --lrun_pack --lrun_np 10 --verbose test.ats
 
-    atslite1 --jsrun --jsrun_exclusive test.ats 
-    atslite1 --jsrun test.ats 
-    atslite1 --jsrun --jsrun_np 20 test.ats
-    atslite1 --jsrun --jsrun_np 20 test.ats
-    atslite1 --jsrun --jsrun_np 20 --verbose test.ats
+                             // --smpi_off may or may not be needed
+                             // in subsequent commands
+    atslite1 --smpi_off test.ats 
+    atslite1 --smpi_off --lrun test.ats 
+    atslite1 --smpi_off --lrun --lrun_pack test.ats
+    atslite1 --smpi_off --lrun --lrun_pack --lrun_np 10 --verbose test.ats
+
+    atslite1 --smpi_off --jsrun --jsrun_exclusive test.ats 
+    atslite1 --smpi_off --jsrun test.ats 
+    atslite1 --smpi_off --jsrun --jsrun_np 20 test.ats
+    atslite1 --smpi_off --jsrun --jsrun_np 20 test.ats
+    atslite1 --smpi_off --jsrun --jsrun_np 20 --verbose test.ats
 
 --------------------------------------------------------------------------------
 Whippet compilation notes (as of 2022 October 12)
