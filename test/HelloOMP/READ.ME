@@ -84,6 +84,10 @@ Toss 4 (rzalastor, etc.).
         # Test with atsflux, will run flux under salloc on toss4 
     atsflux test.ats
 
+    # POODLE TEST LINE (or any other system without cross node MPI)
+    atslite1 test.ats --numNodes=1
+    atsflux  test.ats --numNodes=1 --job_time=30
+
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF
 --------------------------------------------------------------------------------

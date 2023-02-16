@@ -1,4 +1,10 @@
+
 export PATH=${PATH}:/usr/gapps/ats/scripts
+
+Set this as appropriate for you
+
+    export CLONE_SPACE="/usr/workspace/wsrzd"
+    export CLONE_SPACE="/usr/workspace/wsb"
 
     // install python
 ls -la /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}
@@ -8,19 +14,20 @@ python3 -m virtualenv --system-site-packages --python=python3.8 /usr/gapps/ats/b
 export PATH=/usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin:$PATH
 
     // lines not necessary if you already have a clone
-git clone git@github.com:LLNL/ATS.git /usr/workspace/wsrzd/${USER}/Git-ATS-GitHub-${USER}
-cd /usr/workspace/wsrzd/${USER}/Git-ATS-GitHub-${USER}
+git clone git@github.com:LLNL/ATS.git ${CLONE_SPACE}/${USER}/Git-ATS-GitHub-${USER}
+cd ${CLONE_SPACE}/${USER}/Git-ATS-GitHub-${USER}
 git branch feature/${USER}/mydevbranch
 git push --set-upstream origin feature/${USER}/mydevbranch 
 git checkout feature/${USER}/mydevbranch
 
     // install ats
-cd /usr/workspace/wsrzd/${USER}/Git-ATS-GitHub-${USER}
+cd ${CLONE_SPACE}/${USER}/Git-ATS-GitHub-${USER}
 /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin/python -m pip install `pwd`
 set.permissions.noworld /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER} atsb
 
     # Install of ATS extensions from GitLAB
-cd /g/g16/${USER}/wci/Git-ATS-GitLab-${USER}
+git clone git@github.com:LLNL/ATS.git ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
+cd ${CLONE_SPACE}/${USER}/Git-ATS-GitLab-${USER}
 ./scripts/update-version-llnl.x
 /usr/gapps/ats/blueos_3_ppc64le_ib_p9/7.0.${USER}/bin/python -m pip install `pwd` 
 ./setup.fix 3.8 ${USER} 

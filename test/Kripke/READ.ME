@@ -51,6 +51,10 @@ cd kripke-v1.2.5-20e9ea9
 mkdir build
 cd build
 cmake .. -C../host-configs/llnl-toss4-intel-classic.cmake -DCMAKE_BUILD_TYPE=Release
+
+    # POODLE CMAKE LINE
+    cmake .. -C../host-configs/llnl-toss4-intel-classic-magic.cmake -DCMAKE_BUILD_TYPE=Release
+
 make -j 8
 popd
 
@@ -59,7 +63,7 @@ popd
 
 export MACHINE_TYPE=slurm20
 
-
+./create_test_ats.py 
 atslite1
 atslite1 --postrunScript=`pwd`/postrun.py
 atslite1 --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
@@ -71,6 +75,10 @@ export -n MACHINE_TYPE
 ./create_test_ats.py 
 atsflux test.ats
 atsflux test.ats  --postrunScript=`pwd`/postrun.py --prerunScript=`pwd`/prerun.py
+
+    # POODLE TEST LINE (or any other system without cross node MPI)
+    atslite1 test.ats --numNodes=1
+    atsflux  test.ats --numNodes=1 --job_time=30
 
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF

@@ -61,6 +61,10 @@ Toss 4 (rzalastor, etc.).  Additional 'flux' testing on toss4
     export -n MACHINE_TYPE
     atsflux  test.ats        <- test using flux within a slurm allocation
 
+    # POODLE TEST LINE (or any other system without cross node MPI)
+    atslite1 test.ats --numNodes=1
+    atsflux  test.ats --numNodes=1 --job_time=30
+
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF
 --------------------------------------------------------------------------------
