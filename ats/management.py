@@ -667,11 +667,30 @@ to allow user a chance to add options and examine results of option parsing.
 """
         self.init(clas, adder, examiner)
         self.firstBanner()
-        self.core()
-        self.postprocess()
+        core_result = self.core()
+        postprocess_result = self.postprocess()
         self.finalReport()
         self.saveResults()
         self.finalBanner()
+
+        test_result = True
+
+        for test in self.testlist:
+            if (test.status is FAILED):
+                print("There was a failed test.")
+                test_result = False
+                break
+
+        print(f"""core_result = {core_result}
+        postprocess_result = {postprocess_result}
+        test_result = {test_result}""")
+
+        if (core_result and postprocess_result and test_result):
+            print("main() returning true.")
+            return True
+        else:
+            print("main() returning false.")
+            return False
 
     def preprocess(self):
         "Call beforeRunRoutines."
@@ -683,7 +702,7 @@ to allow user a chance to add options and examine results of option parsing.
                 log(details, echo = True)
             except KeyboardInterrupt:
                 log("Keyboard interrupt while in preprocess phase, terminating.", echo=True)
-                return
+                return False
             log("-------------------------------", echo=True)
 
     def postprocess(self):
@@ -696,8 +715,9 @@ to allow user a chance to add options and examine results of option parsing.
                 log(details, echo = True)
             except KeyboardInterrupt:
                 log("Keyboard interrupt while in exit phase, terminating.", echo=True)
-                return
+                return False
             log("-------------------------------", echo=True)
+        return True
 
     def init(self, clas = '', adder=None, examiner=None):
         """This initialization is separate so that unit tests can be done on this module.
@@ -794,7 +814,7 @@ to allow user a chance to add options and examine results of option parsing.
 
         self.collectTimeEnded = datestamp(long_format=True)
         if errorOccurred:
-            return
+            return False
 
         try:
             for f in self.onCollectedRoutines:
@@ -810,13 +830,13 @@ to allow user a chance to add options and examine results of option parsing.
             log(traceback.format_exc(), echo=True)
             errorOccured = True
         if errorOccurred:
-            return
+            return False
 
         # divide into interactive and batch tests
         interactiveTests, batchTests = self.sortTests()
         if len(interactiveTests) + len(batchTests) == 0:
             log("No tests found.", echo = True)
-            return
+            return False
 
         # We have built up the list of tests.  Run functions added via
         # beforeRun() calls to allow user to do stuff like cleaning up old test
@@ -836,10 +856,10 @@ to allow user a chance to add options and examine results of option parsing.
                 except AtsError:
                     log(traceback.format_exc(), echo=True)
                     log("ATS error.", echo=True)
-                    return
+                    return False
                 except KeyboardInterrupt:
                     log("Keyboard interrupt while dispatching batch, terminating.", echo=True)
-                    return
+                    return False
 
         # Phase 3 -- run the interactive tests
 
@@ -862,7 +882,7 @@ to allow user a chance to add options and examine results of option parsing.
                 log(traceback.format_exc(), echo=True)
                 errorOccured = True
             if errorOccurred:
-                return
+                return False
 
             try:
                 self.run(interactiveTests)
@@ -892,6 +912,8 @@ to allow user a chance to add options and examine results of option parsing.
 #            return
 
         self.continuationFile(interactiveTests)
+
+        return True
 
 
     def continuationFile(self, interactiveTests, force = False):
