@@ -295,6 +295,8 @@ Attributes:
     def finalReport(self):
         "Write the final report."
         log.reset()
+        clean_run = True
+
         if self.testlist:
             log("""
 =========================================================
@@ -307,8 +309,9 @@ ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
         if not configuration.options.skip:
             log("""
 ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
-            self.summary(log)
+            clean_run = self.summary(log)
             self._summary2(log)
+        return clean_run
 
     def finalBanner(self):
         "Show final banner."
@@ -391,22 +394,27 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
 CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
                echo = True)
 
+        clean_run = True
         msg = ""
         if (len(failed) == 0):
             msg = "FAILED:  0"
         else:
             msg = "FAILED:  %d %s" % (len(failed), ', '.join(failed))
+            clean_run = False
         log(msg, echo = True)
 
         if timedout:
             log("TIMEOUT:  %d %s" % (len(timedout), ', '.join(timedout)),
                echo = True)
+            clean_run = False
         if halted:
             log("HALTED:   %d" % len(halted),
                echo = True)
+            clean_run = False
         if lsferror:
             log("LSFERROR: %d" % len(lsferror),
                echo = True)
+            clean_run = False
         if expected:
             log("EXPECTED: %d" % len(expected),
                echo = True)
@@ -418,6 +426,8 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
         if notrun:
             log("""NOTRUN:   %d""" % len(notrun),
                echo = True)
+        
+        return clean_run
 
     def _summary2(self, log):
         "Additional detail for  summary."
@@ -669,27 +679,19 @@ to allow user a chance to add options and examine results of option parsing.
         self.firstBanner()
         core_result = self.core()
         postprocess_result = self.postprocess()
-        self.finalReport()
+        report_result = self.finalReport()
         self.saveResults()
         self.finalBanner()
 
-        test_result = True
+        # print(f"""core_result = {core_result}
+        # postprocess_result = {postprocess_result}
+        # report_result = {report_result}""")
 
-        for test in self.testlist:
-            if (test.status is FAILED):
-                print("There was a failed test.")
-                test_result = False
-                break
-
-        print(f"""core_result = {core_result}
-        postprocess_result = {postprocess_result}
-        test_result = {test_result}""")
-
-        if (core_result and postprocess_result and test_result):
-            print("main() returning true.")
+        if (core_result and postprocess_result and report_result):
+            # print("main() returning true.")
             return True
         else:
-            print("main() returning false.")
+            # print("main() returning false.")
             return False
 
     def preprocess(self):
