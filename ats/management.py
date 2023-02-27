@@ -46,7 +46,7 @@ Attributes:
 * groups -- dictionary of test group objects indexed by number
 
     """
-    def __init__ (self):
+    def __init__(self):
         self.restart()
 
     def restart(self):
@@ -67,7 +67,7 @@ Attributes:
 
         AtsTest.restart()
 
-    def filter (self, *filters):
+    def filter(self, *filters):
         "Add filters to the list. Clear list if no arguments."
         if not filters:
             self.filters = []
@@ -92,7 +92,7 @@ Attributes:
             self.filters.append(f)
             log ('Added filter:', repr(f))
 
-    def filterenv (self, test):
+    def filterenv(self, test):
         """Compute the environment in which filters for test will be
             evaluated."""
         if not isinstance(test, AtsTest):
@@ -104,7 +104,7 @@ Attributes:
         fe.update(testEnvironment)
         return fe
 
-    def find_unmatched (self, test):
+    def find_unmatched(self, test):
         """Does this manager's filters match the given test properties?
         Returns '' if it does, the filter that failed if not.
         """
@@ -169,7 +169,7 @@ Attributes:
 
     alreadysourced = []
 
-    def source (self, *paths, **vocabulary):
+    def source(self, *paths, **vocabulary):
         """Input one or more source files, with optional additional vocabulary.
          If introspection=f given in the vocabulary, or using define,
          it should be a function taking one argument and returning any
@@ -337,7 +337,7 @@ Attributes:
         """
         return
 
-    def report (self):
+    def report(self):
         "Log a report, showing each test."
         doAll = debug() or \
                configuration.options.skip or \
@@ -371,7 +371,7 @@ Attributes:
                 log([t.serialNumber for t in test.waitUntil], echo=False)
             log.dedent()
 
-    def summary (self, log):
+    def summary(self, log):
         "Log summary of the results."
         tlist = [t for t in self.testlist if t.options.get('report', True)]
         failed = [test.name for test in self.testlist if (test.status is FAILED)]
