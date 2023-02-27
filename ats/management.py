@@ -295,7 +295,7 @@ Attributes:
     def finalReport(self):
         "Write the final report."
         log.reset()
-        clean_run = True
+        successful_run = True
 
         if self.testlist:
             log("""
@@ -309,9 +309,9 @@ ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
         if not configuration.options.skip:
             log("""
 ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
-            clean_run = self.summary(log)
+            successful_run = self.summary(log)
             self._summary2(log)
-        return clean_run
+        return successful_run
 
     def finalBanner(self):
         "Show final banner."
@@ -394,27 +394,27 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
 CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
                echo = True)
 
-        clean_run = True
+        successful_run = True
         msg = ""
         if (len(failed) == 0):
             msg = "FAILED:  0"
         else:
             msg = "FAILED:  %d %s" % (len(failed), ', '.join(failed))
-            clean_run = False
+            successful_run = False
         log(msg, echo = True)
 
         if timedout:
             log("TIMEOUT:  %d %s" % (len(timedout), ', '.join(timedout)),
                echo = True)
-            clean_run = False
+            successful_run = False
         if halted:
             log("HALTED:   %d" % len(halted),
                echo = True)
-            clean_run = False
+            successful_run = False
         if lsferror:
             log("LSFERROR: %d" % len(lsferror),
                echo = True)
-            clean_run = False
+            successful_run = False
         if expected:
             log("EXPECTED: %d" % len(expected),
                echo = True)
@@ -427,7 +427,7 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
             log("""NOTRUN:   %d""" % len(notrun),
                echo = True)
         
-        return clean_run
+        return successful_run
 
     def _summary2(self, log):
         "Additional detail for  summary."
