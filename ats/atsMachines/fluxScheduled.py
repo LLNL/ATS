@@ -126,8 +126,10 @@ class FluxScheduled(lcMachines.LCMachineCore):
         FluxScheduled.set_nt_num_nodes(self, test)
         # nn = test.options.get("nn", 0)
 
-        max_time = self.timelimit
-        ret.append(f"-t{max_time}")
+        # Remove to let ats control it and avoid needing excessively long allocation requests
+        # to prevent flux refusing to schedule jobs
+        # max_time = self.timelimit
+        # ret.append(f"-t{max_time}")
 
         #if np > self.coresPerNode:
         #    nn = ceil(np / self.coresPerNode)
@@ -297,15 +299,4 @@ class FluxScheduled(lcMachines.LCMachineCore):
             if self.numberNodesExclusivelyUsed >= self.numNodes:
                 return 0
             else:
-                if (flux.resource.list.resource_list(self.fluxHandle).get().free.nnodes < 1):
-                    return 0
-                else:
-                    return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
-              
-
-
-
-
-
-
-
+                return self.numProcsAvailable
