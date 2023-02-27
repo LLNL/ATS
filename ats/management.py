@@ -683,15 +683,9 @@ to allow user a chance to add options and examine results of option parsing.
         self.saveResults()
         self.finalBanner()
 
-        # print(f"""core_result = {core_result}
-        # postprocess_result = {postprocess_result}
-        # report_result = {report_result}""")
-
         if (core_result and postprocess_result and report_result):
-            # print("main() returning true.")
             return True
         else:
-            # print("main() returning false.")
             return False
 
     def preprocess(self):
