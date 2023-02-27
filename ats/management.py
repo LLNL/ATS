@@ -299,8 +299,8 @@ Attributes:
 
         if self.testlist:
             log("""
-=========================================================
-ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
+                =========================================================
+                ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
             log('-------------------------------------------------',
                 echo = True)
             self.report()
@@ -308,7 +308,7 @@ ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
                 echo = True)
         if not configuration.options.skip:
             log("""
-ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
+                ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
             clean_run = self.summary(log)
             self._summary2(log)
         return clean_run
@@ -335,7 +335,7 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
     def logUsage(self):
         """Log this run.
         """
-        return;
+        return
 
     def report (self):
         "Log a report, showing each test."
@@ -386,12 +386,12 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
         expected = [test.name for test in self.testlist if (test.status is EXPECTED)]
         if running:
             #log("""\
-#RUNNING: %d %s""" % (len(running), ', '.join(running)), echo=True)
+                #RUNNING: %d %s""" % (len(running), ', '.join(running)), echo=True)
             log("RUNNING 2: %d %s""" % (len(running), ', '.join(running)), echo=True)
 
         if ncs:
             log("""\
-CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
+                CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
                echo = True)
 
         clean_run = True
@@ -508,14 +508,14 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
 
     def test(self, *clas, **options):
         """Create one test. Signature is zero to two positional arguments,
-then keyword / value options::
+        then keyword / value options::
 
-    test(**options) or
-    test(script, **options) or
-    test(script, clas, **options)
+            test(**options) or
+            test(script, **options) or
+            test(script, clas, **options)
 
-See manual for discussion of these arguments.
-"""
+        See manual for discussion of these arguments.
+        """
         testobj = AtsTest(*clas, **options)
         self.testlist.append(testobj)
 #        if not self.groups.has_key(testobj.groupNumber):
@@ -643,13 +643,13 @@ See manual for discussion of these arguments.
     def sortTests(self):
         """Sort the tests as to batch or interactive or other. Return two lists."""
 
-# tests that were invalid, filtered, skipped etc. have status not CREATED
-# This screens out things that recently got set SKIPPED, etc.
+    # tests that were invalid, filtered, skipped etc. have status not CREATED
+    # This screens out things that recently got set SKIPPED, etc.
 
         interactiveTests = [t for t in self.testlist if t.status is CREATED]
         batchTests = [t for t in self.testlist if t.status is BATCHED]
 
-# postcondition
+    # postcondition
         if (batchTests and (configuration.options.nobatch or \
                             configuration.options.allInteractive)):
             for t in batchTests:
@@ -661,20 +661,20 @@ See manual for discussion of these arguments.
 
     def main(self, clas = '', adder=None, examiner=None):
         """
-This is the main driver code.
-Returns true if all interactive tests found passed, false if interrupted or
-an error occurs.
+        This is the main driver code.
+        Returns true if all interactive tests found passed, false if interrupted or
+        an error occurs.
 
-``clas`` is a string containing command-line options, such as::
+        ``clas`` is a string containing command-line options, such as::
 
-    --debug --level 18
+            --debug --level 18
 
-If ``clas`` is blank, sys.argv[1:] is used as the arguments.
-See ``configuration.init``.
+        If ``clas`` is blank, sys.argv[1:] is used as the arguments.
+        See ``configuration.init``.
 
-Routines ``adder`` and ``examiner``, if given,  are called in ``configuration``
-to allow user a chance to add options and examine results of option parsing.
-"""
+        Routines ``adder`` and ``examiner``, if given,  are called in ``configuration``
+        to allow user a chance to add options and examine results of option parsing.
+        """
         self.init(clas, adder, examiner)
         self.firstBanner()
         core_result = self.core()
@@ -1057,13 +1057,13 @@ BATCHED = ats.BATCHED
     def onSave(self, hook):
         """Add a hook for the results function. Will be passed two arguments:
 
-1. The proposed state r, a dict
-2. This manager
-
-The hook will sually will add items to r, but can make any desired
-modification to r. Note that at this stage the dependents and depends_on
-fields of a test are not present; instead depends_on_serial and
-dependents_serial contain the serial numbers of the relevant tests.
+        1. The proposed state r, a dict
+        2. This manager
+        
+        The hook will sually will add items to r, but can make any desired
+        modification to r. Note that at this stage the dependents and depends_on
+        fields of a test are not present; instead depends_on_serial and
+        dependents_serial contain the serial numbers of the relevant tests.
         """
         self.onResultsRoutines.append(hook)
 
