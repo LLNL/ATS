@@ -41,9 +41,11 @@ git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 A project installation could apply to projects that include ATS in their
 source code directly.
 
+Note: This works with a local install of python, but there are issues when
+using LC's modules.
+
 ```
-# Load a python 3.8 module, or otherwise put python 3.8 in your path
-module load python/3.8.2
+# Put python 3.8 in your path
 
 # Clone ATS
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
@@ -58,9 +60,11 @@ Installation specific to the user could save an individual from running
 multiple project installs. The user just needs to remember to update their ATS
 when needed.
 
+Note: This works with a local install of python, but there are issues when
+using LC's modules.
+
 ```
-# Load a python 3.8 module, or otherwise put python 3.8 in your path
-module load python/3.8.2
+# Put python 3.8 in your path
 
 # Clone ATS
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
