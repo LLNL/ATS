@@ -75,9 +75,9 @@ class MachineCore(object):
         elif (timePassed >= test.timelimit.value):   # process timed out
             # print("DEBUG checkForTimeOut 700 returning 1, timePassed=%f test.timelimit.value=%f" % (timePassed, test.timelimit.value))
             return 1, fraction
-        elif cut is not None and timePassed >= cut.value:
-            # print("DEBUG checkForTimeOut 800 returning -1, timePassed=%f cut=%f fraction=%f" % (timePassed, cut, fraction))
-            return -1, fraction
+        # elif cut is not None and timePassed >= cut.value:
+        #     # print("DEBUG checkForTimeOut 800 returning -1, timePassed=%f cut=%f fraction=%f" % (timePassed, cut, fraction))
+        #     return -1, fraction
         # print("DEBUG checkForTimeOut 999 returning 0")
         return 0, fraction
 

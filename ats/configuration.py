@@ -257,7 +257,7 @@ def add_more_options(parser):
                       help='''Frequency in minutes to write a continuation
                       file. The default is to only write a continuation file at
                       the end of the run, and only if any tests failed.''')
-    parser.add_option('--cutoff',
+    parser.add_option('--cutoff', dest = 'cuttime',
                       help='''Set the HALTED halt time limit on each test.
                       Over-rides job timelimit. All jobs will be HALTED at this
                       time. The value may be given as a digit followed by an s,
@@ -554,8 +554,10 @@ def init(clas = '', adder = None, examiner=None):
 # unpack other options
     cuttime = options.cuttime
     if cuttime is not None:
-        cuttime = Duration(cuttime)
-    timelimit = Duration(options.timelimit)
+        # cuttime = Duration(cuttime)
+        timelimit = Duration(cuttime)
+    else:
+        timelimit = Duration(options.timelimit)
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     if 'ATSROOT' in os.environ:
