@@ -24,26 +24,26 @@ def areBrothers(t1, t2):
     else:
         return False
 
-class AtsManager (object):
+class AtsManager(object):
     """This class is instantiated as a singleton instance, manager.
 
-The principal entry is ``main``.
-
-Attributes:
-
-* filters -- list of filters to be applied in choosing tests.
-* testlist (readonly) -- list of tests processed.
-* badlist (readonly) -- list of tests that could not be sourced properly
-* started -- date time of initialization
-* collectTimeEnded -- when test collection was done
-* onCollected -- just after test collection ends
-* on Prioritized -- just after test totalPriority has been assigned
-* onExitRoutines -- list of routines for onExit to call
-* onResultsRoutines -- list of routines for onResults to call
-* continuationFileName -- "continue.ats" if written
-* saveResultsName -- default "atsr.py"
-* saveXmlResultsName -- default "atsr.xml"
-* groups -- dictionary of test group objects indexed by number
+    The principal entry is ``main``.
+    
+    Attributes:
+    
+    * filters -- list of filters to be applied in choosing tests.
+    * testlist (readonly) -- list of tests processed.
+    * badlist (readonly) -- list of tests that could not be sourced properly
+    * started -- date time of initialization
+    * collectTimeEnded -- when test collection was done
+    * onCollected -- just after test collection ends
+    * on Prioritized -- just after test totalPriority has been assigned
+    * onExitRoutines -- list of routines for onExit to call
+    * onResultsRoutines -- list of routines for onResults to call
+    * continuationFileName -- "continue.ats" if written
+    * saveResultsName -- default "atsr.py"
+    * saveXmlResultsName -- default "atsr.xml"
+    * groups -- dictionary of test group objects indexed by number
 
     """
     def __init__(self):
@@ -90,7 +90,7 @@ Attributes:
             except Exception:
                 pass
             self.filters.append(f)
-            log ('Added filter:', repr(f))
+            log('Added filter:', repr(f))
 
     def filterenv(self, test):
         """Compute the environment in which filters for test will be
@@ -144,7 +144,7 @@ Attributes:
             words.sort()
         for key in words:
             try:
-                log(key,":", testEnvironment[key], logging=logging, echo=echo)
+                log(key, ":", testEnvironment[key], logging=logging, echo=echo)
             except KeyError:
                 log("Not defined:", key, logging=logging, echo=echo)
         log.dedent()
@@ -179,7 +179,7 @@ Attributes:
             log("source:", ' '.join(paths), echo=True)
 
         introspector = vocabulary.get('introspection',
-                   testEnvironment.get('introspection', standardIntrospection))
+                                      testEnvironment.get('introspection', standardIntrospection))
 
         for path in paths:
             self._source(path, introspector, vocabulary)
@@ -392,7 +392,7 @@ Attributes:
         if ncs:
             log("""\
                 CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
-               echo = True)
+                echo = True)
 
         clean_run = True
         msg = ""
@@ -405,28 +405,28 @@ Attributes:
 
         if timedout:
             log("TIMEOUT:  %d %s" % (len(timedout), ', '.join(timedout)),
-               echo = True)
+                echo = True)
             clean_run = False
         if halted:
             log("HALTED:   %d" % len(halted),
-               echo = True)
+                echo = True)
             clean_run = False
         if lsferror:
             log("LSFERROR: %d" % len(lsferror),
-               echo = True)
+                echo = True)
             clean_run = False
         if expected:
             log("EXPECTED: %d" % len(expected),
-               echo = True)
+                echo = True)
         log("PASSED:   %d" % len(passed),
-               echo = True)
+            echo = True)
 
         notrun = [test.name for test in self.testlist if (test.status is CREATED)]
         lnr = len(notrun)
         if notrun:
             log("""NOTRUN:   %d""" % len(notrun),
-               echo = True)
-        
+                echo = True)
+
         return clean_run
 
     def _summary2(self, log):
@@ -440,16 +440,16 @@ Attributes:
 
         if invalid:
             log("INVALID:  %d %s" % (len(invalid) + len(bad), ', '.join(bad + invalid)),
-               echo = True)
+                echo = True)
         if batched:
             log("BATCHED:  %d" % len(batched),
-               echo = True)
+                echo = True)
         if filtered:
             log("FILTERED: %d" % len(filtered),
-               echo = True)
+                echo = True)
         if skipped:
             log("SKIPPED:  %d" % len(skipped),
-               echo = True)
+                echo = True)
 
     def _summary3(self):
         "Additional detail for  summary."
@@ -534,12 +534,12 @@ Attributes:
 
                 if testobj.np > self.batchmachine.numberTestsRunningMax:
                     testobj.set(FILTERED,
-                        "batch job filtered - Number of processors %d exceeds %d"% (testobj.np, self.batchmachine.numberTestsRunningMax))
+                                "batch job filtered - Number of processors %d exceeds %d"% (testobj.np, self.batchmachine.numberTestsRunningMax))
                     return testobj
 
             elif testobj.np > self.machine.numberTestsRunningMax:
                 testobj.set(FILTERED,
-                    "Number of processors %d exceeds %d"% (testobj.np, self.machine.numberTestsRunningMax))
+                            "Number of processors %d exceeds %d"% (testobj.np, self.machine.numberTestsRunningMax))
                 return testobj
 
             # 2019-06-28 Sad added filter on the number of nodes requested for the test vs allocated for testing
@@ -552,7 +552,7 @@ Attributes:
             # print "SAD DEBUG my_nn = %d self.machine.numNodes=%d\n" % (my_nn,self.machine.numNodes)
             if my_nn > self.machine.numNodes:
                 testobj.set(FILTERED,
-                    "Number of nodes requested %d exceeds %d"% (my_nn, self.machine.numNodes))
+                            "Number of nodes requested %d exceeds %d"% (my_nn, self.machine.numNodes))
                 return testobj
 
             # process filters
@@ -998,8 +998,8 @@ BATCHED = ats.BATCHED
             # Convert minutes to seconds
             continuationStep = int(configuration.options.continueFreq * 60)
         while unfinished:
-            timeNow= time.time()
-            timePassed= timeNow - timeStatusReport
+            timeNow = time.time()
+            timePassed = timeNow - timeStatusReport
             if timePassed >= configuration.options.reportFreq*60:
                 terminal("ATS REPORT AT ELAPSED TIME", wallTime())
                 # log("ATS REPORT AT ELAPSED TIME", wallTime(), echo=True)
@@ -1010,7 +1010,7 @@ BATCHED = ats.BATCHED
             unfinished = machine.scheduler.step()
 
             if configuration.options.continueFreq is not None:
-                timeNow= time.time()
+                timeNow = time.time()
                 if (timeNow-timeContinuation) >= continuationStep:
                     self.continuationFile(interactiveTests, True)
                     timeContinuation = timeNow
@@ -1059,7 +1059,7 @@ BATCHED = ats.BATCHED
 
         1. The proposed state r, a dict
         2. This manager
-        
+
         The hook will sually will add items to r, but can make any desired
         modification to r. Note that at this stage the dependents and depends_on
         fields of a test are not present; instead depends_on_serial and
