@@ -36,25 +36,6 @@ git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 <NEW_ENV_PATH>/bin/python -m pip install <CLONE_PATH>/
 ```
 
-#### Project install
-
-A project installation could apply to projects that include ATS in their
-source code directly.
-
-Note: This works with a local install of python, but there are issues when
-using LC's modules.
-
-```
-# Put python 3.8 in your path
-
-# Clone ATS
-git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
-
-# pip install cloned ATS into <DESTINATION_PATH>
-python3 -m pip install <CLONE_PATH>/ --target=<DESTINATION_PATH>
-```
-
-
 ## Getting Involved
 
 Contact the ATS project lead dawson6@llnl.gov
