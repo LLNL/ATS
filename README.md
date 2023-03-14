@@ -16,9 +16,8 @@ For more information, please check our [documentation](https://ats.readthedocs.i
 
 #### Sample install, modify for your project or personal usage. 
 
-A "global" install really means a widely available Python executable with ATS
-modules discoverable in its python path. Useful for multiple different projects
-in a shared environment.
+An  install really means a Python executable with ATS modules discoverable in its python path. 
+Useful for multiple different projects in a shared environment.
 
 Example installation:
 
