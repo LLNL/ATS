@@ -14,7 +14,7 @@ ATS is installed. Below are a few variations that users may find helpful.
 
 For more information, please check our [documentation](https://ats.readthedocs.io).
 
-#### "Global" install
+#### Sample install, modify for your project or personal usage. 
 
 A "global" install really means a widely available Python executable with ATS
 modules discoverable in its python path. Useful for multiple different projects
@@ -27,13 +27,13 @@ Example installation:
 module load python/3.8.2
 
 # Create a fresh Python 3.8 (or higher) executable to be shared.
-python3 -m virtualenv --system-site-packages --python=python3.8 <NEW_ENV_PATH>
+python3 -m virtualenv --system-site-packages --python=python3.8 /location/of/your/new/install
 
 # Clone ATS
 git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 
 # pip install cloned ATS into fresh shared Python 3.8 (or higher) executable.
-<NEW_ENV_PATH>/bin/python -m pip install <CLONE_PATH>/
+/location/of/your/new/install/bin/python -m pip install <CLONE_PATH>/
 ```
 
 ## Getting Involved
