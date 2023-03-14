@@ -54,40 +54,6 @@ git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
 python3 -m pip install <CLONE_PATH>/ --target=<DESTINATION_PATH>
 ```
 
-#### Local/user install
-
-Installation specific to the user could save an individual from running
-multiple project installs. The user just needs to remember to update their ATS
-when needed.
-
-Note: This works with a local install of python, but there are issues when
-using LC's modules.
-
-```
-# Put python 3.8 in your path
-
-# Clone ATS
-git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
-
-# pip install cloned ATS into <DESTINATION_PATH>
-python3 -m pip install --user <CLONE_PATH>/
-```
-
-#### Using ATS without installing
-
-Another option is to tell Python where ATS is without any installation.
-Append the path to ats/__init__.py to $PYTHONPATH as seen below:
-
-```
-# Clone ATS
-git clone git@github.com:LLNL/ATS.git <CLONE_PATH>
-
-# bash and zsh users
-export PYTHONPATH=$PYTHONPATH:<CLONE_PATH>/ats
-
-# (t)csh users. Note that the colon is commented out
-setenv PYTHONPATH $PYTHONPATH\:<CLONE_PATH>/ats
-```
 
 ## Getting Involved
 
