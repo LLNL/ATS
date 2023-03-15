@@ -258,13 +258,12 @@ def add_more_options(parser):
                       file. The default is to only write a continuation file at
                       the end of the run, and only if any tests failed.''')
     parser.add_option('--cutoff', dest = 'cuttime',
-                      help='''Set the HALTED halt time limit on each test.
-                      Over-rides job timelimit. All jobs will be HALTED at this
-                      time. The value may be given as a digit followed by an s,
-                      m, or h to give the time in seconds, minutes (the
-                      default), or hours. This value if given causes jobs to
-                      fail with status HALTED if they run this long and have
-                      not already timed out or finished.''')
+                      help='''This invokes a mode in which no test is allowed to
+                      run longer than cutofftime, regardless of its actual timelimit
+                      option. Jobs that reach this threshold are treated as
+                      failures, so any jobs depending on them are not run. The
+                      value may be given as a digit followed by an s, m, or h
+                      to give the time in seconds, minutes (the default), or hours.''')
     parser.add_option('--debug', action='store_true',
                       help='''debug ; turn on debugging flag for detailed
                       debugging output during the run''')
