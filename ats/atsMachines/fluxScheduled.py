@@ -126,8 +126,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         FluxScheduled.set_nt_num_nodes(self, test)
         # nn = test.options.get("nn", 0)
 
-        max_time = self.timelimit
-        ret.append(f"-t{max_time}")
+        # max_time = self.timelimit
+        # ret.append(f"-t{max_time}")
 
         #if np > self.coresPerNode:
         #    nn = ceil(np / self.coresPerNode)
