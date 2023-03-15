@@ -338,41 +338,39 @@ def set_machine_type_based_on_sys_type():
     print(host)
 
     try:
-        if host.startswith('rzalastor'):
-            os.environ['MACHINE_TYPE'] = 'slurm20'
-
-        elif host.startswith('rzgenie') or host.startswith('rztopaz') or host.startswith('rztrona'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('borax') or host.startswith('quartz') or host.startswith('agate'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('jade'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('mica'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('herd'):
-            os.environ['MACHINE_TYPE'] = 'slurm32'
-
-        elif host.startswith('catalyst'):
-            os.environ['MACHINE_TYPE'] = 'slurm24'
+        if host.startswith('rzzeus'):
+            os.environ['MACHINE_TYPE'] = 'slurm8'
 
         elif host.startswith('sierra') or host.startswith('aztec'):
             os.environ['MACHINE_TYPE'] = 'slurm12'
 
-        elif host.startswith('rzzeus'):
-            os.environ['MACHINE_TYPE'] = 'slurm8'
-
-        elif host.startswith('rzmerl') or host.startswith('cab') or host.startswith('surface'):
+        elif host.startswith('rzmerl') or host.startswith('cab') or host.startswith('surface') or \
+             host.startswith('syrah') or host.startswith('max') or host.startswith('pinot') or \
+             host.startswith('zin'):
             os.environ['MACHINE_TYPE'] = 'slurm16'
 
-        elif host.startswith('syrah') or host.startswith('max') or host.startswith('pinot'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif host.startswith('rzalastor'):
+            os.environ['MACHINE_TYPE'] = 'slurm20'
 
-        elif host.startswith('zin'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif host.startswith('catalyst'):
+            os.environ['MACHINE_TYPE'] = 'slurm24'
+
+        elif host.startswith('herd'):
+            os.environ['MACHINE_TYPE'] = 'slurm32'
+
+        elif host.startswith('rzgenie') or host.startswith('rztopaz') or host.startswith('rztrona') or \
+             host.startswith('borax') or host.startswith('quartz') or host.startswith('agate') or \
+             host.startswith('pascal') or host.startswith('jade') or host.startswith('mica'):
+            os.environ['MACHINE_TYPE'] = 'slurm36'
+
+        elif host.startswith('corona'):
+            os.environ['MACHINE_TYPE'] = 'slurm48'
+
+        elif host.startswith('poodle'):
+            os.environ['MACHINE_TYPE'] = 'slurm112'
+
+        elif host.startswith('mammoth'):
+            os.environ['MACHINE_TYPE'] = 'slurm128'
 
         elif os.environ['SYS_TYPE'] in ['bgqos_0']:
             os.environ['MACHINE_TYPE'] = 'bgqos_0_ASQ'
