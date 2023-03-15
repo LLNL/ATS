@@ -79,12 +79,9 @@ ATS installation.
    Run every test in interactive mode.
 
 --cutoff cutofftime
-   This invokes a special mode in which no test is allowed to run longer
-   than *cutofftime*, regardless of its actual *timelimit* option.
-   Jobs that reach this threshold are treated as failures in the sense that
-   any jobs depending upon them are not run; but they are given status 
-   HALTED rather than TIMEDOUT. The forms for giving the time are the
-   same as for ``--timelimit``.
+   Over-rides the timelimit for all jobs no matter where the timelimit is set. Jobs
+   that fail once reaching the cutoff will TIMEOUT. The forms for giving the time
+   are the same as for ``--timelimit``.
 
 --debug
    Debug mode; prints more information in the log and on the shell window.
