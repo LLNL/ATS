@@ -257,14 +257,12 @@ def add_more_options(parser):
                       help='''Frequency in minutes to write a continuation
                       file. The default is to only write a continuation file at
                       the end of the run, and only if any tests failed.''')
-    parser.add_option('--cutoff',
-                      help='''Set the HALTED halt time limit on each test.
-                      Over-rides job timelimit. All jobs will be HALTED at this
-                      time. The value may be given as a digit followed by an s,
-                      m, or h to give the time in seconds, minutes (the
-                      default), or hours. This value if given causes jobs to
-                      fail with status HALTED if they run this long and have
-                      not already timed out or finished.''')
+    parser.add_option('--cutoff', dest = 'cuttime',
+                      help='''Over-rides job timelimit. All jobs will be TIMEOUT
+                      at this time. The value may be given as a digit followed
+                      by an s, m, or h to give the time in seconds, minutes (the
+                      default), or hours. Note: Jobs that TIMEOUT are marked as
+                      FAIL when using Flux.''')
     parser.add_option('--debug', action='store_true',
                       help='''debug ; turn on debugging flag for detailed
                       debugging output during the run''')
@@ -356,7 +354,8 @@ def add_more_options(parser):
                       This may be over-ridden for specific tests.  Jobs will
                       TIMEOUT at this time.  The value may be given as a digit
                       followed by an s, m, or h to give the time in seconds,
-                      minutes (the default), or hours.''')
+                      minutes (the default), or hours. Note: Jobs that TIMEOUT
+                      are marked as FAIL when using Flux.''')
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                       help='''verbose mode; increased level of terminal output
                       ''')
@@ -554,8 +553,9 @@ def init(clas = '', adder = None, examiner=None):
 # unpack other options
     cuttime = options.cuttime
     if cuttime is not None:
-        cuttime = Duration(cuttime)
-    timelimit = Duration(options.timelimit)
+        timelimit = Duration(cuttime)
+    else:
+        timelimit = Duration(options.timelimit)
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     if 'ATSROOT' in os.environ:
