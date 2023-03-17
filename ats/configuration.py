@@ -261,7 +261,8 @@ def add_more_options(parser):
                       help='''Over-rides job timelimit. All jobs will be TIMEOUT
                       at this time. The value may be given as a digit followed
                       by an s, m, or h to give the time in seconds, minutes (the
-                      default), or hours.''')
+                      default), or hours. Note: Jobs that TIMEOUT are marked as
+                      Failed when using Flux.''')
     parser.add_option('--debug', action='store_true',
                       help='''debug ; turn on debugging flag for detailed
                       debugging output during the run''')
@@ -353,7 +354,8 @@ def add_more_options(parser):
                       This may be over-ridden for specific tests.  Jobs will
                       TIMEOUT at this time.  The value may be given as a digit
                       followed by an s, m, or h to give the time in seconds,
-                      minutes (the default), or hours.''')
+                      minutes (the default), or hours. Note: Jobs that TIMEOUT
+                      are marked as Failed when using Flux.''')
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                       help='''verbose mode; increased level of terminal output
                       ''')
