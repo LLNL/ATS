@@ -81,7 +81,7 @@ ATS installation.
 --cutoff cutofftime
    Over-rides the timelimit for all jobs no matter where the timelimit is set. Jobs
    that fail once reaching the cutoff will TIMEOUT. The forms for giving the time
-   are the same as for ``--timelimit``. Note: Jobs that TIMEOUT are marked as Failed
+   are the same as for ``--timelimit``. Note: Jobs that TIMEOUT are marked as FAIL
    when using Flux.
 
 --debug
@@ -166,7 +166,7 @@ ATS installation.
    Set the default ``timelimit`` test option. TIMELIMIT may be given as an 
    integer number of seconds or a string specification such as '2m', or 
    '3h30m20s'. A similar notation can be used for filtering by time limit, such 
-   as `-f 'timelimit < "30m"'`. Note: Jobs that TIMEOUT are marked as Failed
+   as `-f 'timelimit < "30m"'`. Note: Jobs that TIMEOUT are marked as FAIL
    when using Flux.
 
 --verbose

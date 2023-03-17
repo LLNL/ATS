@@ -262,7 +262,7 @@ def add_more_options(parser):
                       at this time. The value may be given as a digit followed
                       by an s, m, or h to give the time in seconds, minutes (the
                       default), or hours. Note: Jobs that TIMEOUT are marked as
-                      Failed when using Flux.''')
+                      FAIL when using Flux.''')
     parser.add_option('--debug', action='store_true',
                       help='''debug ; turn on debugging flag for detailed
                       debugging output during the run''')
@@ -355,7 +355,7 @@ def add_more_options(parser):
                       TIMEOUT at this time.  The value may be given as a digit
                       followed by an s, m, or h to give the time in seconds,
                       minutes (the default), or hours. Note: Jobs that TIMEOUT
-                      are marked as Failed when using Flux.''')
+                      are marked as FAIL when using Flux.''')
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                       help='''verbose mode; increased level of terminal output
                       ''')
@@ -553,7 +553,6 @@ def init(clas = '', adder = None, examiner=None):
 # unpack other options
     cuttime = options.cuttime
     if cuttime is not None:
-        # cuttime = Duration(cuttime)
         timelimit = Duration(cuttime)
     else:
         timelimit = Duration(options.timelimit)
