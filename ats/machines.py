@@ -54,31 +54,32 @@ class MachineCore(object):
         then the timelimit, return true, else return false.  test's
         end time is set if time elapsed exceeds time limit """
         from ats import configuration
+
         timeNow= time.time()
         # Add small increment to flags jobs that 
         # are close to timing out as timing out. Without this
         # they were occasionally mis categorized as FAILED in
         # later processing.
         timePassed= (timeNow - test.startTime) + 0.2
-        cut = configuration.cuttime
+        #cut = configuration.cuttime
         fraction = timePassed / test.timelimit.value
 
-        # print("DEBUG checkForTimeOut 000")
-        # print(timeNow)
-        # print(timePassed)
-        # print(test.timelimit.value)
-        # print(cut)
-        # print(fraction)
+        # ATS will defer timeouts to the flux scheduler and will
+        #     not implement timeouts within the ATS code.
+        #     This is because the time a job is submitted to flux 
+        #     and the time it actually starts are not equivalent
+        #     So the timelimits or cutoffs will be passed to flux 
+        #     for processing.
+        if "flux" in configuration.MACHINE_TYPE:
+            return 0, 0
+            # print("SAD DEBUG checkForTimeOut always returns 0 under flux\n")
+            
         if (timePassed < 0):         # system clock change, reset start time
-            # print("DEBUG checkForTimeOut 600")
             test.setStartTimeDate()
         elif (timePassed >= test.timelimit.value):   # process timed out
-            # print("DEBUG checkForTimeOut 700 returning 1, timePassed=%f test.timelimit.value=%f" % (timePassed, test.timelimit.value))
             return 1, fraction
         # elif cut is not None and timePassed >= cut.value:
-        #     # print("DEBUG checkForTimeOut 800 returning -1, timePassed=%f cut=%f fraction=%f" % (timePassed, cut, fraction))
         #     return -1, fraction
-        # print("DEBUG checkForTimeOut 999 returning 0")
         return 0, fraction
 
     def checkRunning(self):

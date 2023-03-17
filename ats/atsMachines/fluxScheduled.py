@@ -83,7 +83,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.exclusive = options.exclusive
         self.timelimit = options.timelimit
         self.toss_nn   = options.toss_nn
-
+        self.cuttime   = options.cuttime
 
     def set_nt_num_nodes(self,test):
 
@@ -122,12 +122,22 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         ret = "flux mini run -o cpu-affinity=per-task -o mpibind=off".split()
         np = test.options.get("np", 1)
-
+    
         FluxScheduled.set_nt_num_nodes(self, test)
         # nn = test.options.get("nn", 0)
 
-        # max_time = self.timelimit
-        # ret.append(f"-t{max_time}")
+        # set max_time based on time limit priorities
+        # 1) cuttime is highest priority.  This will have been copied from options.cuttime into self.cuttime
+        # 2) deck timelmit is 2nd priority. Check if 'timelimit' is in the test options
+        # 3) --timelimit (or default timelmit) is last
+        if self.cuttime is not None:        
+            max_time = self.cuttime
+        elif 'timelimit' in test.options:
+            max_time = test.options.get("timelimit")
+        else:
+            max_time = self.timelimit
+        
+        ret.append(f"-t{max_time}")
 
         #if np > self.coresPerNode:
         #    nn = ceil(np / self.coresPerNode)
