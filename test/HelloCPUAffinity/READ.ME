@@ -1,0 +1,129 @@
+--------------------------------------------------------------------------------
+--                 READ.ME for hello_affinity sample program                       --
+--------------------------------------------------------------------------------
+
+Sample use of lightweight ATS wrapper script
+
+How to use:
+
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.111/bin:$PATH
+    or 
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+    ats_hello               <- Lightweight wrapper to ATS for your project
+    hello_affinity.c        <- Simple executable -- will be your projects exectuable(s)
+    create_test_ats.py      <- Python script which will create the test.ats file
+                               Enables projects to easily create tests with
+                               variable number of MPI processes, code executables,
+                               code arguments (test decks, etc), sandbox options,
+                               and post test checkers.
+
+Compile hello_affinity.c with an mpi C wrapper, such as mpigcc or mpiicc, creating
+an a.out executable in this directory like so:
+
+    mpicc hello_affinity.c
+
+--------------------------------------------------------------------------------
+Toss 3 (rzgenie, etc.).  Only use Slurm
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.8.2
+        // Modify this line to be the ats install you are testing
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+    mpicc hello_affinity.c        <- build the code
+    ./create_test_ats.py     <- create the ats test file
+    atslite1 test.ats        <- test using slurm
+
+--------------------------------------------------------------------------------
+Toss 4 (rzalastor, etc.).  Additional 'flux' testing on toss4
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.9.12
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+    mpicc hello_affinity.c           <- build the code
+    ./create_test_ats.py        <- create the ats test file
+    export MACHINE_TYPE=slurm20 <- if on alastor with 20 cores per cpu
+    export MACHINE_TYPE=slurm36 <- if on genie or another 36 core machine
+    atslite1 test.ats           <- test using slurm
+    export -n MACHINE_TYPE
+    atsflux  test.ats           <- test using flux within a slurm allocation
+
+    # POODLE TEST LINE (or any other system without cross node MPI)
+    atslite1 test.ats --numNodes=1
+    atsflux  test.ats --numNodes=1 --job_time=30
+
+--------------------------------------------------------------------------------
+Blueos (rzansel)  Uses LSF
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.8.2
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+    mpicc hello_affinity.c        <- build the code
+    ./create_test_ats.py     <- create the ats test file
+
+                             // --smpi_off may or may not be needed
+                             // in subsequent commands
+    atslite1 --smpi_off test.ats 
+    atslite1 --smpi_off --lrun test.ats 
+    atslite1 --smpi_off --lrun --lrun_pack test.ats
+    atslite1 --smpi_off --lrun --lrun_pack --lrun_np 10 --verbose test.ats
+
+    atslite1 --smpi_off --jsrun --jsrun_exclusive test.ats 
+    atslite1 --smpi_off --jsrun test.ats 
+    atslite1 --smpi_off --jsrun --jsrun_np 20 test.ats
+    atslite1 --smpi_off --jsrun --jsrun_np 20 test.ats
+    atslite1 --smpi_off --jsrun --jsrun_np 20 --verbose test.ats
+
+--------------------------------------------------------------------------------
+Whippet compilation notes (as of 2022 October 12)
+Whippet test run notes using flux
+--------------------------------------------------------------------------------
+    export PATH=${PATH}:/usr/gapps/ats/scripts
+    module load python/3.9.12
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+    mpicc hello_affinity.c  -L /usr/lib64/flux -lpmi2 
+    LD_LIBRARY_PATH=/usr/lib64/flux 
+    ldd a.out | grep pmi2
+
+    ./create_test_ats.py
+    atsflux test.ats
+
+--------------------------------------------------------------------------------
+--  Notes on running
+--------------------------------------------------------------------------------
+
+* If run from a front end node, the ats_hello script will salloc 1 nodes and
+  run within that allocation.  If there are not 4 nodes available in the debug
+  queue, it will stall until nodes are available.  See following notes for
+  other options.
+
+* One may override the number of nodes to be used via the --numNodes option
+to ats_hello like so: ./ats_hello --numNodes=.2
+
+* ats_hello --help will show all options.
+
+* One may pre-allocate a set of nodes, and run ats_hello with that allocation.
+  One way to allocate 2 nodes on chaos and reserve all the cores for your
+  use for testing would be:
+
+  salloc -N2 -n2 -p pdebug --exclusive
+
+  Remember to exit and free the reserved nodes when done testing.
+
+* The sample test case runs parallel jobs up to 64 processors.  If one runs
+  in an allocation that has less than the number of processors, then those
+  jobs will be skipped, but others will run.
+
+* This is just a sample to get one started. There are many other ways to run,
+   more checkers can be specified, more ATS options, etc.
+
+* Contact Shawn Dawson for feedback and for questions about using ATS on your project
+
+
+--------------------------------------------------------------------------------
+--                           end of READ.ME                                   --
+--------------------------------------------------------------------------------
