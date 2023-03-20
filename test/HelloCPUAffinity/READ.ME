@@ -11,17 +11,17 @@ How to use:
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
     ats_hello               <- Lightweight wrapper to ATS for your project
-    hello_affinity.c        <- Simple executable -- will be your projects exectuable(s)
+    hello_affinity.cc       <- Simple executable -- will be your projects exectuable(s)
     create_test_ats.py      <- Python script which will create the test.ats file
                                Enables projects to easily create tests with
                                variable number of MPI processes, code executables,
                                code arguments (test decks, etc), sandbox options,
                                and post test checkers.
 
-Compile hello_affinity.c with an mpi C wrapper, such as mpigcc or mpiicc, creating
+Compile hello_affinity.cc with an mpi C wrapper, such as mpigcc or mpiicc, creating
 an a.out executable in this directory like so:
 
-    mpicc hello_affinity.c
+    mpicc hello_affinity.cc
 
 --------------------------------------------------------------------------------
 Toss 3 (rzgenie, etc.).  Only use Slurm
@@ -31,7 +31,7 @@ Toss 3 (rzgenie, etc.).  Only use Slurm
         // Modify this line to be the ats install you are testing
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_affinity.c        <- build the code
+    mpicc hello_affinity.cc  <- build the code
     ./create_test_ats.py     <- create the ats test file
     atslite1 test.ats        <- test using slurm
 
@@ -42,7 +42,7 @@ Toss 4 (rzalastor, etc.).  Additional 'flux' testing on toss4
     module load python/3.9.12
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_affinity.c           <- build the code
+    mpicc hello_affinity.cc     <- build the code
     ./create_test_ats.py        <- create the ats test file
     export MACHINE_TYPE=slurm20 <- if on alastor with 20 cores per cpu
     export MACHINE_TYPE=slurm36 <- if on genie or another 36 core machine
@@ -61,7 +61,7 @@ Blueos (rzansel)  Uses LSF
     module load python/3.8.2
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_affinity.c        <- build the code
+    mpicc hello_affinity.cc  <- build the code
     ./create_test_ats.py     <- create the ats test file
 
                              // --smpi_off may or may not be needed
@@ -85,7 +85,7 @@ Whippet test run notes using flux
     module load python/3.9.12
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_affinity.c  -L /usr/lib64/flux -lpmi2 
+    mpicc hello_affinity.cc  -L /usr/lib64/flux -lpmi2 
     LD_LIBRARY_PATH=/usr/lib64/flux 
     ldd a.out | grep pmi2
 
