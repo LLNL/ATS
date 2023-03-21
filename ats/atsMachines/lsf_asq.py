@@ -159,6 +159,7 @@ class lsfMachine (machines.Machine):
         self.ompProcBind      = options.ompProcBind
         self.ngpu             = options.blueos_ngpu
         self.blueos_np        = options.blueos_np
+        self.blueos_np_max    = options.blueos_np_max
         self.cpusPerTask      = options.cpusPerTask
         self.timelimit        = options.timelimit
         self.mpi_um           = options.mpi_um
@@ -307,6 +308,7 @@ class lsfMachine (machines.Machine):
         commandList = self.calculateBasicCommandList(test)
         test.jobname         = "t%d_%d%s%s" % (np, test.serialNumber, test.namebase[0:50], timeNow)
         test.blueos_np       = self.blueos_np
+        test.blueos_np_max   = self.blueos_np_max
         test.cpusPerTask     = self.cpusPerTask
         test.jsrun_omp       = self.jsrun_omp
         test.jsrun_bind      = self.jsrun_bind
@@ -323,10 +325,16 @@ class lsfMachine (machines.Machine):
             print("JSRUN 020 DEBUG lsf_asq test.jsrun_bind         =  %s " % test.jsrun_bind)
             print("JSRUN 020 DEBUG lsf_asq test.lrun_jsrun_args    =  %s " % test.lrun_jsrun_args)
 
-        # Allow the ats command line --blueos_np option will over-ride the test specific np option
+        # Command line --blueos_np option will over-ride the test specific np option
         if test.blueos_np > 0:
             test.np = test.blueos_np
             np = test.blueos_np
+
+        # Command line --blueos_np_max option will over-ride the test specific np option if
+        # the test specific option is greater than the command line option
+        if test.blueos_np_max > 0 and  test.np > test.blueos_np_max:
+            test.np = test.blueos_np_max
+            np = test.blueos_np_max
 
         lsfMachine.set_nt_cpus_per_task_num_nodes(self, test)
         num_nodes = test.num_nodes
