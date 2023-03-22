@@ -1,10 +1,9 @@
-##################
-Reference Material
-##################
+====================
+ Reference Material
+====================
 
-****************************
 Test Selection and Execution
-****************************
+============================
 
 Tests are defined in ATS input using two commands, ``test`` and its little 
 brother, ``testif``. However, not every test that gets defined is necessarily
@@ -18,7 +17,7 @@ set of facilities involving filters, command-line options, and arguments to
 executions. 
 
 ATS Execution and Command-line Options
-======================================
+--------------------------------------
 
 .. index:: input file names
 
@@ -30,7 +29,7 @@ using its name, then with a ``.ats`` extension, and then with a ``.py`` extensio
    pair:execution;ATS
 
 Unix or Mac
------------
+~~~~~~~~~~~
 
 To start ATS on a Unix system or Mac, execute this line in a terminal 
 window::
@@ -47,7 +46,7 @@ particular executables. Please consult with the owner of your local ATS
 installation, and the owners of any custom ATS drivers you may be using.
 
 Windows
--------
+~~~~~~~
 Execution on windows can be done in the same way from a command window, but
 can be made more convenient by defining a ``.bat`` file, such as::
 
@@ -57,7 +56,7 @@ These instructions need improvement as the first Windows users determine
 the right way to do this.
 
 Command-line Options
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 .. index::
    pair:command-line options;ATS
@@ -177,7 +176,7 @@ ATS installation.
    Show program's version number and exit.
 
 Basic Operations
-================
+----------------
 
 The goal of ATS is to execute a series of test problems.  It does this by 
 reading input files written in the Python language, with some predefined ATS
@@ -197,7 +196,7 @@ problem input to contain definitions of how they are to be run when run by
 ATS.
 
 Retrying Failed Tests
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 If any tests fail or are not completed, a "continuation" file is written and 
 a message issued in the summary section giving the name of the file. 
@@ -228,7 +227,7 @@ believe you have corrected all errors.
 .. index:: post-processing file
 
 Results Facility
-----------------
+~~~~~~~~~~~~~~~~
 
 Each run creates an ``atsr.py`` file in the log directory. This file, if
 run under Python, creates one variable named "state", which is an
@@ -310,12 +309,11 @@ directory.
     
 .. _Input:
 
-*****************
 Controlling Input
-*****************
+=================
 
 File Sourcing
-=============
+-------------
 
 .. function:: source(*paths, **vocabulary)
 
@@ -368,7 +366,7 @@ suit your input convention, using the second argument to ``source``.
    triple:onCollected;input;customization
 
 Examining and prioritizing tests
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After collection of the tests the user may wish to examine or alter the
 tests before they are executed.  This is done by registering one or more 
@@ -426,7 +424,7 @@ final absolute value.
    single: introspection
 
 Using Introspection
-===================
+-------------------
 
 .. index::
    triple: ``#ATS:``; input; introspection
@@ -467,7 +465,7 @@ need to be ATS commands; they can be any Python code.  They can also
 include log commands, source other files, etc.
 
 Changing the introspection convention
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. index::
    pair:introspection;changing comment convention
@@ -503,7 +501,7 @@ define after you declare it. For example::
 .. _group_statement:
 
 Grouping
-========
+--------
 
 If you have a test that creates some files for postprocessing, you can group that 
 test with the related ones.
@@ -546,7 +544,7 @@ one test skip another. To achieve dependency, use the 'testif' facility.
    single:preventing conflicts
 
 Wait
-====
+----
 
 It is certainly possible to make two tests that appear to be independent but which 
 cannot in fact run simultaneously. ATS prevents many cases of this due to its reluctance
@@ -577,7 +575,7 @@ postprocessors that have been registered using the `onExit` facility described
 later.
 
 Example
--------
+~~~~~~~
 
 Suppose we have this test file "waitforit.ats"::
 
@@ -630,9 +628,8 @@ not affected by the wait statement in the sourced file.  In that file
 the first two tests are waiting for the first two, and the third waits for
 the first four.
 
-***************
 Executing Tests
-***************
+===============
 
 ATS attempts to execute as many tests as it can at the same time in order to keep
 the computational resources it has been given busy, subject to respecting the 
@@ -642,7 +639,7 @@ The following sections describe this process.
 .. _scheduling:
 
 Scheduling
-==========
+----------
 
 .. index::
    pair:priority;scheduling
@@ -713,7 +710,7 @@ until they are all complete.
 .. index:: --verbose
 
 Progress Reports
-================
+----------------
 
 When a test starts this fact is shown on the terminal output. You can use the command
 option ``--verbose`` to cause test completions and other additional events to be reported
@@ -731,7 +728,7 @@ Every minute ATS issues a report on its progress to the terminal only.
    pair: test option; keep
 
 Output Files
-============
+------------
 
 The standard output and standard error of a test are written into 
 files in the directory where the logs are written.  These files are (usually) 
@@ -756,22 +753,21 @@ keep=True or check=True.
     pair: RUNNING; status
 
 Interrupting a Run
-==================
+------------------
 
 A control-C interrupt will terminate the program and all the tests it
 is running. Any test started but still not finished will be reported
 in RUNNING status.
 
-****************************
 Creating and Selecting Tests
-****************************
+============================
 
 .. index:: test creation
 
 .. _testFunction:
 
 Creating Tests
-==============
+--------------
 
 .. function:: test(*args, **options)
 
@@ -854,7 +850,7 @@ Explanation: This works because the test call returned a test
 object, ``t``. 
 
 Expecting Failure
------------------
+~~~~~~~~~~~~~~~~~
 
 .. index:: ~ operator
 
@@ -877,7 +873,7 @@ It is pointless to have a dependent of a test that is not expected to PASS.
 It will be SKIPPED.
 
 Test Options
-============
+------------
 
 .. index:: test option overview
 
@@ -895,7 +891,7 @@ There are five lifetimes of option specification:
  * per test (using the options portion of the test command).
 
 Reserved option names
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. index::
    single: test options
@@ -1034,7 +1030,7 @@ hideOutput
    If true, do not print magic output lines in the log.
 
 Extra Arguments On The Executable
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. index:: executable
 
@@ -1058,7 +1054,7 @@ you must use an extra quotation level::
     test(executable=my_application, clas = "\"print '3+4'\"")
 
 Filters
-=======
+-------
 
 .. index:: filters
 
@@ -1104,7 +1100,7 @@ would pass the filter 'x==7' but not pass the filter 'x==5' nor the filter
 'y==7' (because the symbol y is not defined by the test).
 
 Additional ATS Vocabulary
-=========================
+-------------------------
 
 ATS input is written in a expanded dialect of Python. That dialect
 contains the following facilities.
@@ -1112,7 +1108,7 @@ contains the following facilities.
 .. index:: vocabulary
 
 Debugging and logging
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. index::
    pair:--debug;command line options
@@ -1179,7 +1175,7 @@ please.
 It is not possible to log a partial line.
 
 Manipulating Test Options
-=========================
+-------------------------
 
 .. index::
    pair: test options; manipulating
@@ -1308,7 +1304,7 @@ Despite the power available here, we recommend you don't get too cute about it.
 The main thing is for it to be clear what is happening.
 
 Customization
-=============
+-------------
 
 .. _Customization:
 
@@ -1317,7 +1313,7 @@ These include defining your own postprocessor, main program, and
 application-specific input language extensions.
 
 Using Levels
-============
+------------
 
 .. index:: levels
 
@@ -1352,7 +1348,7 @@ depends on test5, which has level 20, so it will not be run even though it has
 level 10.
 
 The Test Class
-==============
+--------------
 
 When a test is created by the test or testif command, a test object representing
 it is added to manager.testlist.  This object is an instance of a class named
@@ -1489,7 +1485,7 @@ The class ``AtsTest`` is available to users as ``ats.AtsTest``.
 There are other methods that are not intended for end users.
 
 Test Statuses
--------------
+~~~~~~~~~~~~~
 
 There are eleven status values that a test can have. This value is stored in the 
 test's attribute ``status``. Collectively this set of a statuses is in the
@@ -1558,7 +1554,7 @@ HALTED (HALT)
 
 
 Postprocessing
-==============
+--------------
 
 .. index:: postprocessing
 
@@ -1589,7 +1585,7 @@ of this kind using the ``state`` variable as the ``manager`` argument, rather th
 doing it as an ``onExit`` routine.
 
 Test Suite Strategies
-=====================
+---------------------
 
 .. index::
    pair: test suite; organization
@@ -1661,9 +1657,8 @@ different.
 The extended example in Examples/Andyroid gives you many more ideas about how 
 to use ATS.
 
-***************************
 Porting and Custom Machines
-***************************
+===========================
 
 .. index:: porting to new machine types
 
@@ -1753,8 +1748,45 @@ is the name of a directory below your Python installation root where the
 machine files are found by ATS.  The scripts line can be omitted if you 
 do not want to install your own driver. 
 
+Installing Machines as Plugins
+------------------------------
+
+As an alternative to the ``data_files`` approach you can register custom machines
+with ATS using setup tools' entry points plugin mechanism.  This may be convenient
+if you are building more customized ATS wrappers that are themselves packages, but
+can also be used on standalone plugin packages. In this install method, ATS will look for
+these in the group ``"ats.machines"``.  This entry point name space is required for ATS
+to find your machine plugin.  The example below shows how to set this up with a
+``pyproject.toml`` build system using setuptools::
+
+  ...
+  
+  [build-system]
+  requires = ["setuptools", "wheel"]
+  build-backend = "setuptools.build_meta"
+
+  ...
+
+  [project.entry-points."ats.machines"]
+  custom_slurm_proc_sched = "mywrapper.atsMachines.myAtsSlurmProcessorScheduled:MyAtsSlurmProcessorScheduled"
+
+This shows adding a ``custom_slurm_proc_sched`` machine that's defined in the parent
+wrapper ``mywrapper``'s atsMachines submodule, where the ``MyAtsSlurmProcessorScheduled``
+class is defined in ``myAtsSlurmProcessorScheduled.py``. This makes the machine name
+``custom_slurm_proc_sched`` available to ats to use to instatiate a new machine.  With
+this case you can either write whole new machines from scratch, or inherit from one
+of the default machines to change it's behavior.  For more details see the setuptools
+documentations, which also includes more how-to's for ``setup.py`` and ``setup.cfg`` based
+packages.
+
+Note one major difference with this method currently: the default machine config is not
+read from the ``#ATS:name module class npMax`` comment.  The name, module and class gets
+read in from the plugin info, but the ``npMax`` field is not set.  It defaults to -1
+in this case; the current convention is to use env vars to override it inside the machines,
+so be sure and set those accordingly when configuring your custom machines.
+   
 Adding Test Options Via Machine
-===============================
+-------------------------------
 
 In a customized machine, the ``examineOptions`` routine can add entries to 
 a dictionary, ``options.testDefaults``. These will be default option values for each
@@ -1773,7 +1805,7 @@ each test's option ``nt``; but it would always have one, and hence it could be
 used in filters.
 
 Customizing the Scheduler
-=========================
+-------------------------
 
 The scheduler class StandardScheduler is defined in module ``schedulers``. It
 handles issues such as priorities, and enforcing rules for the ``group()`` 
@@ -1795,9 +1827,8 @@ a list of the jobs currently running.  The ``periodicReport`` in the
 scheduler does the basic report once a minute; a machine can call this and 
 then add more.
 
-**************
 The ats Module
-**************
+==============
 
 The ``ats`` module can be imported in custom drivers and postprocessors.
 Resources available in it are all imported from internal modules.
@@ -1848,12 +1879,11 @@ These are documented further in the Appendix.
 .. index:: 
    pair: StandardScheduler;customizing
 
-**********************
 Using A Batch Facility
-**********************
+======================
 
 General Information
-===================
+-------------------
 
 .. index:: batch
 
@@ -1885,7 +1915,7 @@ For the LC system in particular,
   the tests.
 
 Running Entirely In Batch
-=========================   
+-------------------------
 
 Submitting a lot of single batch jobs may overwhelm some batch systems.
 In that case it may be preferable to submit just one big batch job.
@@ -1918,16 +1948,15 @@ The command-line options ``--numNodes=4 --useSrunStep`` are not a part of
 standard ATS. In this case, the ATS machine type ``chaos_4_x86_64_ib`` has been 
 defined in a custom machine file, and custom machine files can add command-line options.
  
-*************
 More Examples
-*************
+=============
 
 .. index::examples
 
 .. index::introspection
 
 Introspection
-=============
+-------------
 
 ::
 
@@ -1957,7 +1986,7 @@ files that get read. If this were a ``stick``, it wouldn't apply inside those
 other files.
 
 Test Control
-============
+------------
 
 .. index:: filters
 
@@ -2049,7 +2078,7 @@ Finally,
 will test both myTestA and myTestB.
 
 Resources For Learning ATS
-==========================
+--------------------------
 
 The `Examples` directory in the distribution contains the sources that
 accompany the Andyroid Tutorial, including some sample customizations.
@@ -2061,7 +2090,7 @@ At your particular location you may find other directories that define
 machines and batch systems for your local computer center.
 
 Quick Recipes
-=============
+-------------
 
 * To run only the batch tests::
 
