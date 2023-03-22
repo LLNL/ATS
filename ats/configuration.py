@@ -100,6 +100,7 @@ def addOptions(parser):
         exclusive=True,
         blueos_ngpu=0,
         blueos_np=-1,
+        blueos_np_max=-1,
         cuttime=None,
     )
 
