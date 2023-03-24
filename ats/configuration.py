@@ -100,6 +100,7 @@ def addOptions(parser):
         exclusive=True,
         blueos_ngpu=0,
         blueos_np=-1,
+        blueos_np_max=-1,
         cuttime=None,
     )
 
@@ -183,6 +184,10 @@ def add_blueos_only_options(parser):
                       settings of np (number of processors).  Useful for GPU
                       tests where the 4 MPI and 4 GPU devices are a common
                       testing scenario''')
+    parser.add_option('--lrun_np_max', dest='blueos_np_max', type='int',
+                      help='''Blueos option: Over-rides test specific settings
+                      of np (number of processors) if the test is set greater
+                      than the value provided.''')
     parser.add_option('--ompDisplayEnv', action='store_true',
                       help='''Blueos option: Set OMP_DISPLAY_ENV=True to see
                       detailed OMP settings at run time''')
@@ -198,9 +203,13 @@ def add_blueos_only_options(parser):
                       OMP built codes.''')
     parser.add_option('--jsrun_np', dest='blueos_np', type='int',
                       help='''Blueos option: Over-rides test specific settings
-                      of np (number of processors).  Useful for GPU tests where
+                      of np (number of processors). Useful for GPU tests where
                       the 4 MPI and 4 GPU devices are a common testing
                       scenario''')
+    parser.add_option('--jsrun_np_max', dest='blueos_np_max', type='int',
+                      help='''Blueos option: Over-rides test specific settings
+                      of np (number of processors) if the test is set greater
+                      than the value provided.''')
     parser.add_option('--jsrun_bind', dest='blueos_jsrun_bind',
                       default='unset',
                       help='''Blueos option: jsrun --bind option. "none",
