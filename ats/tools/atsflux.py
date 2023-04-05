@@ -140,7 +140,7 @@ def main():
         # else start flux from the login node
         else:
             cmd = [
-                "flux", "mini", "alloc", 
+                "flux", "alloc",
                 "-N", f"{args.numNodes}",
                 "-n", f"{total_cores}",
                 "-t", f"{args.job_time}m",
