@@ -332,7 +332,11 @@ def add_more_options(parser):
                        help='''Run each test consecutively. Do not run
                        concurrent test jobs.''')
     parser.add_option('--nosrun', action='store_true',
-                      help='Slurm option: Run the code without srun.')
+                      help='''Slurm option: Run the code without srun. This
+                      option can also be used on BlueOS to run ALL test on
+                      a login node as it circumvents the login node check.
+                      If the tests need to be run on a working node, then
+                      the tests themselves will need to get an allocation.''')
     parser.add_option('--salloc', action='store_true',
                       help='Slurm option: Run the code with salloc rather than srun.')
     parser.add_option('--showGroupStartOnly', action='store_true',
