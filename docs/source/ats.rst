@@ -146,6 +146,11 @@ ATS installation.
 --nobatch
    Do not run any "batch" tests..
 
+--nosrun
+   Run the code without srun. This option can also be used on BlueOS to run ALL test on
+   a login node as it circumvents the login node check. If the tests need to be run on
+   a working node, then the tests themselves will need to get an allocation.
+
 --npMax value
    Value is an integer, the maximum number of tests to run at once (on a node, 
    if multinode machine).  Some machines allow you to set this higher than
@@ -1468,6 +1473,12 @@ The class ``AtsTest`` is available to users as ``ats.AtsTest``.
    .. attribute:: waitUntil
 
       A list of serial numbers of tests this one must wait for.
+
+   .. attribute:: nosrun
+
+      Boolean value, runs the code without srun when ``True``. This can also be
+      used to circumvent the login node check so that a test can be run on a login
+      node. When used it will be up to the test to get an allocation if needed.
 
    .. method:: set (status, message)
 
