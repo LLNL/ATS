@@ -120,7 +120,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         :param test: the test to be run, of type ATSTest. Defined in /ats/tests.py.
         """
-        ret = "flux mini run -o cpu-affinity=per-task -o mpibind=off".split()
+        ret = "flux run -o cpu-affinity=per-task -o mpibind=off".split()
         np = test.options.get("np", 1)
     
         FluxScheduled.set_nt_num_nodes(self, test)
