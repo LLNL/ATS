@@ -31,7 +31,7 @@ def importName( moduleName, name, default_func=None, verbose=False ):
         print("Loading %s from %s." % (name, moduleName))
     func = default_func
     try:
-        print("WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
+        print("ATS WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
         my_mod = __import__( moduleName, globals(), locals(), [name] )
         func   =  vars(my_mod)[name]
     except ImportError as value:
@@ -187,11 +187,11 @@ def copyAndRenameFile(filename, newfilename, srcdir, destdir, groupID):
             os.chown( destfile, -1, groupID)
             os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
         except OSError as error:
-            log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
+            log('ATS WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
                 echo=True)
         return destfile
     else:
-        log("WARNING - copyAndRenameFile: %s file does not exist in %s." % (filename, srcdir),
+        log("ATS WARNING - copyAndRenameFile: %s file does not exist in %s." % (filename, srcdir),
             echo=True )
         #raise Exception("\n\n\t%s file does not exist." % (srcfile) )
 
@@ -281,7 +281,7 @@ def setDirectoryPermissions( dir, groupID):
         os.chown( dir, -1, groupID)
         os.chmod( dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_ISUID | stat.S_ISGID )
     except:
-        log('Warning - failed to set permissions on directory ' + dir, echo=True)
+        log('ATS WARNING - failed to set permissions on directory ' + dir, echo=True)
 
 
 def setFilePermissions( file, groupID):
@@ -289,7 +289,7 @@ def setFilePermissions( file, groupID):
         os.chown( file, -1, groupID)
         os.chmod( file, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
     except:
-        log('Warning - failed to set permissions on file ' + file, echo=True)
+        log('ATS WARNING - failed to set permissions on file ' + file, echo=True)
 
 ####################################################################################
 # Routine to delete sandbox dirs in the current dir
