@@ -812,7 +812,7 @@ class lsfMachine (machines.Machine):
                 if slot == 1:
                     numSlotsUsed += 1
             if self.numberNodesExclusivelyUsed != numSlotsUsed:
-                print("Programmer Error numSlotsUsed = %i numberNodesExclusivelyUsed = %i\n" %
+                print("ATS Error: numSlotsUsed = %i numberNodesExclusivelyUsed = %i\n" %
                       (numSlotsUsed, self.numberNodesExclusivelyUsed))
                 sys.exit(-1)
 
@@ -859,13 +859,13 @@ class lsfMachine (machines.Machine):
                 cntNumNodes += 1
                 slotNum = nodeNum - 1   # nodeNum is 1 based, convert to 0 based index forarray
                 if slotNum > self.numNodes:
-                    print("Programmer Error: noteEnd, slotNum=%i self.npMax=%i\n" %
+                    print("ATS Error: noteEnd, slotNum=%i self.npMax=%i\n" %
                           (slotNum, self.numNodes))
                     sys.exit(-1)
                 self.nodesInUse[slotNum] = 0;
 
             if cntNumNodes != test.num_nodes:
-                print("Programmer Error: noteEnd, cntNumNodes=%i test.num_nodes=%i\n" %
+                print("ATS Error: noteEnd, cntNumNodes=%i test.num_nodes=%i\n" %
                       (cntNumNodes, test.num_nodes))
                 sys.exit(-1)
 
@@ -877,7 +877,7 @@ class lsfMachine (machines.Machine):
                 #print "DEBUG noteEnd unlinking '%s'" % test.rs_filename
                 os.unlink(test.rs_filename)
             else:
-                print("Programmer Error: Can not find file '%s'\n" % test.rs_filename)
+                print("ATS Error: Can not find file '%s'\n" % test.rs_filename)
 
         #print self.nodesInUse
 

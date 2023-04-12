@@ -49,7 +49,7 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
         print('status=%s' % status)
         print('lines=%s' % lines)
         if status == 32512:
-            print('ERROR: showq command not found: status=%s' % status)
+            print('ATS ERROR: showq command not found: status=%s' % status)
             print('       cannot execute showq command from %s' % node2runCMD)
             sys.exit(1)
         elif status == 256:
@@ -63,7 +63,7 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
                 allJobs[label] = {}
             return allJobs
         else:
-            print('ERROR: failed to run showq command with status=%s' % status)
+            print('ATS ERROR: failed to run showq command with status=%s' % status)
             print('       executed showq from %s' % node2runCMD)
             sys.exit(1)
 
@@ -91,7 +91,7 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
                     if num_jobs != len(jobs):
                         print('num_jobs=%s; len(jobs)=%s' % (num_jobs,
                                                              len(jobs)))
-                        print('ERROR: num_jobs != len(jobs)')
+                        print('ATS ERROR: num_jobs != len(jobs)')
                         sys.exit(1)
                     else:
                         jobs = {}
@@ -123,7 +123,7 @@ def showq(label=None,node=None,user=os.environ['LOGNAME']):
                     if num_jobs != len(jobs):
                         print('num_jobs=%s; len(jobs)=%s' % (num_jobs,
                                                              len(jobs)))
-                        print('ERROR: num_jobs != len(jobs)')
+                        print('ATS ERROR: num_jobs != len(jobs)')
                         sys.exit(1)
                 elif line.startswith('Total job'):
                     pass

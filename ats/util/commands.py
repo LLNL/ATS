@@ -16,7 +16,7 @@ class UsageError(Exception):
         super(UsageError, self).__init__()
         self.message = message
     def __str__(self):
-        return 'Usage error.  %s' % self.message
+        return 'ATS ERROR: Usage.  %s' % self.message
 
 class CommandRunner(object):
     """Shell command implementation base class"""

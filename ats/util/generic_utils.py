@@ -38,7 +38,7 @@ def importName( moduleName, name, default_func=None, verbose=False ):
         print("Import of function %s from %s failed: %s" % (name, moduleName, value))
         raise Exception
     except KeyError as value:
-        print("KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
+        print("ATS ERROR: KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
         pass
 
     return func
@@ -81,12 +81,12 @@ def runCommand( cmd_line, file_name=None, exit=True, verbose=False):
             stderr_pipe.close()
 
     except CalledProcessError as error:
-        log('Command failed: error code %d' % error.returncode, echo=True)
+        log('ATS ERROR: Command failed: error code %d' % error.returncode, echo=True)
         log('Failed Command: %s' % cmd_line, echo=True)
         if exit:
             raise SystemExit(1)
     except OSError as error:
-        log('Command failed with OSError: traceback %s' % error.child_traceback, echo=True)
+        log('ATS ERROR: Command failed with OSError: traceback %s' % error.child_traceback, echo=True)
         log('Failed Command: %s' % cmd_line, echo=True)
         if exit:
             raise SystemExit(1)
@@ -116,10 +116,10 @@ def execute(cmd_line, file_name=None, verbose=False):
         with open(file_name, 'w') as log_file:
             log_file.write(f'Command: {cmd_line}\n{completed_process.stdout}')
             if completed_process.returncode:
-                log_file('Command failed: error code '
+                log_file('ATS ERROR: Command failed: error code '
                          f'{completed_process.returncode}')
     if completed_process.returncode:
-        log(f'Command failed: error code {completed_process.returncode}',
+        log(f'ATS ERROR: Command failed: error code {completed_process.returncode}',
             echo=True)
 
     return completed_process.returncode
@@ -137,7 +137,7 @@ def listdirs(folder):
     try:
         dir_list = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
     except OSError as error:
-        log("WARNING - listdirs: %s" % error.strerror, echo=True)
+        log("ATS WARNING - listdirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
 
@@ -147,7 +147,7 @@ def listDatedDirs(folder):
                       if re.search('2[0-9][0-9][0-9]_[0-9][0-9]$', d) \
                       if os.path.isdir(os.path.join(folder, d))]
     except OSError as error:
-        log("WARNING - listDatedDirs: %s" % error.strerror, echo=True)
+        log("ATS WARNING - listDatedDirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
 
@@ -155,7 +155,7 @@ def listfiles(folder):
     try:
         file_list = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d))]
     except OSError as error:
-        log("WARNING - listfiles: %s" % error.strerror, echo=True)
+        log("ATS WARNING - listfiles: %s" % error.strerror, echo=True)
         file_list = []
     return file_list
 
@@ -170,11 +170,11 @@ def copyFile(filename, srcdir, destdir, groupID):
             os.chown( destfile, -1, groupID)
             os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
         except OSError as error:
-            log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
+            log('ATS WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
                 echo=True)
         return destfile
     else:
-        log("WARNING - copyFile: %s file does not exist in %s." % (filename, srcdir),
+        log("ATS WARNING - copyFile: %s file does not exist in %s." % (filename, srcdir),
             echo=True )
         # raise Exception("\n\n\t%s file does not exist in %s." % (filename, srcdir) )
 
@@ -203,11 +203,11 @@ def makeDir( new_dir ):
             os.mkdir( new_dir )
 
         except OSError as error:
-            log('Error making %s: %s' %( new_dir, error.strerror), echo=True)
+            log('ATS ERROR: making %s: %s' %( new_dir, error.strerror), echo=True)
             raise SystemExit(1)
 
     elif not os.path.isdir(new_dir):
-        log('ERROR: %s exists and is NOT a directory' % new_dir, echo=True)
+        log('ATS ERROR: %s exists and is NOT a directory' % new_dir, echo=True)
         raise SystemExit(1)
 
 def makeSymLink( path, target ):
@@ -216,7 +216,7 @@ def makeSymLink( path, target ):
             os.symlink( path, target )
 
         except OSError as error:
-            log('Error making link to %s: %s' %( target, error.strerror), echo=True)
+            log('ATS ERROR: making link to %s: %s' %( target, error.strerror), echo=True)
             raise SystemExit(1)
 
     elif os.path.islink(target):
@@ -225,11 +225,11 @@ def makeSymLink( path, target ):
             os.symlink( path, target )
 
         except OSError as error:
-            log('Error making link to %s: %s' %( target, error.strerror), echo=True)
+            log('ATS ERROR: making link to %s: %s' %( target, error.strerror), echo=True)
             raise SystemExit(1)
 
     else:
-        log('ERROR: %s exists and is NOT a symlink' % target, echo=True)
+        log('ATS ERROR: %s exists and is NOT a symlink' % target, echo=True)
         raise SystemExit(1)
 
 

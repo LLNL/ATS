@@ -113,7 +113,7 @@ class noSrunMachine (machines.Machine):
         tasks_per_node_modulo = np % num_nodes
         if not tasks_per_node_modulo == 0:
             print(test)
-            print("ERROR np=%i nn=%i" % (np, num_nodes))
+            print("ATS ERROR: np=%i nn=%i" % (np, num_nodes))
             print("      Number_of_processes (%i) is not evenly divisible by number_of_nodes (%i)"  % (np, num_nodes))
             print("      %i modulo %i = %i " % (np, num_nodes, tasks_per_node_modulo))
             sys.exit(1)
@@ -121,7 +121,7 @@ class noSrunMachine (machines.Machine):
         cpus_per_task_modulo = self.npMax % tasks_per_node
         if not cpus_per_task_modulo == 0:
             print(test)
-            print("ERROR np=%i nn=%i tasks_per_node=%i cpus_on_node=%i" % (np, num_nodes, tasks_per_node, self.npMax))
+            print("ATS ERROR: np=%i nn=%i tasks_per_node=%i cpus_on_node=%i" % (np, num_nodes, tasks_per_node, self.npMax))
             print("      Number of cpus_on_node (%i) is not evenly divisible by tasks_per_node (%i)" % (self.npMax, tasks_per_node))
             print("      %i modulo %i = %i " % (self.npMax, tasks_per_node, cpus_per_task_modulo))
             sys.exit(1)

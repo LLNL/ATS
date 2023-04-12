@@ -74,7 +74,7 @@ def getAllHostnames():
             print("DEBUG: after sort %s" % allHostname)
 
     except:
-        print("Unexpected error in utils.py getAllHostnames:%s" % sys.exc_info()[0])
+        print("ATS ERROR: in utils.py getAllHostnames:%s" % sys.exc_info()[0])
         return allHostname
     return allHostname
 
@@ -538,7 +538,7 @@ def getNumberOfProcessorsPerNode(useNode=None):
     except KeyboardInterrupt:
         raise
     except:
-        print("Unexpected error in getNumberOfProcsPerNode:%s" % sys.exc_info())
+        print("ATS ERROR: in getNumberOfProcsPerNode:%s" % sys.exc_info())
         return 0
 
 

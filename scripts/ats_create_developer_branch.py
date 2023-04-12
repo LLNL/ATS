@@ -19,18 +19,18 @@ import argparse
 # Simple support routines
 # ----------------------------------------------------------------------------------------------------------------------
 def error_and_exit(code, messages):
-    print("Error: ------------------------------------------------------------------------")
-    print("Error:         C R E A T E   D E V E L O P E R   B R A N C H   A B E N D")
+    print("ATS ERROR: ------------------------------------------------------------------------")
+    print("ATS ERROR:         C R E A T E   D E V E L O P E R   B R A N C H   A B E N D")
     for mess in messages:
-        print("Error: %s" % mess)
-    print("Error: ------------------------------------------------------------------------")
+        print("ATS ERROR: %s" % mess)
+    print("ATS ERROR: ------------------------------------------------------------------------")
     sys.exit(code)
 
 def warning_but_continue(messages):
-    print("Warning: ----------------------------------------------------------------------")
+    print("ATS WARNING: ----------------------------------------------------------------------")
     for mess in messages:
-        print("Warning: %s" % mess)
-    print("Warning: ----------------------------------------------------------------------")
+        print("ATS WARNING: %s" % mess)
+    print("ATS WARNING: ----------------------------------------------------------------------")
 
 def yes_or_no(question, default_to_yes):
     if default_to_yes:

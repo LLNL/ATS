@@ -204,7 +204,7 @@ Attributes:
             except IOError as e:
                 pass
         else:
-            log("Error opening input file:", t1, echo=True)
+            log("ATS ERROR opening input file:", t1, echo=True)
             self.badlist.append(t1)
             raise AtsError("Could not open input file %s" % path)
         t = abspath(t1)
@@ -248,7 +248,7 @@ Attributes:
                 raise
             except Exception as details:
                 self.badlist.append(t1)
-                log('Error while processing statements in', t1, ':', echo=True)
+                log('ATS ERROR while processing statements in', t1, ':', echo=True)
                 log(details, echo=True)
             log.dedent()
         else:
@@ -268,7 +268,7 @@ Attributes:
                 raise
             except Exception as details:
                 self.badlist.append(t1)
-                log('Error in input file', t1, ':', echo=True)
+                log('ATS ERROR in input file', t1, ':', echo=True)
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log(traceback.print_exception(exc_type, exc_value, exc_traceback), echo=True)
                 log('------------------------------------------', echo=True)
@@ -659,7 +659,7 @@ See manual for discussion of these arguments.
         if (batchTests and (configuration.options.nobatch or \
                             configuration.options.allInteractive)):
             for t in batchTests:
-                log( t, "BATCH sorting error.", echo=True)
+                log( t, "ATS ERROR: BATCH sorting.", echo=True)
             raise ValueError('batch test(s) should not exist')
 
         return interactiveTests, batchTests
@@ -804,7 +804,7 @@ to allow user a chance to add options and examine results of option parsing.
         try:   # surround with keyboard interrupt, AtsError handlers
             self.collectTests()
         except AtsError:
-            log("ATS error while collecting tests.", echo=True)
+            log("ATS ERROR while collecting tests.", echo=True)
             log(traceback.format_exc(), echo=True)
             errorOccurred = True
             self.collectTimeEnded = datestamp(long_format=True)
@@ -857,7 +857,7 @@ to allow user a chance to add options and examine results of option parsing.
                     self.batchmachine.load(batchTests)
                 except AtsError:
                     log(traceback.format_exc(), echo=True)
-                    log("ATS error.", echo=True)
+                    log("ATS ERROR.", echo=True)
                     return False
                 except KeyboardInterrupt:
                     log("Keyboard interrupt while dispatching batch, terminating.", echo=True)
@@ -880,7 +880,7 @@ to allow user a chance to add options and examine results of option parsing.
                     echo=True)
                 errorOccurred = True
             except Exception:
-                log("Error in prioritizing tests.", echo=True)
+                log("ATS ERROR in prioritizing tests.", echo=True)
                 log(traceback.format_exc(), echo=True)
                 errorOccured = True
             if errorOccurred:
@@ -890,7 +890,7 @@ to allow user a chance to add options and examine results of option parsing.
                 self.run(interactiveTests)
             except AtsError:
                 log(traceback.format_exc(), echo=True)
-                log("ATS error. Removing running jobs....", echo=True)
+                log("ATS ERROR. Removing running jobs....", echo=True)
                 dieDieDie = True
 
             except KeyboardInterrupt:
