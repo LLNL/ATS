@@ -208,7 +208,7 @@ class FluxDirect (lcMachines.LCMachineCore):
         if job_response is None:
             raise RuntimeError("RPC response invalid")
         if job_response.get('errnum', None) is not None:
-            raise RuntimeError("Job creation failed with error code {}".format(
+            raise RuntimeError("ATS ERROR: Job creation failed with error code {}".format(
                 job_response['errnum']))
         test.job_id = job_response['jobid']
         test.kvs_path = job_response['kvs_path']

@@ -81,7 +81,7 @@ def main():
             if val.isdigit():
                 numNodes = int(val)
             else:
-                print("Error '%s' is invalid" % arg)
+                print("ATS ERROR: '%s' is invalid" % arg)
                 sys.exit(-1)
             print("INFO: atslite1 %s option will use %i nodes" % (arg, numNodes))
             del sys.argv[index]

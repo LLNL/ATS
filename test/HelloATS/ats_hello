@@ -58,7 +58,7 @@ for index, arg in enumerate(sys.argv):
         if val.isdigit():
             numNodes = int(val)
         else:
-            print(f"Error '{arg}' is invalid")
+            print(f"ATS ERROR '{arg}' is invalid")
             sys.exit(-1)
         if   'chaos' in sys_type:
             del sys.argv[index]

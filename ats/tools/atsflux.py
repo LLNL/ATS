@@ -110,14 +110,14 @@ def main():
         )
         if (version) < 38:
             sys.exit(
-                f"""Error: this system does not have a current version of Flux installed.
+                f"""ATS ERROR: this system does not have a current version of Flux installed.
                 Version 0.{version}.0 is installed but >= 0.38.0 is required. Please update
                 the Flux version or use a different Flux (check which one you're using with `which flux`).
                 """
             )
     except Exception:
         sys.exit(
-            """Error: this system does not have a current version of Flux installed.
+            """ATS ERROR: this system does not have a current version of Flux installed.
             No version of Flux was found on this system but version >= 0.38.0 required. Please update
             the Flux version or specify a different Flux installation to use.
             """

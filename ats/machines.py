@@ -210,18 +210,18 @@ testEnded will call your bookkeeping method noteEnd.
                 for line in lines:
                     if lsf_error == False:
                         if "Terminated while pending" in line:
-                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                         elif "JSM daemon timed" in line:
-                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                             #time.sleep(10)      # See if sleeiping helps the JSM daemon recover
                         elif "Error initializing RM" in line:
-                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                             #time.sleep(10)      # See if sleeiping helps the JSM daemon recover
                         elif "Bus error)" in line:
-                            print("ATS Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line))
+                            print("ATS ERROR: Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line))
                             lsf_error = True
 
                 if not lsf_error:
@@ -230,14 +230,14 @@ testEnded will call your bookkeeping method noteEnd.
                     f.close
                     for line in lines:
                         if lsf_error == False:
-                            if "Error: Locate pipe file" in line:
-                                print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            if "ATS Error: Locate pipe file" in line:
+                                print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                                 lsf_error = True
                             elif "Could not read jskill" in line:
-                                print("ATS Detected LSF Job Scheduler Error %s.  : %s " % (test.name, line))
+                                print("ATS ERROR: Detected LSF Job Scheduler Error %s.  : %s " % (test.name, line))
                                 lsf_error = True
-                            elif "Error initializing RM" in line:
-                                print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            elif "AST Error: initializing RM" in line:
+                                print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                                 lsf_error = True
 
 
@@ -293,7 +293,7 @@ call noteEnd for machine-specific part.
             if os.path.exists( globalPostrunScript ):
                 self._executePreOrPostRunScript( globalPostrunScript, test, verbose, globalPostrunScript_outname )
             else:
-                log("ERROR: globalPostrunScript %s not found" % (globalPostrunScript), echo=True)
+                log("ATS ERROR: globalPostrunScript %s not found" % (globalPostrunScript), echo=True)
                 sys.exit(-1)
             os.chdir( here )
 
@@ -549,7 +549,7 @@ The subprocess part of launch. Also the part that might fail.
             if os.path.exists( globalPrerunScript ):
                 self._executePreOrPostRunScript( globalPrerunScript, test, verbose, globalPrerunScript_outname )
             else:
-                log("ERROR: globalPrerunScript %s not found" % (globalPrerunScript), echo=True)
+                log("ATS ERROR: globalPrerunScript %s not found" % (globalPrerunScript), echo=True)
                 sys.exit(-1)
             os.chdir( here )
 

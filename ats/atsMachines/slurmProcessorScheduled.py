@@ -407,7 +407,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             elif self.npMax > 0:
                 self.slurm_cpus_on_node = self.npMax
             else:
-                print("ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set.")
+                print("ATS ERROR: 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set.")
                 sys.exit(1)
 
             tasks_per_node        = np / num_nodes
