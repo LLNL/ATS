@@ -1,10 +1,10 @@
-from ats.configuration import machine
 from ats.atsut import is_valid_executable
 
 class Executable:
     """Information about an executable to use. Can be created from string or
      list of strings."""
     def __init__ (self, value):
+        from ats.configuration import machine
         if isinstance(value, str):
             self.commandList = machine.split(value)
         else:
