@@ -8,21 +8,15 @@ from ats.tests import AtsTest
 from ats.log import log, terminal
 from ats.parser import AtsCodeParser, AtsFileParser
 
-def standardIntrospection(line):
-    "Standard magic detector for input."
-    if line.startswith("#ATS:"):
-        return line[5:]
-    else:
-        return None
+def standard_introspection(line):
+    """Standard magic detector for input."""
+    prefix = "#ATS:"
+    return line[len(prefix):] if line.startswith(prefix) else None
 
-def areBrothers(t1, t2):
-    "are two tests part of a set of related tests?"
-    if t1.group is t2.group:
-        return True
-    elif t1 in t2.dependents or t2 in t1.dependents:
-        return True
-    else:
-        return False
+def are_brothers(t1, t2):
+    """Are two tests part of a set of related tests?"""
+    return t1.group is t2.group or t1 in t2.dependents or t2 in t1.dependents
+
 
 class AtsManager (object):
     """This class is instantiated as a singleton instance, manager.
