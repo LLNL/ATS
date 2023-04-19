@@ -150,10 +150,10 @@ Attributes:
         test_environment.update(definitions)
 
     def undefine(*args):
-        "Remove one or more symbols for input files."
-        for x in args:
-            if x in test_environment:
-                del test_environment[x]
+        """Remove one or more symbols from input files."""
+        for symbol in args:
+            test_environment.pop(symbol, None)
+
 
     def get(self, name):
         """Return the definition of name from the test environment.
