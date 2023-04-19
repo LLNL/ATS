@@ -62,7 +62,7 @@ Attributes:
         AtsTest.restart()
 
     def filter (self, *filters):
-        "Add filters to the list. Clear list if no arguments."
+        "Add filters to the list. Clear list if no argum    ents."
         if not filters:
             self.filters = []
             log('Filter list empty.', echo=self.verbose)
@@ -86,17 +86,19 @@ Attributes:
             self.filters.append(f)
             log ('Added filter:', repr(f))
 
-    def filterenv (self, test):
-        """Compute the environment in which filters for test will be
-            evaluated."""
+    def filter_env(self, test):
+        """Compute the environment in which filters for test will be evaluated."""
         if not isinstance(test, AtsTest):
-            raise AtsError('filterenv argument must be a test instance.')
-        fe = {}
-        for f in _filterwith:
-            exec(f, fe)
-        fe.update(test.options)
-        fe.update(testEnvironment)
-        return fe
+            raise AtsError('filter_env argument must be a test instance.')
+
+        filter_env = {}
+        for filter_expr in _filterwith:
+            exec(filter_expr, filter_env)
+
+        filter_env.update(test.options)
+        filter_env.update(test_environment)
+
+        return filter_env
 
     def find_unmatched (self, test):
         """Does this manager's filters match the given test properties?
@@ -134,30 +136,30 @@ Attributes:
         log("Test environment symbols:", logging=logging, echo=echo)
         log.indent()
         if not words:
-            words = list(testEnvironment.keys())
+            words = list(test_environment.keys())
             words.sort()
         for key in words:
             try:
-                log(key,":", testEnvironment[key], logging=logging, echo=echo)
+                log(key,":", test_environment[key], logging=logging, echo=echo)
             except KeyError:
                 log("Not defined:", key, logging=logging, echo=echo)
         log.dedent()
 
     def define(self, **definitions):
         "Define symbols for input files."
-        testEnvironment.update(definitions)
+        test_environment.update(definitions)
 
     def undefine(*args):
         "Remove one or more symbols for input files."
         for x in args:
-            if x in testEnvironment:
-                del testEnvironment[x]
+            if x in test_environment:
+                del test_environment[x]
 
     def get(self, name):
         """Return the definition of name from the test environment.
         """
-        if name in testEnvironment:
-            return testEnvironment.get(name)
+        if name in test_environment:
+            return test_environment.get(name)
 
         raise AtsError("Could not find name %s in vocabulary." % name)
 
@@ -173,7 +175,7 @@ Attributes:
             log("source:", ' '.join(paths), echo=True)
 
         introspector = vocabulary.get('introspection',
-                   testEnvironment.get('introspection', standardIntrospection))
+                   test_environment.get('introspection', standardIntrospection))
 
         for path in paths:
             self._source(path, introspector, vocabulary)
@@ -211,7 +213,7 @@ Attributes:
         unstick() #clear sticky list at the start of a file.
         AtsTest.waitNewSource()
 
-        testenv = dict(testEnvironment)
+        testenv = dict(test_environment)
         testenv.update(vocabulary)
         testenv['SELF'] = t1
         atstext = []
@@ -1224,7 +1226,7 @@ def filterdefs (text=None):
         _filterwith.append(text)
 
 # Set up the testing environment, add statuses to it.
-testEnvironment = {
+test_environment = {
         "debug": debug,
         "manager": manager,
         "test": test,
@@ -1263,7 +1265,7 @@ testEnvironment = {
         "onSave": onSave,
         "getResults": getResults,
     }
-testEnvironment.update(statuses)
+test_environment.update(statuses)
 
 if __name__ == "__main__":
     logDefinitions()
