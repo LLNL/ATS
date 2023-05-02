@@ -1127,6 +1127,7 @@ dependents_serial contain the serial numbers of the relevant tests.
         "Print state to file, formatting items with repr"
 # import * is bad style but helps with robustness with respect to ats changes:
         print("""from ats import *""", file=file)
+        print("""from argparse import *""", file=file)
         print("state =  ", file=file, end='')
         print(repr(self.getResults()), file=file)
         print("logDirectory = %r" % log.directory, file=file)
@@ -1139,29 +1140,29 @@ dependents_serial contain the serial numbers of the relevant tests.
 class TestLike(dict):
     def __init__ (self, aDict):
         dict.__init__(self, **aDict)
-        n = self.groupNumber
-        if n not in state.groups:
-            state.groups[n] = AtsTestGroup(n)
-        self.group = state.groups[n]
-        self.group.append(self)
+        n = self['groupNumber']
+        if n not in state['groups']:
+            state['groups'][n] = AtsTestGroup(n)
+        self['group'] = state['groups'][n]
+        self['group'].append(self)
 
     def __str__ (self):
-        return str(self.status) + ' ' + self.name + ' ' + self.message
+        return str(self['status']) + ' ' + self['name'] + ' ' + self['message']
 
     def __repr__(self):
-        return "Test #%d %s %s" %(self.serialNumber, self.name, self.status)
+        return "Test #%d %s %s" %(self['serialNumber'], self['name'], self['status'])
 
 
-for i in range(len(state.testlist)):
-    state.testlist[i] = TestLike(state.testlist[i])
+for i in range(len(state['testlist'])):
+    state['testlist'][i] = TestLike(state['testlist'][i])
 
-for t in state.testlist:
-    if t.depends_on_serial == 0:
-        t.depends_on = None
+for t in state['testlist']:
+    if t['depends_on_serial'] == 0:
+        t['depends_on'] = None
     else:
-        t.depends_on = state.testlist[t.depends_on_serial -1 ]
-    t.dependents = [state.testlist[serial-1] for serial in t.dependents_serial]
-    t.waitUntil = [state.testlist[serial-1] for serial in t.waitUntil_serial]
+        t['depends_on'] = state['testlist'][t['depends_on_serial'] -1 ]
+    t['dependents'] = [state['testlist'][serial-1] for serial in t['dependents_serial']]
+    t['waitUntil'] = [state['testlist'][serial-1] for serial in t['waitUntil_serial']]
 
 # clean up
 del i, t
