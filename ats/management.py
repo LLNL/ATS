@@ -668,7 +668,7 @@ See manual for discussion of these arguments.
     def main(self, clas = '', adder=None, examiner=None):
         """
 This is the main driver code.
-Returns true if all interactive tests found passed, false if interrupted or
+Returns false if all interactive tests found passed, true if interrupted or
 an error occurs.
 
 ``clas`` is a string containing command-line options, such as::
@@ -690,9 +690,9 @@ to allow user a chance to add options and examine results of option parsing.
         self.finalBanner()
 
         if (core_result and postprocess_result and report_result):
-            return True
-        else:
             return False
+        else:
+            return True
 
     def preprocess(self):
         "Call beforeRunRoutines."
