@@ -9,7 +9,7 @@ def main():
     result = ats.manager.main()
     if result:
         return 0
-    else
+    else:
         return 1
 
 if __name__ == "__main__":

@@ -186,9 +186,11 @@ def main():
     cmd.append(myats)
     cmd.extend(extra_args)
     print("Executing: " + " ".join(cmd))
-    #sys.exit("debug")
 
-    subprocess.run(cmd, text=True)
+    completed_process subprocess.run(cmd, text=True)
+
+    #  return return code from flux or salloc
+    return(completed_process.returncode);
 
 
 if __name__ == "__main__":
