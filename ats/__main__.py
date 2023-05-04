@@ -7,6 +7,9 @@ import ats
 
 def main():
     result = ats.manager.main()
+
+    # Return values need to be modified because code returns bool checking for errors
+    # if there was no error then we return False, but codes using us expect 0 as a successful run
     if result:
         return 0
     else:
