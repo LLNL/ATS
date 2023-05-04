@@ -21,7 +21,7 @@ num_cpus = multiprocessing.cpu_count()
 
 # Get hostname to set defaults for if Flux is the native scheduler
 my_hostname = os.environ.get("HOSTNAME", "unset")
-if (my_hostname.startswith('rzwhip')):
+if (my_hostname.startswith('rzansel')):
     flux_native = True
     time_limit = 240
 else:
