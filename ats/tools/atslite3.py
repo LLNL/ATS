@@ -59,7 +59,7 @@ def main():
     elif 'blueos' in sys_type:
         numNodes = 1
     else:
-        numNodes = 4
+        numNodes = 3
 
     my_bank = "guests"
 
@@ -171,10 +171,7 @@ def main():
 
     ats_lite_ats.wait()
 
-    return_code = ats_lite_ats.returncode
-    #print "ATS finished, exiting with return code "
-    #print return_code
-    sys.exit(return_code)
+    return ats_lite_ats.returncode
 
 # -----------------------------------------------------------------------------
 #  Startup
