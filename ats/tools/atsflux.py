@@ -187,10 +187,10 @@ def main():
     cmd.extend(extra_args)
     print("Executing: " + " ".join(cmd))
 
-    completed_process subprocess.run(cmd, text=True)
+    completed_process = subprocess.run(cmd, text=True)
 
     #  return return code from flux or salloc
-    return(completed_process.returncode);
+    return(completed_process.returncode)
 
 
 if __name__ == "__main__":
