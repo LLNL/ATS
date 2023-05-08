@@ -54,31 +54,32 @@ class MachineCore(object):
         then the timelimit, return true, else return false.  test's
         end time is set if time elapsed exceeds time limit """
         from ats import configuration
+
         timeNow= time.time()
         # Add small increment to flags jobs that 
         # are close to timing out as timing out. Without this
         # they were occasionally mis categorized as FAILED in
         # later processing.
         timePassed= (timeNow - test.startTime) + 0.2
-        cut = configuration.cuttime
+        #cut = configuration.cuttime
         fraction = timePassed / test.timelimit.value
 
-        # print("DEBUG checkForTimeOut 000")
-        # print(timeNow)
-        # print(timePassed)
-        # print(test.timelimit.value)
-        # print(cut)
-        # print(fraction)
+        # ATS will defer timeouts to the flux scheduler and will
+        #     not implement timeouts within the ATS code.
+        #     This is because the time a job is submitted to flux 
+        #     and the time it actually starts are not equivalent
+        #     So the timelimits or cutoffs will be passed to flux 
+        #     for processing.
+        if "flux" in configuration.MACHINE_TYPE:
+            return 0, 0
+            # print("SAD DEBUG checkForTimeOut always returns 0 under flux\n")
+            
         if (timePassed < 0):         # system clock change, reset start time
-            # print("DEBUG checkForTimeOut 600")
             test.setStartTimeDate()
         elif (timePassed >= test.timelimit.value):   # process timed out
-            # print("DEBUG checkForTimeOut 700 returning 1, timePassed=%f test.timelimit.value=%f" % (timePassed, test.timelimit.value))
             return 1, fraction
-        elif cut is not None and timePassed >= cut.value:
-            # print("DEBUG checkForTimeOut 800 returning -1, timePassed=%f cut=%f fraction=%f" % (timePassed, cut, fraction))
-            return -1, fraction
-        # print("DEBUG checkForTimeOut 999 returning 0")
+        # elif cut is not None and timePassed >= cut.value:
+        #     return -1, fraction
         return 0, fraction
 
     def checkRunning(self):
@@ -209,18 +210,18 @@ testEnded will call your bookkeeping method noteEnd.
                 for line in lines:
                     if lsf_error == False:
                         if "Terminated while pending" in line:
-                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                         elif "JSM daemon timed" in line:
-                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                             #time.sleep(10)      # See if sleeiping helps the JSM daemon recover
                         elif "Error initializing RM" in line:
-                            print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                             lsf_error = True
                             #time.sleep(10)      # See if sleeiping helps the JSM daemon recover
                         elif "Bus error)" in line:
-                            print("ATS Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line))
+                            print("ATS ERROR: Halting test %s. Detected Bus Error (perhaps MPI related) : %s " % (test.name, line))
                             lsf_error = True
 
                 if not lsf_error:
@@ -229,14 +230,14 @@ testEnded will call your bookkeeping method noteEnd.
                     f.close
                     for line in lines:
                         if lsf_error == False:
-                            if "Error: Locate pipe file" in line:
-                                print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            if "ATS Error: Locate pipe file" in line:
+                                print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                                 lsf_error = True
                             elif "Could not read jskill" in line:
-                                print("ATS Detected LSF Job Scheduler Error %s.  : %s " % (test.name, line))
+                                print("ATS ERROR: Detected LSF Job Scheduler Error %s.  : %s " % (test.name, line))
                                 lsf_error = True
-                            elif "Error initializing RM" in line:
-                                print("ATS Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
+                            elif "AST Error: initializing RM" in line:
+                                print("ATS ERROR: Detected LSF Job Start Error %s.  Detected LSF launch failure : %s " % (test.name, line))
                                 lsf_error = True
 
 
@@ -292,7 +293,7 @@ call noteEnd for machine-specific part.
             if os.path.exists( globalPostrunScript ):
                 self._executePreOrPostRunScript( globalPostrunScript, test, verbose, globalPostrunScript_outname )
             else:
-                log("ERROR: globalPostrunScript %s not found" % (globalPostrunScript), echo=True)
+                log("ATS ERROR: globalPostrunScript %s not found" % (globalPostrunScript), echo=True)
                 sys.exit(-1)
             os.chdir( here )
 
@@ -548,7 +549,7 @@ The subprocess part of launch. Also the part that might fail.
             if os.path.exists( globalPrerunScript ):
                 self._executePreOrPostRunScript( globalPrerunScript, test, verbose, globalPrerunScript_outname )
             else:
-                log("ERROR: globalPrerunScript %s not found" % (globalPrerunScript), echo=True)
+                log("ATS ERROR: globalPrerunScript %s not found" % (globalPrerunScript), echo=True)
                 sys.exit(-1)
             os.chdir( here )
 

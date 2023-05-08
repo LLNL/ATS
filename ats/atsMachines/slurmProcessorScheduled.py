@@ -6,7 +6,10 @@
 #ATS:slurm24                 SELF SlurmProcessorScheduled 24
 #ATS:slurm32                 SELF SlurmProcessorScheduled 32
 #ATS:slurm36                 SELF SlurmProcessorScheduled 36
+#ATS:slurm48                 SELF SlurmProcessorScheduled 48
 #ATS:slurm56                 SELF SlurmProcessorScheduled 56
+#ATS:slurm112                 SELF SlurmProcessorScheduled 112
+#ATS:slurm128                 SELF SlurmProcessorScheduled 128
 #ATS:toss_3_x86_64_ib        SELF SlurmProcessorScheduled 36
 #ATS:toss_3_x86_64           SELF SlurmProcessorScheduled 36
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64
@@ -46,7 +49,7 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
         tarray=tstr.split() 
         SlurmProcessorScheduled.slurm_version_str=tarray[1]
         log('SLURM VERSION STRING', SlurmProcessorScheduled.slurm_version_str)
-        tarray=re.split('[\.\-]',SlurmProcessorScheduled.slurm_version_str);
+        tarray=re.split('[\.\-]',SlurmProcessorScheduled.slurm_version_str)
         SlurmProcessorScheduled.slurm_version_int=(int(tarray[0]) * 1000) + (int(tarray[1]) * 100) + (int(tarray[2]))
         log('SLURM VERSION NUMBER', SlurmProcessorScheduled.slurm_version_int)
 
@@ -289,15 +292,15 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         distribution       = self.distribution        # default is cyclic, by can be overridden with --distribution=xxx
         test.runningWithinSalloc = self.runningWithinSalloc
         commandList        = self.calculateBasicCommandList(test)
-        timeNow            = time.strftime('%H%M%S',time.localtime())
+        timeNow            = time.strftime('%H%M%S', time.localtime())
         test.jobname       = "t%d_%d%s%s" % (np, test.serialNumber, test.namebase[0:50], timeNow)
-        test_time          = test.options.get('time',0);
+        test_time          = test.options.get('time', 0)
 
         SlurmProcessorScheduled.set_nt_num_nodes(self, test)
         num_nodes   = test.num_nodes
         num_threads = test.nt
         # minNodes    = np / self.npMax + (np % self.npMax != 0 )
-        minNodes    = math.ceil( (float(np) * float(num_threads)) / float(self.npMax))
+        minNodes    = math.ceil((float(np) * float(num_threads)) / float(self.npMax))
 
         #print("DEBUG SAD JULY np=%i num_threads=%i" % (np, num_threads))
         #print("DEBUG SAD JULY test.num_nodes=%i num_nodes=%i" % (test.num_nodes, num_nodes))
@@ -404,7 +407,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             elif self.npMax > 0:
                 self.slurm_cpus_on_node = self.npMax
             else:
-                print("ERROR 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set.")
+                print("ATS ERROR: 'nn' specified neither SLURM_JOB_CPUS_PER_NODE nor SLURM_CPUS_ON_NODE nor self.npMax is set.")
                 sys.exit(1)
 
             tasks_per_node        = np / num_nodes

@@ -110,14 +110,14 @@ def main():
         )
         if (version) < 38:
             sys.exit(
-                f"""Error: this system does not have a current version of Flux installed.
+                f"""ATS ERROR: this system does not have a current version of Flux installed.
                 Version 0.{version}.0 is installed but >= 0.38.0 is required. Please update
                 the Flux version or use a different Flux (check which one you're using with `which flux`).
                 """
             )
     except Exception:
         sys.exit(
-            """Error: this system does not have a current version of Flux installed.
+            """ATS ERROR: this system does not have a current version of Flux installed.
             No version of Flux was found on this system but version >= 0.38.0 required. Please update
             the Flux version or specify a different Flux installation to use.
             """
@@ -140,7 +140,7 @@ def main():
         # else start flux from the login node
         else:
             cmd = [
-                "flux", "mini", "alloc", 
+                "flux", "alloc",
                 "-N", f"{args.numNodes}",
                 "-n", f"{total_cores}",
                 "-t", f"{args.job_time}m",
@@ -186,9 +186,11 @@ def main():
     cmd.append(myats)
     cmd.extend(extra_args)
     print("Executing: " + " ".join(cmd))
-    #sys.exit("debug")
 
-    subprocess.run(cmd, text=True)
+    completed_process = subprocess.run(cmd, text=True)
+
+    #  return return code from flux or salloc
+    return(completed_process.returncode)
 
 
 if __name__ == "__main__":

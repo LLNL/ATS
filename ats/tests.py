@@ -283,7 +283,7 @@ class AtsTest (object):
         #set the timelimit
         try:
             tl = options.get('timelimit', None)
-            if tl is None:
+            if tl is None or configuration.cuttime is not None:
                 self.timelimit = configuration.timelimit
             else:
                 self.timelimit = Duration(tl)

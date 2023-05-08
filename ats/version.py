@@ -2,7 +2,7 @@
 #
 ATS_MAJOR = 7
 ATS_MINOR = 0
-ATS_PATCH = 112
+ATS_PATCH = 113
 
 #
 # This version, constructed from the above,  is used internally by ATS

@@ -51,15 +51,21 @@ def main() -> None:
     ]
 
     print("ATS: Running Black formatter...")
-    subprocess.run(BLACK_CMD + BLACK_OPTIONS + args.path)
+    completed_process = subprocess.run(BLACK_CMD + BLACK_OPTIONS + args.path)
     print("ATS: Black formatter done.\n")
+    if completed_process.returncode != 0:
+        return(completed_process.returncode)
 
     print("ATS: Running isort formatter...")
-    subprocess.run(ISORT_CMD + ISORT_OPTIONS + args.path)
+    completed_process = subprocess.run(ISORT_CMD + ISORT_OPTIONS + args.path)
     print("ATS: isort formatter done.")
+    if completed_process.returncode != 0:
+        return(completed_process.returncode)
 
     for machine_file in Path("ats", "atsMachines").glob("*.py"):
         unformat_ATS_headers(machine_file)
+
+    return(0)
 
 
 if __name__ == "__main__":

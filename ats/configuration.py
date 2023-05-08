@@ -14,6 +14,9 @@ import importlib
 import os
 import re
 import sys
+
+from importlib.metadata import entry_points
+
 from ats import version
 from ats.atsut import debug, abspath
 from ats.log import log, terminal
@@ -97,6 +100,7 @@ def addOptions(parser):
         exclusive=True,
         blueos_ngpu=0,
         blueos_np=-1,
+        blueos_np_max=-1,
         cuttime=None,
     )
 
@@ -180,6 +184,10 @@ def add_blueos_only_options(parser):
                       settings of np (number of processors).  Useful for GPU
                       tests where the 4 MPI and 4 GPU devices are a common
                       testing scenario''')
+    parser.add_option('--lrun_np_max', dest='blueos_np_max', type='int',
+                      help='''Blueos option: Over-rides test specific settings
+                      of np (number of processors) if the test is set greater
+                      than the value provided.''')
     parser.add_option('--ompDisplayEnv', action='store_true',
                       help='''Blueos option: Set OMP_DISPLAY_ENV=True to see
                       detailed OMP settings at run time''')
@@ -195,9 +203,13 @@ def add_blueos_only_options(parser):
                       OMP built codes.''')
     parser.add_option('--jsrun_np', dest='blueos_np', type='int',
                       help='''Blueos option: Over-rides test specific settings
-                      of np (number of processors).  Useful for GPU tests where
+                      of np (number of processors). Useful for GPU tests where
                       the 4 MPI and 4 GPU devices are a common testing
                       scenario''')
+    parser.add_option('--jsrun_np_max', dest='blueos_np_max', type='int',
+                      help='''Blueos option: Over-rides test specific settings
+                      of np (number of processors) if the test is set greater
+                      than the value provided.''')
     parser.add_option('--jsrun_bind', dest='blueos_jsrun_bind',
                       default='unset',
                       help='''Blueos option: jsrun --bind option. "none",
@@ -257,14 +269,12 @@ def add_more_options(parser):
                       help='''Frequency in minutes to write a continuation
                       file. The default is to only write a continuation file at
                       the end of the run, and only if any tests failed.''')
-    parser.add_option('--cutoff',
-                      help='''Set the HALTED halt time limit on each test.
-                      Over-rides job timelimit. All jobs will be HALTED at this
-                      time. The value may be given as a digit followed by an s,
-                      m, or h to give the time in seconds, minutes (the
-                      default), or hours. This value if given causes jobs to
-                      fail with status HALTED if they run this long and have
-                      not already timed out or finished.''')
+    parser.add_option('--cutoff', dest = 'cuttime',
+                      help='''Over-rides job timelimit. All jobs will be TIMEOUT
+                      at this time. The value may be given as a digit followed
+                      by an s, m, or h to give the time in seconds, minutes (the
+                      default), or hours. Note: Jobs that TIMEOUT are marked as
+                      FAIL when using Flux.''')
     parser.add_option('--debug', action='store_true',
                       help='''debug ; turn on debugging flag for detailed
                       debugging output during the run''')
@@ -322,7 +332,11 @@ def add_more_options(parser):
                        help='''Run each test consecutively. Do not run
                        concurrent test jobs.''')
     parser.add_option('--nosrun', action='store_true',
-                      help='Slurm option: Run the code without srun.')
+                      help='''Slurm option: Run the code without srun. This
+                      option can also be used on BlueOS to run ALL test on
+                      a login node as it circumvents the login node check.
+                      If the tests need to be run on a working node, then
+                      the tests themselves will need to get an allocation.''')
     parser.add_option('--salloc', action='store_true',
                       help='Slurm option: Run the code with salloc rather than srun.')
     parser.add_option('--showGroupStartOnly', action='store_true',
@@ -356,7 +370,8 @@ def add_more_options(parser):
                       This may be over-ridden for specific tests.  Jobs will
                       TIMEOUT at this time.  The value may be given as a digit
                       followed by an s, m, or h to give the time in seconds,
-                      minutes (the default), or hours.''')
+                      minutes (the default), or hours. Note: Jobs that TIMEOUT
+                      are marked as FAIL when using Flux.''')
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                       help='''verbose mode; increased level of terminal output
                       ''')
@@ -386,10 +401,18 @@ def get_machine_factory(module_name, machine_class,
     module_name. "machine_package" tells Python where module_name can be found if
     not in the project's root directory.
     """
-    machine_module = importlib.import_module(f'.{module_name}',
-                                             package=machine_package)
-    machine_factory = getattr(machine_module, machine_class)
-    return machine_factory
+    log("Machine Factory: importing {} from {}".format(module_name, machine_package),
+        echo=False)
+    try:
+        machine_module = importlib.import_module(f'.{module_name}',
+                                                 package=machine_package)
+        machine_factory = getattr(machine_module, machine_class)
+        return machine_factory
+    
+    except ModuleNotFoundError:
+        log(f"Module '{module_name}' not found in package '{machine_package}'. Continuing search.",
+            echo=False)
+        return None
 
 def get_machine(file_text, file_name, is_batch=False):
     header = '#BATS:' if is_batch else '#ATS:'
@@ -402,23 +425,62 @@ def get_machine(file_text, file_name, is_batch=False):
         if machine_name == machine_type:
             if module_name == "SELF":
                 module_name = os.path.splitext(file_name)[0]
-            try:
-                machine_factory = get_machine_factory(module_name,
-                                                      machine_class)
+
+            # Look in ats.atsMachines
+            machine_factory = get_machine_factory(module_name,
+                                                  machine_class)
+            if machine_factory:
                 print(f"from ats.atsMachines.{module_name} "
                       f"import {machine_class} as Machine")
-            except ModuleNotFoundError:
+
+            if not machine_factory:
                 machine_factory = get_machine_factory(module_name,
                                                       machine_class,
                                                       machine_package='atsMachines')
-                print(f"from atsMachines.{module_name} "
-                      f"import {machine_class} as Machine")
-            machine = machine_factory(machine_name, int(npMaxH))
-            break
+
+                if machine_factory:
+                    print(f"from atsMachines.{module_name} "
+                          f"import {machine_class} as Machine")
+
+            if machine_factory:
+                machine = machine_factory(machine_name, int(npMaxH))
+                break
+
     else:
         machine = None
 
     return machine
+
+def get_machine_entry_points(machine_class):
+    """
+    Looks for custom machine type via entry_points plugins
+    installed by ats wrappers.
+
+    Notes
+    -----
+    Batch mode not really supported this way? -> would want
+    to tag batch vs ats headers as an instance/class variable
+    instead in this mode rather than rely on the header comments
+    """
+    log("Machine Factory: looping over available machine plugins:",
+        echo=False)
+    ats_machines = {machine.name: machine
+                    for group, machines in entry_points().items()
+                    if group == 'ats.machines' for machine in machines}
+    log(f"Machine Factory: found machine plugins: {ats_machines}",
+        echo=False)
+    for name, machine_factory in ats_machines.items():
+        if machine_class in machine_factory.value:
+            log("Machine Factory: Found machine {} of class {}: {}".format(
+                name,
+                machine_class,
+                machine_factory
+            ))
+
+            return machine_factory.load()(machine_class, -1)
+
+    # Downstream needs to be able to detect if machine isn't found
+    return None
 
 
 def init(clas = '', adder = None, examiner=None):
@@ -482,6 +544,12 @@ def init(clas = '', adder = None, examiner=None):
 
         if machine and batchmachine:
             break
+
+    # Check entry_points plugins to override built-in machines
+    machine_plugin = get_machine_entry_points(MACHINE_TYPE)
+
+    if machine_plugin:
+        machine = machine_plugin
 
     if machine is None:
         terminal("No machine specifications for", SYS_TYPE, "found, using generic.")
@@ -554,8 +622,9 @@ def init(clas = '', adder = None, examiner=None):
 # unpack other options
     cuttime = options.cuttime
     if cuttime is not None:
-        cuttime = Duration(cuttime)
-    timelimit = Duration(options.timelimit)
+        timelimit = Duration(cuttime)
+    else:
+        timelimit = Duration(options.timelimit)
     defaultExecutable = executables.Executable(abspath(options.executable))
     # ATSROOT is used in tests.py to allow paths pointed at the executable's directory
     if 'ATSROOT' in os.environ:

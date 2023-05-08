@@ -204,7 +204,7 @@ class AtsManager(object):
             except IOError as e:
                 pass
         else:
-            log("Error opening input file:", t1, echo=True)
+            log("ATS ERROR opening input file:", t1, echo=True)
             self.badlist.append(t1)
             raise AtsError("Could not open input file %s" % path)
         t = abspath(t1)
@@ -238,16 +238,17 @@ class AtsManager(object):
                     log(line, echo=False)
             os.chdir(directory)
             try:
-                parser = AtsCodeParser(code)
-                for code_segment in parser.get_code_iterator():
-                    exec(code_segment, testenv)
+                exec(code, testenv)
+                # parser = AtsCodeParser(code)
+                # for code_segment in parser.get_code_iterator():
+                #     exec(code_segment, testenv)
                 if debug():
                     log('Finished ', t1, datestamp())
             except KeyboardInterrupt:
                 raise
             except Exception as details:
                 self.badlist.append(t1)
-                log('Error while processing statements in', t1, ':', echo=True)
+                log('ATS ERROR while processing statements in', t1, ':', echo=True)
                 log(details, echo=True)
             log.dedent()
         else:
@@ -255,18 +256,23 @@ class AtsManager(object):
             log.indent()
             os.chdir(directory)
             try:
-                parser = AtsFileParser(t1)
-                for code_segment in parser.get_code_iterator():
-                    exec(code_segment, testenv)
-                if debug(): log('Finished ', t1, datestamp())
+                exec(compile(open(t1, "rb").read(), t1, 'exec'), testenv)
+                # parser = AtsFileParser(t1)
+                # for code_segment in parser.get_code_iterator():
+                #     exec(code_segment, testenv)
+                if debug():
+                    log('Finished ', t1, datestamp())
+
                 result = 1
             except KeyboardInterrupt:
                 raise
             except Exception as details:
                 self.badlist.append(t1)
-                log('Error in input file', t1, ':', echo=True)
-                log(details, echo=True)
+                log('ATS ERROR in input file', t1, ':', echo=True)
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                log(traceback.print_exception(exc_type, exc_value, exc_traceback), echo=True)
                 log('------------------------------------------', echo=True)
+
             log.dedent()
         AtsTest.endGroup()
         unstick()
@@ -295,7 +301,7 @@ class AtsManager(object):
     def finalReport(self):
         "Write the final report."
         log.reset()
-        clean_run = True
+        successful_run = True
 
         if self.testlist:
             log("""
@@ -308,10 +314,10 @@ class AtsManager(object):
                 echo = True)
         if not configuration.options.skip:
             log("""
-                ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
-            clean_run = self.summary(log)
+ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
+            successful_run = self.summary(log)
             self._summary2(log)
-        return clean_run
+        return successful_run
 
     def finalBanner(self):
         "Show final banner."
@@ -394,27 +400,27 @@ class AtsManager(object):
                 CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
                 echo = True)
 
-        clean_run = True
+        successful_run = True
         msg = ""
         if (len(failed) == 0):
             msg = "FAILED:  0"
         else:
             msg = "FAILED:  %d %s" % (len(failed), ', '.join(failed))
-            clean_run = False
+            successful_run = False
         log(msg, echo = True)
 
         if timedout:
             log("TIMEOUT:  %d %s" % (len(timedout), ', '.join(timedout)),
-                echo = True)
-            clean_run = False
+               echo = True)
+            successful_run = False
         if halted:
             log("HALTED:   %d" % len(halted),
-                echo = True)
-            clean_run = False
+               echo = True)
+            successful_run = False
         if lsferror:
             log("LSFERROR: %d" % len(lsferror),
-                echo = True)
-            clean_run = False
+               echo = True)
+            successful_run = False
         if expected:
             log("EXPECTED: %d" % len(expected),
                 echo = True)
@@ -425,9 +431,9 @@ class AtsManager(object):
         lnr = len(notrun)
         if notrun:
             log("""NOTRUN:   %d""" % len(notrun),
-                echo = True)
-
-        return clean_run
+               echo = True)
+        
+        return successful_run
 
     def _summary2(self, log):
         "Additional detail for  summary."
@@ -653,7 +659,7 @@ class AtsManager(object):
         if (batchTests and (configuration.options.nobatch or \
                             configuration.options.allInteractive)):
             for t in batchTests:
-                log( t, "BATCH sorting error.", echo=True)
+                log( t, "ATS ERROR: BATCH sorting.", echo=True)
             raise ValueError('batch test(s) should not exist')
 
         return interactiveTests, batchTests
@@ -798,7 +804,7 @@ class AtsManager(object):
         try:   # surround with keyboard interrupt, AtsError handlers
             self.collectTests()
         except AtsError:
-            log("ATS error while collecting tests.", echo=True)
+            log("ATS ERROR while collecting tests.", echo=True)
             log(traceback.format_exc(), echo=True)
             errorOccurred = True
             self.collectTimeEnded = datestamp(long_format=True)
@@ -851,7 +857,7 @@ class AtsManager(object):
                     self.batchmachine.load(batchTests)
                 except AtsError:
                     log(traceback.format_exc(), echo=True)
-                    log("ATS error.", echo=True)
+                    log("ATS ERROR.", echo=True)
                     return False
                 except KeyboardInterrupt:
                     log("Keyboard interrupt while dispatching batch, terminating.", echo=True)
@@ -874,7 +880,7 @@ class AtsManager(object):
                     echo=True)
                 errorOccurred = True
             except Exception:
-                log("Error in prioritizing tests.", echo=True)
+                log("ATS ERROR in prioritizing tests.", echo=True)
                 log(traceback.format_exc(), echo=True)
                 errorOccured = True
             if errorOccurred:
@@ -884,7 +890,7 @@ class AtsManager(object):
                 self.run(interactiveTests)
             except AtsError:
                 log(traceback.format_exc(), echo=True)
-                log("ATS error. Removing running jobs....", echo=True)
+                log("ATS ERROR. Removing running jobs....", echo=True)
                 dieDieDie = True
 
             except KeyboardInterrupt:
@@ -1121,6 +1127,7 @@ BATCHED = ats.BATCHED
         "Print state to file, formatting items with repr"
 # import * is bad style but helps with robustness with respect to ats changes:
         print("""from ats import *""", file=file)
+        print("""from argparse import *""", file=file)
         print("state =  ", file=file, end='')
         print(repr(self.getResults()), file=file)
         print("logDirectory = %r" % log.directory, file=file)
@@ -1133,29 +1140,29 @@ BATCHED = ats.BATCHED
 class TestLike(dict):
     def __init__ (self, aDict):
         dict.__init__(self, **aDict)
-        n = self.groupNumber
-        if n not in state.groups:
-            state.groups[n] = AtsTestGroup(n)
-        self.group = state.groups[n]
-        self.group.append(self)
+        n = self['groupNumber']
+        if n not in state['groups']:
+            state['groups'][n] = AtsTestGroup(n)
+        self['group'] = state['groups'][n]
+        self['group'].append(self)
 
     def __str__ (self):
-        return str(self.status) + ' ' + self.name + ' ' + self.message
+        return str(self['status']) + ' ' + self['name'] + ' ' + self['message']
 
     def __repr__(self):
-        return "Test #%d %s %s" %(self.serialNumber, self.name, self.status)
+        return "Test #%d %s %s" %(self['serialNumber'], self['name'], self['status'])
 
 
-for i in range(len(state.testlist)):
-    state.testlist[i] = TestLike(state.testlist[i])
+for i in range(len(state['testlist'])):
+    state['testlist'][i] = TestLike(state['testlist'][i])
 
-for t in state.testlist:
-    if t.depends_on_serial == 0:
-        t.depends_on = None
+for t in state['testlist']:
+    if t['depends_on_serial'] == 0:
+        t['depends_on'] = None
     else:
-        t.depends_on = state.testlist[t.depends_on_serial -1 ]
-    t.dependents = [state.testlist[serial-1] for serial in t.dependents_serial]
-    t.waitUntil = [state.testlist[serial-1] for serial in t.waitUntil_serial]
+        t['depends_on'] = state['testlist'][t['depends_on_serial'] -1 ]
+    t['dependents'] = [state['testlist'][serial-1] for serial in t['dependents_serial']]
+    t['waitUntil'] = [state['testlist'][serial-1] for serial in t['waitUntil_serial']]
 
 # clean up
 del i, t

@@ -62,7 +62,7 @@ def main():
     elif 'blueos' in sys_type:
         numNodes = 1
     else:
-        numNodes = 4
+        numNodes = 3
 
     my_bank = "guests"
 
@@ -81,7 +81,7 @@ def main():
             if val.isdigit():
                 numNodes = int(val)
             else:
-                print("Error '%s' is invalid" % arg)
+                print("ATS ERROR: '%s' is invalid" % arg)
                 sys.exit(-1)
             print("INFO: atslite1 %s option will use %i nodes" % (arg, numNodes))
             del sys.argv[index]
@@ -167,7 +167,8 @@ def main():
 
     print("Executing: %s" % cmd)
 
-    subprocess.run(cmd.split(), text=True)
+    completed_process = subprocess.run(cmd.split(), text=True)
+    return completed_process.returncode
 
 # -----------------------------------------------------------------------------
 #  Startup

@@ -31,14 +31,14 @@ def importName( moduleName, name, default_func=None, verbose=False ):
         print("Loading %s from %s." % (name, moduleName))
     func = default_func
     try:
-        print("WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
+        print("ATS WARNING: VERY SUSPICIOUS WAY OF IMPORTING")
         my_mod = __import__( moduleName, globals(), locals(), [name] )
         func   =  vars(my_mod)[name]
     except ImportError as value:
         print("Import of function %s from %s failed: %s" % (name, moduleName, value))
         raise Exception
     except KeyError as value:
-        print("KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
+        print("ATS ERROR: KeyError during import of function %s from %s failed: %s" % (name, moduleName, value))
         pass
 
     return func
@@ -81,12 +81,12 @@ def runCommand( cmd_line, file_name=None, exit=True, verbose=False):
             stderr_pipe.close()
 
     except CalledProcessError as error:
-        log('Command failed: error code %d' % error.returncode, echo=True)
+        log('ATS ERROR: Command failed: error code %d' % error.returncode, echo=True)
         log('Failed Command: %s' % cmd_line, echo=True)
         if exit:
             raise SystemExit(1)
     except OSError as error:
-        log('Command failed with OSError: traceback %s' % error.child_traceback, echo=True)
+        log('ATS ERROR: Command failed with OSError: traceback %s' % error.child_traceback, echo=True)
         log('Failed Command: %s' % cmd_line, echo=True)
         if exit:
             raise SystemExit(1)
@@ -116,10 +116,10 @@ def execute(cmd_line, file_name=None, verbose=False):
         with open(file_name, 'w') as log_file:
             log_file.write(f'Command: {cmd_line}\n{completed_process.stdout}')
             if completed_process.returncode:
-                log_file('Command failed: error code '
+                log_file('ATS ERROR: Command failed: error code '
                          f'{completed_process.returncode}')
     if completed_process.returncode:
-        log(f'Command failed: error code {completed_process.returncode}',
+        log(f'ATS ERROR: Command failed: error code {completed_process.returncode}',
             echo=True)
 
     return completed_process.returncode
@@ -137,7 +137,7 @@ def listdirs(folder):
     try:
         dir_list = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d))]
     except OSError as error:
-        log("WARNING - listdirs: %s" % error.strerror, echo=True)
+        log("ATS WARNING - listdirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
 
@@ -147,7 +147,7 @@ def listDatedDirs(folder):
                       if re.search('2[0-9][0-9][0-9]_[0-9][0-9]$', d) \
                       if os.path.isdir(os.path.join(folder, d))]
     except OSError as error:
-        log("WARNING - listDatedDirs: %s" % error.strerror, echo=True)
+        log("ATS WARNING - listDatedDirs: %s" % error.strerror, echo=True)
         dir_list = []
     return dir_list
 
@@ -155,7 +155,7 @@ def listfiles(folder):
     try:
         file_list = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d))]
     except OSError as error:
-        log("WARNING - listfiles: %s" % error.strerror, echo=True)
+        log("ATS WARNING - listfiles: %s" % error.strerror, echo=True)
         file_list = []
     return file_list
 
@@ -170,11 +170,11 @@ def copyFile(filename, srcdir, destdir, groupID):
             os.chown( destfile, -1, groupID)
             os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
         except OSError as error:
-            log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
+            log('ATS WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
                 echo=True)
         return destfile
     else:
-        log("WARNING - copyFile: %s file does not exist in %s." % (filename, srcdir),
+        log("ATS WARNING - copyFile: %s file does not exist in %s." % (filename, srcdir),
             echo=True )
         # raise Exception("\n\n\t%s file does not exist in %s." % (filename, srcdir) )
 
@@ -187,11 +187,11 @@ def copyAndRenameFile(filename, newfilename, srcdir, destdir, groupID):
             os.chown( destfile, -1, groupID)
             os.chmod( destfile, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
         except OSError as error:
-            log('WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
+            log('ATS WARNING - failed to set permissions on %s: %s' % ( destfile, error.strerror),
                 echo=True)
         return destfile
     else:
-        log("WARNING - copyAndRenameFile: %s file does not exist in %s." % (filename, srcdir),
+        log("ATS WARNING - copyAndRenameFile: %s file does not exist in %s." % (filename, srcdir),
             echo=True )
         #raise Exception("\n\n\t%s file does not exist." % (srcfile) )
 
@@ -203,11 +203,11 @@ def makeDir( new_dir ):
             os.mkdir( new_dir )
 
         except OSError as error:
-            log('Error making %s: %s' %( new_dir, error.strerror), echo=True)
+            log('ATS ERROR: making %s: %s' %( new_dir, error.strerror), echo=True)
             raise SystemExit(1)
 
     elif not os.path.isdir(new_dir):
-        log('ERROR: %s exists and is NOT a directory' % new_dir, echo=True)
+        log('ATS ERROR: %s exists and is NOT a directory' % new_dir, echo=True)
         raise SystemExit(1)
 
 def makeSymLink( path, target ):
@@ -216,7 +216,7 @@ def makeSymLink( path, target ):
             os.symlink( path, target )
 
         except OSError as error:
-            log('Error making link to %s: %s' %( target, error.strerror), echo=True)
+            log('ATS ERROR: making link to %s: %s' %( target, error.strerror), echo=True)
             raise SystemExit(1)
 
     elif os.path.islink(target):
@@ -225,11 +225,11 @@ def makeSymLink( path, target ):
             os.symlink( path, target )
 
         except OSError as error:
-            log('Error making link to %s: %s' %( target, error.strerror), echo=True)
+            log('ATS ERROR: making link to %s: %s' %( target, error.strerror), echo=True)
             raise SystemExit(1)
 
     else:
-        log('ERROR: %s exists and is NOT a symlink' % target, echo=True)
+        log('ATS ERROR: %s exists and is NOT a symlink' % target, echo=True)
         raise SystemExit(1)
 
 
@@ -281,7 +281,7 @@ def setDirectoryPermissions( dir, groupID):
         os.chown( dir, -1, groupID)
         os.chmod( dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_ISUID | stat.S_ISGID )
     except:
-        log('Warning - failed to set permissions on directory ' + dir, echo=True)
+        log('ATS WARNING - failed to set permissions on directory ' + dir, echo=True)
 
 
 def setFilePermissions( file, groupID):
@@ -289,7 +289,7 @@ def setFilePermissions( file, groupID):
         os.chown( file, -1, groupID)
         os.chmod( file, stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IWGRP )
     except:
-        log('Warning - failed to set permissions on file ' + file, echo=True)
+        log('ATS WARNING - failed to set permissions on file ' + file, echo=True)
 
 ####################################################################################
 # Routine to delete sandbox dirs in the current dir
@@ -338,41 +338,39 @@ def set_machine_type_based_on_sys_type():
     print(host)
 
     try:
-        if host.startswith('rzalastor'):
-            os.environ['MACHINE_TYPE'] = 'slurm20'
-
-        elif host.startswith('rzgenie') or host.startswith('rztopaz') or host.startswith('rztrona'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('borax') or host.startswith('quartz') or host.startswith('agate'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('jade'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('mica'):
-            os.environ['MACHINE_TYPE'] = 'slurm36'
-
-        elif host.startswith('herd'):
-            os.environ['MACHINE_TYPE'] = 'slurm32'
-
-        elif host.startswith('catalyst'):
-            os.environ['MACHINE_TYPE'] = 'slurm24'
+        if host.startswith('rzzeus'):
+            os.environ['MACHINE_TYPE'] = 'slurm8'
 
         elif host.startswith('sierra') or host.startswith('aztec'):
             os.environ['MACHINE_TYPE'] = 'slurm12'
 
-        elif host.startswith('rzzeus'):
-            os.environ['MACHINE_TYPE'] = 'slurm8'
-
-        elif host.startswith('rzmerl') or host.startswith('cab') or host.startswith('surface'):
+        elif host.startswith('rzmerl') or host.startswith('cab') or host.startswith('surface') or \
+             host.startswith('syrah') or host.startswith('max') or host.startswith('pinot') or \
+             host.startswith('zin'):
             os.environ['MACHINE_TYPE'] = 'slurm16'
 
-        elif host.startswith('syrah') or host.startswith('max') or host.startswith('pinot'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif host.startswith('rzalastor'):
+            os.environ['MACHINE_TYPE'] = 'slurm20'
 
-        elif host.startswith('zin'):
-            os.environ['MACHINE_TYPE'] = 'slurm16'
+        elif host.startswith('catalyst'):
+            os.environ['MACHINE_TYPE'] = 'slurm24'
+
+        elif host.startswith('herd'):
+            os.environ['MACHINE_TYPE'] = 'slurm32'
+
+        elif host.startswith('rzgenie') or host.startswith('rztopaz') or host.startswith('rztrona') or \
+             host.startswith('borax') or host.startswith('quartz') or host.startswith('agate') or \
+             host.startswith('pascal') or host.startswith('jade') or host.startswith('mica'):
+            os.environ['MACHINE_TYPE'] = 'slurm36'
+
+        elif host.startswith('corona'):
+            os.environ['MACHINE_TYPE'] = 'slurm48'
+
+        elif host.startswith('poodle'):
+            os.environ['MACHINE_TYPE'] = 'slurm112'
+
+        elif host.startswith('mammoth'):
+            os.environ['MACHINE_TYPE'] = 'slurm128'
 
         elif os.environ['SYS_TYPE'] in ['bgqos_0']:
             os.environ['MACHINE_TYPE'] = 'bgqos_0_ASQ'

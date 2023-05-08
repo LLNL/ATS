@@ -518,7 +518,7 @@ void Omp_Test(int in_rank, int in_size, int in_seed1, int in_seed2, int in_seed3
             time_stop - time_start, dwork[seed3],serial_value);
         if (serial_value != dwork[seed3])
         {
-            printf("    OpenMP Host MM Test            : ERROR: OpenMP Host MM Test failed!\n");
+            printf("    OpenMP Host MM Test            : ATS ERROR: OpenMP Host MM Test failed!\n");
             MY_ABORT;
         }
 
@@ -562,7 +562,7 @@ void Omp_Test(int in_rank, int in_size, int in_seed1, int in_seed2, int in_seed3
 
         if (serial_value != fwork[seed3])
         {
-            printf("    OpenMP GPU MM Test No Collapse : ERROR: OpenMP GPU MM Test 1 failed! %e != %e \n", serial_value, fwork[seed3]);
+            printf("    OpenMP GPU MM Test No Collapse : ATS ERROR: OpenMP GPU MM Test 1 failed! %e != %e \n", serial_value, fwork[seed3]);
             MY_ABORT;
         }
 
@@ -604,7 +604,7 @@ void Omp_Test(int in_rank, int in_size, int in_seed1, int in_seed2, int in_seed3
 
         if (serial_value != ework[seed3])
         {
-            printf("    OpenMP GPU MM Collapse   : ERROR: OpenMP GPU MM Test 2 failed! %e != %e \n", serial_value, ework[seed3]);
+            printf("    OpenMP GPU MM Collapse   : ATS ERROR: OpenMP GPU MM Test 2 failed! %e != %e \n", serial_value, ework[seed3]);
             MY_ABORT;
         }
 
