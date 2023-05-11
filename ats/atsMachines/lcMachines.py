@@ -13,6 +13,9 @@ class LCMachineCore (machines.Machine):
     def kill(self, test):
         "Final cleanup if any."
 
+        if not hasattr(test, 'jobname'):
+            return
+
         for killTimes in range(0,1):
 
             if self.lastSqueueResult is None or ( (time.time() - self.lastTimeSqueueCalled) > 60):   # in seconds
