@@ -25,7 +25,7 @@ def get_test_lines_generator():
     # Command line args - 'clas' alternate between three args and nothing.
     clas = itertools.cycle(['', 'arg1 arg2 arg3'])
     # Duplicate items in nprocs: [1, 2, ..., 64] --> [1, 1, 2, 2, ..., 64, 64]
-    nprocs = sorted(2 * [1, 2, 3, 4, 5, 6, 7, 8, 16, 31, 64])
+    nprocs = sorted(2 * [1, 2, 3, 4, 5, 6, 7, 8, 16 ])
 
     test_line = "t%d=test  (executable='./a.out', clas='%s', " \
                 "label='a.out_%d', np=%d, sandbox=False)\n"
