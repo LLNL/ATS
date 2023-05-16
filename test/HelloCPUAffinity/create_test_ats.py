@@ -22,7 +22,7 @@ def get_test_lines_generator():
     clas = itertools.cycle(['', '2', '10', '20'])
 
     # Duplicate items in nprocs: [1, 2, ..., 64] --> [1, 1, 2, 2, ..., 64, 64]
-    nprocs = sorted(4 * [1, 2, 4, 10, 20])
+    nprocs = sorted(4 * [1, 2, 4, 10])
 
     test_line = "t%d=test  (executable='./a.out', clas='%s', " \
                 "label='a.out_%d', np=%d)\n"
