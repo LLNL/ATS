@@ -6,7 +6,7 @@ from ats.atsut import RUNNING, TIMEDOUT, PASSED, FAILED, LSFERROR, \
 from ats.log import log, terminal
 from shutil import copytree, ignore_patterns
 
-def comparePriorities (t1, t2):
+def comparePriorities(t1, t2):
     "Input is two tests; return comparison based on totalPriority."
     return t2.totalPriority - t1.totalPriority
 
@@ -73,7 +73,7 @@ class MachineCore(object):
         if "flux" in configuration.MACHINE_TYPE:
             return 0, 0
             # print("SAD DEBUG checkForTimeOut always returns 0 under flux\n")
-            
+
         if (timePassed < 0):         # system clock change, reset start time
             test.setStartTimeDate()
         elif (timePassed >= test.timelimit.value):   # process timed out
@@ -101,20 +101,20 @@ class MachineCore(object):
 
     def remainingCapacity(self):
         """How many processors are free? Could be overriden to answer the real question,
-what is the largest job you could start at this time?"""
+           what is the largest job you could start at this time?"""
         return self.numberTestsRunningMax - self.numberTestsRunning
 
-    def getStatus (self, test):
+    def getStatus(self, test):
         """
-Override this only if not using subprocess (unusual).
-Obtains the exit code of the test object process and then sets
-the status of the test object accordingly. Returns True if test done.
+        Override this only if not using subprocess (unusual).
+        Obtains the exit code of the test object process and then sets
+        the status of the test object accordingly. Returns True if test done.
 
-When a test has completed you must set test.statusCode and
-call self.testEnded(test, status). You may add a message as a third arg,
-which will be shown in the test's final report.
-testEnded will call your bookkeeping method noteEnd.
-"""
+        When a test has completed you must set test.statusCode and
+        call self.testEnded(test, status). You may add a message as a third arg,
+        which will be shown in the test's final report.
+        testEnded will call your bookkeeping method noteEnd.
+        """
         from ats import configuration
         test.child.poll()
         #print test.child.returncode
@@ -146,7 +146,7 @@ testEnded will call your bookkeeping method noteEnd.
             #print "DEBUG getStatus 400"
             if overtime != 0:
                 self.kill(test)
-                test.statusCode=2
+                test.statusCode = 2
                 test.setEndDateTime()
                 if overtime > 0:
                     status = TIMEDOUT
@@ -157,8 +157,8 @@ testEnded will call your bookkeeping method noteEnd.
                 # SAD
                 # Coding to detect SLURM deficiencies, and abort job.
                 # Implemented 2016-Aug-30
-                slurm_error = False;
-                f = open( test.errname, 'r')
+                slurm_error = False
+                f = open(test.errname, 'r')
                 lines = f.readlines()
                 f.close
                 for line in lines:
@@ -184,7 +184,7 @@ testEnded will call your bookkeeping method noteEnd.
 
                 if slurm_error:
                     self.kill(test)
-                    test.statusCode=2
+                    test.statusCode = 2
                     test.setEndDateTime()
                     status = HALTED
 
@@ -203,8 +203,8 @@ testEnded will call your bookkeeping method noteEnd.
             else:
                 # Coding to detect LSF deficiencies
                 # Implemented 2018-12-12
-                lsf_error = False;
-                f = open( test.errname, 'r')
+                lsf_error = False
+                f = open(test.errname, 'r')
                 lines = f.readlines()
                 f.close
                 for line in lines:
@@ -225,7 +225,7 @@ testEnded will call your bookkeeping method noteEnd.
                             lsf_error = True
 
                 if not lsf_error:
-                    f = open( test.outname, 'r')
+                    f = open(test.outname, 'r')
                     lines = f.readlines()
                     f.close
                     for line in lines:
@@ -245,12 +245,12 @@ testEnded will call your bookkeeping method noteEnd.
                 #print "DEBUG getStatus 420 statusCode is %d " % test.statusCode
                 if lsf_error:
                     print("ATS LSF Development: LSFE Detected statusCode is %d " % test.statusCode)
-                    test.statusCode=2
+                    test.statusCode = 2
                     test.setEndDateTime()
                     status = LSFERROR
 
                 else:
-                    status= FAILED
+                    status = FAILED
 
 
         # Send test's stdout/stderr to file and to terminal
@@ -271,8 +271,8 @@ testEnded will call your bookkeeping method noteEnd.
 
     def testEnded(self, test, status):
         """Do book-keeping when a job has exited;
-call noteEnd for machine-specific part.
-"""
+           call noteEnd for machine-specific part.
+        """
         from ats import configuration
         if MachineCore.debugClass:
             print("DEBUG MachineCore.testEnded invoked cwd= %s " % (os.getcwd()))
@@ -282,20 +282,20 @@ call noteEnd for machine-specific part.
         globalPostrunScript         = test.options.get('globalPostrunScript', None)
         # Strip quotes which are somehow added to the string in Python3
         # Otherwise we can't verify the file exists or execute it.
-        globalPostrunScript=globalPostrunScript.replace('"', '')
+        globalPostrunScript = globalPostrunScript.replace('"', '')
 
         #verbose                     = test.options.get('verbose', False)
         verbose                     = configuration.options.debug
 
         if not (globalPostrunScript == "unset"):
             here = os.getcwd()
-            os.chdir( test.directory )
-            if os.path.exists( globalPostrunScript ):
-                self._executePreOrPostRunScript( globalPostrunScript, test, verbose, globalPostrunScript_outname )
+            os.chdir(test.directory)
+            if os.path.exists(globalPostrunScript):
+                self._executePreOrPostRunScript(globalPostrunScript, test, verbose, globalPostrunScript_outname)
             else:
                 log("ATS ERROR: globalPostrunScript %s not found" % (globalPostrunScript), echo=True)
                 sys.exit(-1)
-            os.chdir( here )
+            os.chdir(here)
 
         self.numberTestsRunning -= 1
         if MachineCore.debugClass or MachineCore.canRunNow_debugClass:
@@ -332,7 +332,7 @@ call noteEnd for machine-specific part.
             if test.stdOutLocGet() != 'terminal':
                 test.fileHandleClose()
 
-    def launch (self, test):
+    def launch(self, test):
         """Start executable using a suitable command.
            Return True if able to do so.
            Call noteLaunch if launch succeeded."""
@@ -341,14 +341,14 @@ call noteEnd for machine-specific part.
         #print test.__dict__
         ##print self.__dict__
 
-        nosrun  = test.options.get('nosrun', False)
-        serial  = test.options.get('serial', False) # support serial=True on a per-test basis for backwards compatability for a while
+        nosrun = test.options.get('nosrun', False)
+        serial = test.options.get('serial', False) # support serial=True on a per-test basis for backwards compatability for a while
         if nosrun == True or serial == True:
             test.commandList = self.calculateBasicCommandList(test)
             test.cpus_per_task = 1
         else:
             test.commandList = self.calculateCommandList(test)
-            if  test.commandList==None:
+            if test.commandList == None:
                 log("ATS def launch returning false, commandList is None", echo=True)
                 return False
 
@@ -449,7 +449,7 @@ call noteEnd for machine-specific part.
             if deck_directory == None or deck_directory == '':
                 deck_directory = os.getcwd()
 
-            if not os.path.isdir( directory ) :
+            if not os.path.isdir(directory):
 
                 if MachineCore.debugClass:
                     print("MachineCore.launch \n\tcwd=%s \n\tdir=%s \n\tdeck_directory=%s" %
@@ -531,13 +531,13 @@ The subprocess part of launch. Also the part that might fail.
 
         from ats import configuration
         # See if user specified a file to use as stdin to the test problem.
-        stdin_file                  = test.options.get('stdin', None)
-        globalPrerunScript_outname  = test.globalPrerunScript_outname
+        stdin_file                 = test.options.get('stdin', None)
+        globalPrerunScript_outname = test.globalPrerunScript_outname
 
         globalPrerunScript          = test.options.get('globalPrerunScript', None)
         # Strip quotes which are somehow added to the string in Python3
         # Otherwise we can't verify the file exists or execute it.
-        globalPrerunScript=globalPrerunScript.replace('"', '')
+        globalPrerunScript = globalPrerunScript.replace('"', '')
 
         #verbose                     = test.options.get('verbose', False)
         verbose                     = configuration.options.debug
@@ -545,13 +545,13 @@ The subprocess part of launch. Also the part that might fail.
 
         if not (globalPrerunScript == "unset"):
             here = os.getcwd()
-            os.chdir( test.directory )
-            if os.path.exists( globalPrerunScript ):
-                self._executePreOrPostRunScript( globalPrerunScript, test, verbose, globalPrerunScript_outname )
+            os.chdir(test.directory)
+            if os.path.exists(globalPrerunScript):
+                self._executePreOrPostRunScript(globalPrerunScript, test, verbose, globalPrerunScript_outname)
             else:
                 log("ATS ERROR: globalPrerunScript %s not found" % (globalPrerunScript), echo=True)
                 sys.exit(-1)
-            os.chdir( here )
+            os.chdir(here)
 
         try:
             Eadd    = test.options.get('env', None)
@@ -594,7 +594,7 @@ The subprocess part of launch. Also the part that might fail.
             # 2016-12-02
             # Default sleep is now 0 on all systems.
 
-            # 2021-Sep-21  
+            # 2021-Sep-21
             # Per project request.  If nosrun is on, do not sleep (as we are not using MPI in that scenario)
             #
             nosrun  = test.options.get('nosrun', False)
@@ -794,12 +794,12 @@ is hard upper limit.
 
         # print "DEBUG Machine:MachineCore %s %d" % (name, npMaxH)
 
-        self.name =  name
+        self.name = name
         self.numberTestsRunning = 0
         self.numberNodesExclusivelyUsed = 0
         self.numberTestsRunningMax = max(1, abs(npMaxH))
         self.numNodes = -1
-        self.npMaxH= npMaxH    # allow the machine modules to access this value
+        self.npMaxH = npMaxH    # allow the machine modules to access this value
         self.hardLimit = (npMaxH > 0)
         self.naptime = 0.2 #number of seconds to sleep between checks on running tests.
         self.running = []
@@ -834,7 +834,7 @@ then modify if necessary.
     def periodicReport(self):
         "Make the machine-specific part of periodic report to the terminal."
         terminal(len(self.running), "tests running on", self.numberTestsRunning,
-              "of", self.numberTestsRunningMax, "processors.")
+                 "of", self.numberTestsRunningMax, "processors.")
 
     def canRun(self, test):
         """
@@ -954,12 +954,12 @@ A fake batch you can use for debugging input by setting::
         return "BatchSimulator"
 
     def __init__(self, name, npMaxH):
-        self.name =  name
+        self.name = name
         self.npMaxH = npMaxH
         self.np = npMaxH
 
     def load(self, batchlist):
         "Simulate the batch system"
-        log("Simulation of batch load:",  echo=True)
+        log("Simulation of batch load:", echo=True)
         for t in batchlist:
             log(t, echo=True)
