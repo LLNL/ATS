@@ -63,7 +63,6 @@ Toss 4  Cray rzvernal with rocm 5.4.3
 
     mpihipcc hello_ats.c        <- build the code
     ./create_test_ats.py        <- create the ats test file
-    export MACHINE_TYPE=flux00  <- set machine type to flux00
     atsflux  test.ats           <- test using flux
     export -n MACHINE_TYPE
 
@@ -83,8 +82,6 @@ Toss 4   Testing on slurm based toss4 machines such as rzwhippet
 
     mpicc hello_ats.c            <- build the code
     ./create_test_ats.py         <- create the ats test file
-    export MACHINE_TYPE=slurm36  <- if on genie or another 36 core machine
-    export MACHINE_TYPE=slurm112 <- if on whippet or another 112 core machine
     atslite1 test.ats           <- test using slurm
     export -n MACHINE_TYPE
 
