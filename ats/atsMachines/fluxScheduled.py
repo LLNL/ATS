@@ -130,7 +130,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # 1) cuttime is highest priority.  This will have been copied from options.cuttime into self.cuttime
         # 2) deck timelmit is 2nd priority. Check if 'timelimit' is in the test options
         # 3) --timelimit (or default timelmit) is last
-        if self.cuttime is not None:        
+        if self.cuttime is not None:
             max_time = self.cuttime
         elif 'timelimit' in test.options:
             max_time = test.options.get("timelimit")
