@@ -44,7 +44,7 @@ Sample ATS runs of the code
    atslite1 --smpi_off                      <- blueos version
 
 --------------------------------------------------------------------------------
-Toss 3 (rzgenie, etc.).  
+Toss 3 (rzgenie, etc.).
 --------------------------------------------------------------------------------
     export PATH=${PATH}:/usr/gapps/ats/scripts
     module load python/3.8.2
@@ -77,10 +77,10 @@ Toss 4  Cray rzvernal with rocm 5.4.3
 
     mpihipcc -g -fopenmp -O2 -o omp_test omp_test.cc
     ./create_test_ats.py
-    atslite1 test.ats
+    atsflux test.ats
 
 --------------------------------------------------------------------------------
-Toss 4 (rzwhippet, etc.). 
+Toss 4 (rzwhippet, etc.).
 --------------------------------------------------------------------------------
     export PATH=${PATH}:/usr/gapps/ats/scripts
     module load python/3.9.12
@@ -88,11 +88,9 @@ Toss 4 (rzwhippet, etc.).
 
     mpicxx -g -qopenmp -pthread -O2 -o omp_test omp_test.cc
     ./create_test_ats.py
-    export MACHINE_TYPE=slurm36 
-    export MACHINE_TYPE=slurm112
-    atslite1 --numNodes=3 test.ats   
+    atslite1 --numNodes=3 test.ats
 
-    ats test.ats --verbose --exclusive  --numNodes=3 
+    ats test.ats --verbose --exclusive  --numNodes=3
 
     export -n MACHINE_TYPE
 

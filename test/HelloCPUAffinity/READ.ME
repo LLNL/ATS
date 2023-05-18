@@ -35,9 +35,9 @@ Toss 3 (rzgenie, etc.).  Only use Slurm
         // Modify this line to be the ats install you are testing
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_affinity.cc  
-    ./create_test_ats.py     
-    atslite1 test.ats        
+    mpicc hello_affinity.cc
+    ./create_test_ats.py
+    atslite1 test.ats
 
 --------------------------------------------------------------------------------
 Toss 4  Cray rzvernal with rocm 5.4.3
@@ -53,10 +53,9 @@ Toss 4  Cray rzvernal with rocm 5.4.3
     export ROCR_VISIBLE_DEVICES=0,1,2,3
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-5.4.3-magic/llvm/lib
 
-    mpihipcc hello_affinity.cc  
-    ./create_test_ats.py        
-    export MACHINE_TYPE=flux00
-    atsflux  test.ats        
+    mpihipcc hello_affinity.cc
+    ./create_test_ats.py
+    atsflux  test.ats
     export -n MACHINE_TYPE
 
 --------------------------------------------------------------------------------
@@ -72,9 +71,7 @@ Toss 4   Testing on slurm based toss4 machines such as rzwhippet
 
     mpicc hello_affinity.cc
     ./create_test_ats.py
-    export MACHINE_TYPE=slurm36  
-    export MACHINE_TYPE=slurm112 
-    atslite1 test.ats           
+    atslite1 test.ats
     export -n MACHINE_TYPE
 
     # POODLE TEST LINE (or any other system without cross node MPI)
