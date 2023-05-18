@@ -85,7 +85,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.toss_nn   = options.toss_nn
         self.cuttime   = options.cuttime
 
-    def set_nt_num_nodes(self,test):
+    def set_nt_num_nodes(self, test):
 
         # Command line option nt over-rides what is in the deck.
         test.nt = 1
@@ -122,7 +122,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         ret = "flux run -o cpu-affinity=per-task -o mpibind=off".split()
         np = test.options.get("np", 1)
-    
+
         FluxScheduled.set_nt_num_nodes(self, test)
         # nn = test.options.get("nn", 0)
 
@@ -136,7 +136,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             max_time = test.options.get("timelimit")
         else:
             max_time = self.timelimit
-        
+
         ret.append(f"-t{max_time}")
 
         #if np > self.coresPerNode:
