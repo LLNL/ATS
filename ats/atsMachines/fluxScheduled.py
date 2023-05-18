@@ -237,7 +237,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: Before Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
         self.numProcsAvailable -= (np * test.cpus_per_task)
         if test.num_nodes > 0:
@@ -245,7 +245,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: After  Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
     def noteEnd(self, test):
         """A test has finished running. """
@@ -256,7 +256,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             self.numberNodesExclusivelyUsed -= test.num_nodes
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: After  Job Finished remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
     def periodicReport(self):
         """
@@ -311,11 +311,3 @@ class FluxScheduled(lcMachines.LCMachineCore):
                     return 0
                 else:
                     return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
-              
-
-
-
-
-
-
-
