@@ -159,9 +159,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
         ret.append(f"-c{test.cpus_per_task}")
 
         """GPU scheduling interface"""
-        ngpu = test.options.get("ngpu", 0)
-        if ngpu:
-            ret.append(f"-g{ngpu}")
+        gpus_per_task = test.options.get("gpus_per_task", 0)
+        if gpus_per_task:
+            print("Ngpu per task option working as expected.")
+            ret.append(f"--gpus-per-task={gpus_per_task}")
+
+        gpus_per_node = test.options.get("gpus_per_node", 0)
+        if gpus_per_node:
+            print("Ngpu per node option working as expected.")
+            ret.append(f"--gpus-per-node={gpus_per_node}")
+            ret.append(f"--nodes={gpus_per_node}")
+
 
 
         """
