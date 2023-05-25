@@ -155,20 +155,27 @@ class FluxScheduled(lcMachines.LCMachineCore):
         #In order to marry ATS's description of threading with Flux's understanding, Flux will
         #request 1 core per thread
         #"""
-        ret.append(f"-n{np}")
-        ret.append(f"-c{test.cpus_per_task}")
+        # ret.append(f"-n{np}")  # Need to comment these out if we are using per-resource options like tasks-per-node
+        # ret.append(f"-c{test.cpus_per_task}")
 
         """GPU scheduling interface"""
         gpus_per_task = test.options.get("gpus_per_task", 0)
         if gpus_per_task:
-            print("Ngpu per task option working as expected.")
             ret.append(f"--gpus-per-task={gpus_per_task}")
 
         gpus_per_node = test.options.get("gpus_per_node", 0)
         if gpus_per_node:
-            print("Ngpu per node option working as expected.")
+            # Need to add check and good message about gpus_per_node needs to be less than 8 (for vernal)
             ret.append(f"--gpus-per-node={gpus_per_node}")
-            ret.append(f"--nodes={gpus_per_node}")
+            if not test.num_nodes:
+                print("We need to assign nodes.")
+                # This will mostlikely be deleted, was playing with node assignment based on gpus requested
+                # nodes = (gpus_per_node // 8) + 1 # This eight is specifically for vernal
+                # print(f"This is what we are trying to put into nodes: {nodes}")
+                ret.append(f"--nodes=1") #something needs to get nodes if we are using a per-node option
+        else:
+            ret.append(f"-n{np}")  # Cannot use these options if we are using per-resource options like tasks-per-node
+            ret.append(f"-c{test.cpus_per_task}")
 
 
 
