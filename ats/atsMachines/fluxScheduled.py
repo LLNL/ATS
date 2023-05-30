@@ -22,6 +22,7 @@ from ats import terminal
 from ats.atsMachines import lcMachines
 from ats.tests import AtsTest
 from ats import configuration
+from ats import log
 
 
 class FluxScheduled(lcMachines.LCMachineCore):
@@ -165,14 +166,12 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         gpus_per_node = test.options.get("gpus_per_node", 0)
         if gpus_per_node:
-            # Need to add check and good message about gpus_per_node needs to be less than 8 (for vernal)
+            if gpus_per_node > (self.numGPUs / self.numNodes):
+                log(f"ATS WARNING: Number of gpus_per_node requested is higher than this machine can support. This machine allows for a max of: {self.numGPUs // self.numNodes}", echo=True)
             ret.append(f"--gpus-per-node={gpus_per_node}")
             if not test.num_nodes:
-                print("We need to assign nodes.")
-                # This will mostlikely be deleted, was playing with node assignment based on gpus requested
-                # nodes = (gpus_per_node // 8) + 1 # This eight is specifically for vernal
-                # print(f"This is what we are trying to put into nodes: {nodes}")
-                ret.append(f"--nodes=1") #something needs to get nodes if we are using a per-node option
+                log("ATS WARNING: number of nodes not set when using gpus_per_node, defaulting to nodes=1", echo=True)
+                ret.append(f"--nodes=1")
         else:
             ret.append(f"-n{np}")  # Cannot use these options if we are using per-resource options like tasks-per-node
             ret.append(f"-c{test.cpus_per_task}")
