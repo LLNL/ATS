@@ -380,7 +380,8 @@ static void MC_Core_Affinity(int world_rank, int world_size)
 
     if (world_rank == 0)
     {
-        printf("%s    -------- MPI Rank / Thread Id / Node / Core Affinity  ------------\n","");
+        printf("    -------- MPI Rank / Thread Id / Node / Core Affinity  ------------\n");
+        printf("    %i MPI Ranks\n", world_size);
         printf("%s",print_buf);
         for (size_t source = 1; source<world_size; ++source)
         {

@@ -11,9 +11,97 @@ export MPICH_SMP_SINGLE_COPY_MODE=NONE
 make clean
 make hip
 
-flux run -N 1 -n 8 -c 8  -g 1 ./a.out
-flux run -N 1 -n 2 -c 32 -g 1 ./a.out
+    # non ats runs
+    # Inspect cpu affinity and gpu devices for correctnes
+flux alloc -N2 -n112 --exclusive --time-limit=30m
+
+    // per task syntax
+flux run -N 1 -n 1 -c 64  --gpus-per-task=8 ./a.out
+
+    // per resource syntax
+flux run -N 2 --tasks-per-node 2 ./a.out
+
+    # ats tests
+/usr/apps/ats/7.0.112/bin/atslite1 test.ats
+
+--------------------------------------------------------------------------------
+Test a GPU code built with cuda/nvcc
+--------------------------------------------------------------------------------
+make clean
+make nvcc
+
+    # non ats runs
+    # Inspect cpu affinity and gpu devices for correctness
+
+lalloc 2                
+                        <- these will use the default lrun bind option
+lrun -N2 -n4 ./a.out    <- each mpi rank will see 2 GPU devices
+lrun -N2 -n8 ./a.out    <- each mpi rank will see 1 GPU device, no duplicate gpu devices
+lrun -N2 -n16 ./a.out   <- each mpi rank will see 1 GPU device, over subscribed devices will
+                        <- be seen by multiple ranks
+
+                                    <- disable bind
+lrun --bind=off -N2 -n16 ./a.out    <- each MPI rank will see all 4 gpu devices on the node
+lrun --mpibind=off -N2 -n16 ./a.out <- same as above
+
+    # ats tests
+    # these tests should always pass, but they do not self-verify. That is we do not vet
+    # the cpu and gpu affinity in the tes case, so look at them by hand for reasonableness
+    # lrun will 'pack' the jobs.  jsrun will use a resource list
+
+/usr/apps/ats/7.0.112/bin/atslite1 
+/usr/apps/ats/7.0.112/bin/atslite1 --lrun -verbose
+/usr/apps/ats/7.0.112/bin/atslite1 --lrun --lrun_pack -verbose
+/usr/apps/ats/7.0.112/bin/atslite1 --jsrun_exclusive  -verbose
 
 
+--------------------------------------------------------------------------------
+Flux Documentation:
+--------------------------------------------------------------------------------
+   Common resource options
+       These commands take the following common resource allocation options:
 
+       -N, --nodes=N
+              Set the number of nodes to assign to the job. Tasks will be distributed evenly across the allocated nodes, unless the per-resource options  (noted  below)  are
+              used  with  submit,  run,  or  bulksubmit. It is an error to request more nodes than there are tasks. If unspecified, the number of nodes will be chosen by the
+              scheduler.
 
+       -x, --exclusive
+              Indicate to the scheduler that nodes should be exclusively allocated to this job. It is an error to specify this option without  also  using  -N,  --nodes.  If
+              --nodes  is  specified  without --nslots or --ntasks, then this option will be enabled by default and the number of tasks or slots will be set to the number of
+              requested nodes.
+
+   Per-task options
+       flux-run(1), flux-submit(1) and flux-bulksubmit(1) take two sets of mutually exclusive options to specify the size of the job request.  The most common form uses  the
+       total number of tasks to run along with the amount of resources required per task to specify the resources for the entire job:
+
+       -n, --ntasks=N
+              Set the number of tasks to launch (default 1).
+
+       -c, --cores-per-task=N
+              Set the number of cores to assign to each task (default 1).
+
+       -g, --gpus-per-task=N
+              Set the number of GPU devices to assign to each task (default none).
+
+   Per-resource options
+       The  second  set of options allows an amount of resources to be specified with the number of tasks per core or node set on the command line. It is an error to specify
+       any of these options when using any per-task option listed above:
+
+       --cores=N
+              Set the total number of cores.
+
+       --tasks-per-node=N
+              Set the number of tasks per node to run.
+
+       --gpus-per-node=N
+              With -N, --nodes, request a specific number of GPUs per node.
+
+       --tasks-per-core=N
+              Force a number of tasks per core. Note that this will run N tasks per allocated core. If nodes are  exclusively  scheduled  by  configuration  or  use  of  the
+              --exclusive  flag, then this option could result in many more tasks than expected. The default for this option is effectively 1, so it is useful only for overâ
+              subscribing tasks to cores for testing purposes. You probably don't want to use this option.
+
+--------------------------------------------------------------------------------
+end of file
+--------------------------------------------------------------------------------

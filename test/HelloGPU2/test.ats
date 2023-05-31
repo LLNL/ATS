@@ -2,14 +2,11 @@ import os
 glue(independent=True)
 glue(keep=True)
 
-SAD Placeholder, have yet to add some ats options, we
-want to test nn, np, and ngpu variations with flux and with lsf
+test(executable='./a.out', nn=1, np=1, ngpu=1)
+test(executable='./a.out', nn=1, np=1, ngpu=1)
+test(executable='./a.out', nn=1, np=4, ngpu=1)
+test(executable='./a.out', nn=2, np=8, ngpu=1)
 
-These are not done yet
-
-t1=test(executable='./a.out',       np=1, ngpu=1)
-t2=test(executable='./a.out', nn=1, np=1, ngpu=4)
-t2=test(executable='./a.out', nn=1, np=2, ngpu=2)
-t2=test(executable='./a.out', nn=1, np=4, ngpu=1)
-t2=test(executable='./a.out', nn=1, np=4, ngpu=1)
-t2=test(executable='./a.out', nn=2, np=8, ngpu=2)
+# t2=test(executable='./a.out', nn=1, np=4, ngpu=1)
+# t2=test(executable='./a.out', nn=1, np=4, ngpu=1)
+# t2=test(executable='./a.out', nn=2, np=8, ngpu=2)
