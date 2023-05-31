@@ -1,0 +1,19 @@
+--------------------------------------------------------------------------------
+Test a GPU code built with hip/rocm
+--------------------------------------------------------------------------------
+
+module load python/3.9.12
+module load rocmcc/5.5.0-cce-15.0.1g-magic
+export ROCR_VISIBLE_DEVICES=0,1,2,3
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-5.5.0-cce-15.0.1g-magic/llvm/lib
+export MPICH_SMP_SINGLE_COPY_MODE=NONE
+
+make clean
+make hip
+
+flux run -N 1 -n 8 -c 8  -g 1 ./a.out
+flux run -N 1 -n 2 -c 32 -g 1 ./a.out
+
+
+
+
