@@ -22,7 +22,7 @@ static void Call_Cuda_Hello_Method1(int mpi_rank, int some_user_number);
 #if 0
 static void Call_Cuda_Hello_Method2(int mpi_rank);
 #endif
-static void MC_Core_Affinity(int mpi_rank, int mpi_size);
+static void MC_Core_Affinity(int mpi_rank, int mpi_size, int *node_num);
 static char *MC_cpuset_to_cstr(cpu_set_t *mask, char *str);
 
 template <typename Function> __global__ void SAD_operatorLaunch(Function lambda, int unused)
@@ -188,7 +188,7 @@ static void Call_Cuda_Hello_Method2(int mpi_rank)
 
 int main(int argc, char *argv[])
 {
-    int my_rank = 0, my_num_mpi = 1;
+    int my_rank = 0, my_num_mpi = 1, node_num = 0;
     const int kb = 1024;
     const int mb = kb * kb;
     char print_buf[256];
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
     // ----------------------------------------------------------------------
     // Call routine to print cpu core affinity
     // ----------------------------------------------------------------------
-    MC_Core_Affinity(my_rank, my_num_mpi);
+    MC_Core_Affinity(my_rank, my_num_mpi, &node_num);
 
     // ----------------------------------------------------------------------
     // Print GPU device information
@@ -271,11 +271,11 @@ int main(int argc, char *argv[])
             my_uuid += (unsigned long)props.uuid.bytes[uuid_ndx];
         }
 
-        snprintf(small_buf, 15, "%lu ", my_uuid);
+        snprintf(small_buf, 15, "%i-%lu ", node_num, my_uuid);
 
 #elif defined(HAVE_HIP)
         // For HIP, use the unique pciBusID for the GPU identifier.
-        snprintf(small_buf, 15, "%i ", props.pciBusID);
+        snprintf(small_buf, 15, "%i-%i ", node_num, props.pciBusID);
 #endif
         strcat(print_buf, small_buf);
     }
@@ -347,7 +347,7 @@ Comment out for now, keep in case wanted later
 //----------------------------------------------------------------------------------------------------------------------
 // 
 //----------------------------------------------------------------------------------------------------------------------
-static void MC_Core_Affinity(int world_rank, int world_size)
+static void MC_Core_Affinity(int world_rank, int world_size, int *node_num)
 {
     int thread, hostname_sz;
     cpu_set_t coremask;
@@ -356,6 +356,10 @@ static void MC_Core_Affinity(int world_rank, int world_size)
     MPI_Status status;
 
     MPI_Get_processor_name(hostname, &hostname_sz);
+
+    // Get the integer part of the node name. blue47 is 47 for instance.
+    size_t indx2 = strcspn(hostname, "0123456789");
+    *node_num = atoi(&hostname[indx2]);
 
     memset(clbuf, 0, sizeof(clbuf));
 
