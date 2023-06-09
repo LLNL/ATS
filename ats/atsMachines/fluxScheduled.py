@@ -22,6 +22,7 @@ from ats import terminal
 from ats.atsMachines import lcMachines
 from ats.tests import AtsTest
 from ats import configuration
+from ats import log
 
 
 class FluxScheduled(lcMachines.LCMachineCore):
@@ -155,13 +156,26 @@ class FluxScheduled(lcMachines.LCMachineCore):
         #In order to marry ATS's description of threading with Flux's understanding, Flux will
         #request 1 core per thread
         #"""
-        ret.append(f"-n{np}")
-        ret.append(f"-c{test.cpus_per_task}")
+        # ret.append(f"-n{np}")  # Need to comment these out if we are using per-resource options like tasks-per-node
+        # ret.append(f"-c{test.cpus_per_task}")
 
         """GPU scheduling interface"""
-        ngpu = test.options.get("ngpu", 0)
-        if ngpu:
-            ret.append(f"-g{ngpu}")
+        gpus_per_task = test.options.get("gpus_per_task", 0)
+        if gpus_per_task:
+            ret.append(f"--gpus-per-task={gpus_per_task}")
+
+        gpus_per_node = test.options.get("gpus_per_node", 0)
+        if gpus_per_node:
+            if gpus_per_node > (self.numGPUs / self.numNodes):
+                log(f"ATS WARNING: Number of gpus_per_node requested is higher than this machine can support. This machine allows for a max of: {self.numGPUs // self.numNodes}", echo=True)
+            ret.append(f"--gpus-per-node={gpus_per_node}")
+            if not test.num_nodes:
+                log("ATS WARNING: number of nodes not set when using gpus_per_node, defaulting to nodes=1", echo=True)
+                ret.append(f"--nodes=1")
+        else:
+            ret.append(f"-n{np}")  # Cannot use these options if we are using per-resource options like tasks-per-node
+            ret.append(f"-c{test.cpus_per_task}")
+
 
 
         """
