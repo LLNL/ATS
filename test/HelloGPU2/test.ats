@@ -1,0 +1,12 @@
+import os
+glue(independent=True)
+glue(keep=True)
+
+test(executable='./a.out', nn=1, np=1, ngpu=1)
+test(executable='./a.out', nn=1, np=1, ngpu=1)
+test(executable='./a.out', nn=1, np=4, ngpu=1)
+test(executable='./a.out', nn=2, np=8, ngpu=1)
+
+# t2=test(executable='./a.out', nn=1, np=4, ngpu=1)
+# t2=test(executable='./a.out', nn=1, np=4, ngpu=1)
+# t2=test(executable='./a.out', nn=2, np=8, ngpu=2)

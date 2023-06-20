@@ -1,0 +1,23 @@
+CXX      = 	/usr/tce/packages/cuda/cuda-11.7.0/bin/nvcc 
+CXXFLAGS = 	-g -O1 -DHAVE_NVCC \
+	       	-lineinfo -std c++11 \
+	       	-ccbin /usr/tce/packages/clang/clang-ibm-14.0.5/bin/clang++ \
+	       	-arch sm_70 -x=cu --expt-extended-lambda -m64 -allow-unsupported-compiler \
+	       	-rdc=true \
+	       	-Xcudafe --display_error_number -Xcompiler=-Wno-unused-variable \
+			-I/usr/tce/packages/spectrum-mpi/ibm/spectrum-mpi-rolling-release/include
+LD       = 	/usr/tce/packages/cuda/cuda-11.7.0/bin/nvcc
+LDFLAGS  = 	-L/usr/tce/packages/spectrum-mpi/ibm/spectrum-mpi-rolling-release/lib \
+			-lmpiprofilesupport -lmpi_ibm
+
+a.out:gputest_this.cc
+	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o a.out gputest_this.cc
+
+clean:
+	rm -vf a.out
+	rm -vf load.map*
+
+
+# ----------------------------------------------------------------------------------------
+# End of file
+# ----------------------------------------------------------------------------------------
