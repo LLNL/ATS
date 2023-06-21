@@ -42,6 +42,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
 #include <mpi.h>
 
 #ifdef HAVE_OPENMP
@@ -162,6 +163,12 @@ int main(int argc, char **argv)
        sleep_seconds = atoi(argv[1]); 
     }
 
+    time_t my_time = time(NULL);
+    if (my_rank == 0)
+    {
+        printf("START TIME %s", ctime(&my_time));
+    }
+
     SAD_Core_Affinity();
 
     if (sleep_seconds > 0)
@@ -180,6 +187,13 @@ int main(int argc, char **argv)
     }
 
     if (my_rank == 0) { printf("Good-night Gracie.\n"); }
+
+    my_time = time(NULL);
+    if (my_rank == 0)
+    {
+        printf("STOP  TIME %s", ctime(&my_time));
+    }
+
     return(0);
 }
 

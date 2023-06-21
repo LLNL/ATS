@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <sched.h>
+#include <time.h>
 #include <mpi.h>
 #include "gputest_this.hh"
 
@@ -210,6 +211,12 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &my_num_mpi);
 
+    time_t my_time = time(NULL);
+    if (my_rank == 0)
+    {
+        printf("START TIME %s", ctime(&my_time));
+    }
+
     // ---------------------------------
     // Print compiler information
     // ---------------------------------
@@ -336,12 +343,18 @@ Comment out for now, keep in case wanted later
     Call_Cuda_Hello_Method2(my_rank);
 #endif
 
+    my_time = time(NULL);
+    if (my_rank == 0)
+    {
+        printf("STOP  TIME %s", ctime(&my_time));
+    }
+
     // ----------------------------------------------------------------------
     // Shut down  MPI
     // ----------------------------------------------------------------------
     MPI_Finalize();
 
-
+    return(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
