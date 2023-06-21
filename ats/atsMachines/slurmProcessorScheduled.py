@@ -12,6 +12,8 @@
 #ATS:slurm128                 SELF SlurmProcessorScheduled 128
 #ATS:toss_3_x86_64_ib        SELF SlurmProcessorScheduled 36
 #ATS:toss_3_x86_64           SELF SlurmProcessorScheduled 36
+#ATS:toss_4_x86_64_ib        SELF SlurmProcessorScheduled 36
+#ATS:toss_4_x86_64           SELF SlurmProcessorScheduled 36
 #ATS:toss_4_x86_64_ib_cray   SELF SlurmProcessorScheduled 64
 
 import inspect
@@ -66,12 +68,18 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
             self.npMax= self.numberTestsRunningMax
 
         # Set cores on alastor to 20
+        # Set cores to 112 on whippet
         if "HOSTNAME" in os.environ.keys():
             self.hostname= os.getenv("HOSTNAME")
             if self.hostname.startswith('rzalastor'):
                 print("Setting npMax to 20 on alastor")
                 self.npMax = 20
                 self.npMaxH = 20
+            elif self.hostname.startswith('rzwhippet'):
+                print("Setting npMax to 112 on whippet")
+                self.npMax = 112
+                self.npMaxH = 112
+            
 
 
         # Does slurm see the ATS process itself as utilizing a core?
