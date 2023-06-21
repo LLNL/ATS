@@ -31,7 +31,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
     from ATS tests.
     """
 
-    debug = False
+    debug = True
     debug_canRunNow = False
     debug_noteLaunch = False
 
@@ -54,6 +54,12 @@ class FluxScheduled(lcMachines.LCMachineCore):
             flux.resource.list.resource_list(self.fluxHandle).get().up.ngpus
         )
         self.numberNodesExclusivelyUsed = 0
+
+        if FluxScheduled.debug:
+            print("DEBUG: FluxScheduled init : self.numNodes=%i" % (self.numNodes))
+            print("DEBUG: FluxScheduled init : self.maxCores=%i" % (self.maxCores))
+            print("DEBUG: FluxScheduled init : self.numCores=%i" % (self.numCores))
+            print("DEBUG: FluxScheduled init : self.numGPUs =%i" % (self.numGPUs))
 
         # self.coresPerNode = self.maxCores // self.numNodes
         self.npMax  = multiprocessing.cpu_count()
@@ -83,8 +89,14 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         self.exclusive = options.exclusive
         self.timelimit = options.timelimit
-        self.toss_nn   = options.toss_nn
         self.cuttime   = options.cuttime
+        self.flux_run_args  = options.flux_run_args
+
+        if FluxScheduled.debug:
+            print("DEBUG: FluxScheduled examineOptions : self.exclusive=%s" % (self.exclusive))
+            print("DEBUG: FluxScheduled examineOptions : self.timelimit=%s" % (self.timelimit))
+            print("DEBUG: FluxScheduled examineOptions : self.cuttime=%s" % (self.cuttime))
+            print("DEBUG: FluxScheduled examineOptions : self.flux_run_args=%s" % (self.flux_run_args))
 
     def set_nt_num_nodes(self,test):
 
@@ -121,7 +133,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         :param test: the test to be run, of type ATSTest. Defined in /ats/tests.py.
         """
-        ret = "flux run -o cpu-affinity=per-task -o mpibind=off".split()
+        # ret = "flux run -o cpu-affinity=per-task -o mpibind=off".split()
+        ret = "flux run ".split()
         np = test.options.get("np", 1)
     
         FluxScheduled.set_nt_num_nodes(self, test)
@@ -164,19 +177,42 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if gpus_per_task:
             ret.append(f"--gpus-per-task={gpus_per_task}")
 
-        gpus_per_node = test.options.get("gpus_per_node", 0)
-        if gpus_per_node:
-            if gpus_per_node > (self.numGPUs / self.numNodes):
-                log(f"ATS WARNING: Number of gpus_per_node requested is higher than this machine can support. This machine allows for a max of: {self.numGPUs // self.numNodes}", echo=True)
-            ret.append(f"--gpus-per-node={gpus_per_node}")
-            if not test.num_nodes:
-                log("ATS WARNING: number of nodes not set when using gpus_per_node, defaulting to nodes=1", echo=True)
-                ret.append(f"--nodes=1")
-        else:
-            ret.append(f"-n{np}")  # Cannot use these options if we are using per-resource options like tasks-per-node
-            ret.append(f"-c{test.cpus_per_task}")
+        # Let's punt on gpus_per_node or gpus_per_job or gpus_per_resource in LSF speak for now.
+        # Let's get gpus_per_task working correctly first.  This will also be synonymous with 
+        # the historical 'ngpu' option that was used on BlueOS.
+        # But commenting out gpus_per_node for now.
+        # gpus_per_node = test.options.get("gpus_per_node", 0)
+        # if gpus_per_node:
+        #     if gpus_per_node > (self.numGPUs / self.numNodes):
+        #         log(f"ATS WARNING: Number of gpus_per_node requested is higher than this machine can support. This machine allows for a max of: {self.numGPUs // self.numNodes}", echo=True)
+        #     ret.append(f"--gpus-per-node={gpus_per_node}")
+        #     if not test.num_nodes:
+        #         log("ATS WARNING: number of nodes not set when using gpus_per_node, defaulting to nodes=1", echo=True)
+        #         ret.append(f"--nodes=1")
+        # else:
+        #     ret.append(f"-n{np}")  # Cannot use these options if we are using per-resource options like tasks-per-node
+        #     ret.append(f"-c{test.cpus_per_task}")
+
+        # Need to set -n{np} and -c{test.cpus_per_task}.  But we also need to account for accessing
+        # GPUS using flux.  In testing flux outside of ATS it is evident that one needs to increase the -c option
+        # in order to access the GPUS.   The -g option alone does not suffice.
+        # In a test platform which has 64 CPUs and 8 GPUS, then there are 1 GPU for every 8 CPUS and the 
+        # -c option must be used to ensure GPU access as follows:
+        #
+        # 8 MPI 1 GPU each: -n 8 -c 8   <-- each MPI rank reserves the 8 CPUS neede to get the 1 GPU
+        # 4 MPI 2 GPU each: -n 4 -c 16  <-- each MPI rank reserves 16 CPUs to get the 2 GPUS.
+        # 2 MPI 4 GPU each: -n 2 -c 32
+        # 1 MPI 8 GPU each: -n 1 -c 64 
+        #
+        # Thus we need to find the 'c_multiplier' needed for each GPU.  In this case we can divide 
+        # the number of CPUs by the number of GPUS  (64 / 8) and get 8 as the factor. 
+        # And we can use this to set the -c option.
 
 
+        # Pass any arbitrary string provided by the user here.  This could be any of the -o options for affinity
+        # preferences, or any other valid 'flux run' option
+        if self.flux_run_args != "unset":
+            ret.append(self.flux_run_args)
 
         """
         CPU affinity enabled settings will go here. These are applicable 
