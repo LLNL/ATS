@@ -217,10 +217,10 @@ class AtsTest (object):
 
             script = script.replace('$ATSROOT', configuration.ATSROOT)
             if len(configuration.ATSROOT)==0:
-                script= script[1:]           # remove leading "/" or "\"
+                script = script[1:]           # remove leading "/" or "\"
             script = script % rootdict
             self.executable = Executable(script)
-            if self.directory== '':
+            if self.directory == '':
                 self.directory = os.getcwd()
             path = self.executable.path
             _, filename = os.path.split(path)
@@ -234,10 +234,10 @@ class AtsTest (object):
             if script:
                 script = abspath(script) % self.options
                 self.clas.insert(0, script)
-                if self.directory== '':
+                if self.directory == '':
                     self.directory, filename = os.path.split(script)
             else:
-                if self.directory== '':
+                if self.directory == '':
                     self.directory = os.getcwd()
                 _, filename = os.path.split(self.executable.path)
 
@@ -360,7 +360,7 @@ class AtsTest (object):
             d.set(SKIPPED, "Ancestor %s status is %s" %(self.name, self.status))
         elif self.expectedResult is not PASSED:
             d.set(SKIPPED,
-                "depends on %s that is not expected to pass." % self.name)
+                  "depends on %s that is not expected to pass." % self.name)
         elif self.status is BATCHED:
             d.set(BATCHED, "Child of batch job must be batch also.")
 
@@ -372,7 +372,7 @@ class AtsTest (object):
     def getResults(self):
         "Return a dictionary containing the essential information about this test."
         if not hasattr(self, 'timelimit'):
-            self.timelimit= None
+            self.timelimit = None
         if self.depends_on is None:
             ds = 0
         else:
@@ -432,12 +432,12 @@ class AtsTest (object):
     def setStartDateTime(self):
         "Sets date and time in the form of yyyy-mm-dd hh:mm:ss for database"
         self.startDateTime = curDateTime()
-        self.startTime= time.time()
+        self.startTime = time.time()
 
     def setEndDateTime(self):
         "Sets date and time in the form of yyyy-mm-dd hh:mm:ss for database"
         self.endDateTime = curDateTime()
-        self.endTime= time.time()
+        self.endTime = time.time()
 
     def elapsedTime(self):
         "Returns formatted elapsed time of the run."

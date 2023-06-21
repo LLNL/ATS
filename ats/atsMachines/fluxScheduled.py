@@ -86,7 +86,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.toss_nn   = options.toss_nn
         self.cuttime   = options.cuttime
 
-    def set_nt_num_nodes(self,test):
+    def set_nt_num_nodes(self, test):
 
         # Command line option nt over-rides what is in the deck.
         test.nt = 1
@@ -123,7 +123,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         ret = "flux run -o cpu-affinity=per-task -o mpibind=off".split()
         np = test.options.get("np", 1)
-    
+
         FluxScheduled.set_nt_num_nodes(self, test)
         # nn = test.options.get("nn", 0)
 
@@ -131,13 +131,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # 1) cuttime is highest priority.  This will have been copied from options.cuttime into self.cuttime
         # 2) deck timelmit is 2nd priority. Check if 'timelimit' is in the test options
         # 3) --timelimit (or default timelmit) is last
-        if self.cuttime is not None:        
+        if self.cuttime is not None:
             max_time = self.cuttime
         elif 'timelimit' in test.options:
             max_time = test.options.get("timelimit")
         else:
             max_time = self.timelimit
-        
+
         ret.append(f"-t{max_time}")
 
         #if np > self.coresPerNode:
@@ -251,7 +251,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: Before Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
         self.numProcsAvailable -= (np * test.cpus_per_task)
         if test.num_nodes > 0:
@@ -259,7 +259,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: After  Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
     def noteEnd(self, test):
         """A test has finished running. """
@@ -270,7 +270,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             self.numberNodesExclusivelyUsed -= test.num_nodes
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: After  Job Finished remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
     def periodicReport(self):
         """
@@ -325,11 +325,3 @@ class FluxScheduled(lcMachines.LCMachineCore):
                     return 0
                 else:
                     return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
-              
-
-
-
-
-
-
-
