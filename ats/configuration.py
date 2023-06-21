@@ -150,6 +150,12 @@ def add_flux_only_options(parser):
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
                       test cases.''')
+    parser.add_option('--gpus_per_task', dest='gpus_per_task', type='int',
+                       help='''Flux option: Sets or over-rides
+                       test specific settings of gpus_per_task, or ngpu,
+                       which is the number of GPU devices per MPI rank. ''')
+    parser.add_option('--flux_exclusive', action='store_true', dest='flux_exclusive', default=False,
+                      help='Flux option: Use --exclusive when submiting jobs')
 
 
 def add_blueos_only_options(parser):
@@ -235,13 +241,13 @@ def add_blueos_only_options(parser):
                       running with --mpibind this will be "none" and the
                       mpibind application will manage the binding''')
     parser.add_option('--jsrun_ngpu', dest='blueos_ngpu',
-                      type='int', help='''Blueos option: Sets of orver-rides
+                      type='int', help='''Blueos option: Sets or over-rides
                       test specific settings of ngpu (number of gpu devices
                       per resource/test case). Maps to jsrun --gpu_per_rs
                       option.  Default is 0. Number of GPU devices to use for
                       the test.''')
     parser.add_option('--lrun_ngpu', dest='blueos_ngpu',
-                      type='int', help='''Blueos option: Sets of orver-rides
+                      type='int', help='''Blueos option: Sets or over-rides
                       test specific settings of ngpu (number of gpu devices
                       per MPI process)) Maps to lrun -g option. Default is 0.
                       Number of GPU devices for each MPI rank in each test.
@@ -255,7 +261,7 @@ def add_toss3_only_options(parser):
     parser.add_option('--unbuffered', action='store_true',
                       help='Slurm option: Pass srun the --unbuffered option.')
     parser.add_option('--exclusive', action='store_true', dest='exclusive',
-                      help='Slurm or Flux  option: Use --exclusive when submiting jobs')
+                      help='Slurm option: Use --exclusive when submiting jobs')
     parser.add_option('--mpibind', default='off',
                       help='''Slurm option: Specify slurm --mpibind plugin
                       options to use. By default, ATS specifies --mpibind=off
@@ -263,7 +269,7 @@ def add_toss3_only_options(parser):
                       Common options are none, on, off.  srun --mpibind=help
                       will show further options.''')
     parser.add_option('--nn', dest='toss_nn', type='int', default=-1,
-                      help='''Slurm or option: -nn option. Over-rides test
+                      help='''Slurm option: -nn option. Over-rides test
                       specific settings of nn (number of nodes). Setting this
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
