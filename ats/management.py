@@ -24,29 +24,29 @@ def areBrothers(t1, t2):
     else:
         return False
 
-class AtsManager (object):
+class AtsManager(object):
     """This class is instantiated as a singleton instance, manager.
 
-The principal entry is ``main``.
-
-Attributes:
-
-* filters -- list of filters to be applied in choosing tests.
-* testlist (readonly) -- list of tests processed.
-* badlist (readonly) -- list of tests that could not be sourced properly
-* started -- date time of initialization
-* collectTimeEnded -- when test collection was done
-* onCollected -- just after test collection ends
-* on Prioritized -- just after test totalPriority has been assigned
-* onExitRoutines -- list of routines for onExit to call
-* onResultsRoutines -- list of routines for onResults to call
-* continuationFileName -- "continue.ats" if written
-* saveResultsName -- default "atsr.py"
-* saveXmlResultsName -- default "atsr.xml"
-* groups -- dictionary of test group objects indexed by number
+    The principal entry is ``main``.
+    
+    Attributes:
+    
+    * filters -- list of filters to be applied in choosing tests.
+    * testlist (readonly) -- list of tests processed.
+    * badlist (readonly) -- list of tests that could not be sourced properly
+    * started -- date time of initialization
+    * collectTimeEnded -- when test collection was done
+    * onCollected -- just after test collection ends
+    * on Prioritized -- just after test totalPriority has been assigned
+    * onExitRoutines -- list of routines for onExit to call
+    * onResultsRoutines -- list of routines for onResults to call
+    * continuationFileName -- "continue.ats" if written
+    * saveResultsName -- default "atsr.py"
+    * saveXmlResultsName -- default "atsr.xml"
+    * groups -- dictionary of test group objects indexed by number
 
     """
-    def __init__ (self):
+    def __init__(self):
         self.restart()
 
     def restart(self):
@@ -67,7 +67,7 @@ Attributes:
 
         AtsTest.restart()
 
-    def filter (self, *filters):
+    def filter(self, *filters):
         "Add filters to the list. Clear list if no arguments."
         if not filters:
             self.filters = []
@@ -90,9 +90,9 @@ Attributes:
             except Exception:
                 pass
             self.filters.append(f)
-            log ('Added filter:', repr(f))
+            log('Added filter:', repr(f))
 
-    def filterenv (self, test):
+    def filterenv(self, test):
         """Compute the environment in which filters for test will be
             evaluated."""
         if not isinstance(test, AtsTest):
@@ -104,7 +104,7 @@ Attributes:
         fe.update(testEnvironment)
         return fe
 
-    def find_unmatched (self, test):
+    def find_unmatched(self, test):
         """Does this manager's filters match the given test properties?
         Returns '' if it does, the filter that failed if not.
         """
@@ -144,7 +144,7 @@ Attributes:
             words.sort()
         for key in words:
             try:
-                log(key,":", testEnvironment[key], logging=logging, echo=echo)
+                log(key, ":", testEnvironment[key], logging=logging, echo=echo)
             except KeyError:
                 log("Not defined:", key, logging=logging, echo=echo)
         log.dedent()
@@ -169,7 +169,7 @@ Attributes:
 
     alreadysourced = []
 
-    def source (self, *paths, **vocabulary):
+    def source(self, *paths, **vocabulary):
         """Input one or more source files, with optional additional vocabulary.
          If introspection=f given in the vocabulary, or using define,
          it should be a function taking one argument and returning any
@@ -179,7 +179,7 @@ Attributes:
             log("source:", ' '.join(paths), echo=True)
 
         introspector = vocabulary.get('introspection',
-                   testEnvironment.get('introspection', standardIntrospection))
+                                      testEnvironment.get('introspection', standardIntrospection))
 
         for path in paths:
             self._source(path, introspector, vocabulary)
@@ -305,8 +305,8 @@ Attributes:
 
         if self.testlist:
             log("""
-=========================================================
-ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
+                =========================================================
+                ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
             log('-------------------------------------------------',
                 echo = True)
             self.report()
@@ -341,9 +341,9 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
     def logUsage(self):
         """Log this run.
         """
-        return;
+        return
 
-    def report (self):
+    def report(self):
         "Log a report, showing each test."
         doAll = debug() or \
                configuration.options.skip or \
@@ -377,7 +377,7 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
                 log([t.serialNumber for t in test.waitUntil], echo=False)
             log.dedent()
 
-    def summary (self, log):
+    def summary(self, log):
         "Log summary of the results."
         tlist = [t for t in self.testlist if t.options.get('report', True)]
         failed = [test.name for test in self.testlist if (test.status is FAILED)]
@@ -392,13 +392,13 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
         expected = [test.name for test in self.testlist if (test.status is EXPECTED)]
         if running:
             #log("""\
-#RUNNING: %d %s""" % (len(running), ', '.join(running)), echo=True)
+                #RUNNING: %d %s""" % (len(running), ', '.join(running)), echo=True)
             log("RUNNING 2: %d %s""" % (len(running), ', '.join(running)), echo=True)
 
         if ncs:
             log("""\
-CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
-               echo = True)
+                CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
+                echo = True)
 
         successful_run = True
         msg = ""
@@ -423,9 +423,9 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
             successful_run = False
         if expected:
             log("EXPECTED: %d" % len(expected),
-               echo = True)
+                echo = True)
         log("PASSED:   %d" % len(passed),
-               echo = True)
+            echo = True)
 
         notrun = [test.name for test in self.testlist if (test.status is CREATED)]
         lnr = len(notrun)
@@ -446,16 +446,16 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
 
         if invalid:
             log("INVALID:  %d %s" % (len(invalid) + len(bad), ', '.join(bad + invalid)),
-               echo = True)
+                echo = True)
         if batched:
             log("BATCHED:  %d" % len(batched),
-               echo = True)
+                echo = True)
         if filtered:
             log("FILTERED: %d" % len(filtered),
-               echo = True)
+                echo = True)
         if skipped:
             log("SKIPPED:  %d" % len(skipped),
-               echo = True)
+                echo = True)
 
     def _summary3(self):
         "Additional detail for  summary."
@@ -514,14 +514,14 @@ CHECK:    %d %s""" % (len(ncs), ', '.join([test.name for test in ncs])),
 
     def test(self, *clas, **options):
         """Create one test. Signature is zero to two positional arguments,
-then keyword / value options::
+        then keyword / value options::
 
-    test(**options) or
-    test(script, **options) or
-    test(script, clas, **options)
+            test(**options) or
+            test(script, **options) or
+            test(script, clas, **options)
 
-See manual for discussion of these arguments.
-"""
+        See manual for discussion of these arguments.
+        """
         testobj = AtsTest(*clas, **options)
         self.testlist.append(testobj)
 #        if not self.groups.has_key(testobj.groupNumber):
@@ -540,12 +540,12 @@ See manual for discussion of these arguments.
 
                 if testobj.np > self.batchmachine.numberTestsRunningMax:
                     testobj.set(FILTERED,
-                        "batch job filtered - Number of processors %d exceeds %d"% (testobj.np, self.batchmachine.numberTestsRunningMax))
+                                "batch job filtered - Number of processors %d exceeds %d"% (testobj.np, self.batchmachine.numberTestsRunningMax))
                     return testobj
 
             elif testobj.np > self.machine.numberTestsRunningMax:
                 testobj.set(FILTERED,
-                    "Number of processors %d exceeds %d"% (testobj.np, self.machine.numberTestsRunningMax))
+                            "Number of processors %d exceeds %d"% (testobj.np, self.machine.numberTestsRunningMax))
                 return testobj
 
             # 2019-06-28 Sad added filter on the number of nodes requested for the test vs allocated for testing
@@ -558,7 +558,7 @@ See manual for discussion of these arguments.
             # print "SAD DEBUG my_nn = %d self.machine.numNodes=%d\n" % (my_nn,self.machine.numNodes)
             if my_nn > self.machine.numNodes:
                 testobj.set(FILTERED,
-                    "Number of nodes requested %d exceeds %d"% (my_nn, self.machine.numNodes))
+                            "Number of nodes requested %d exceeds %d"% (my_nn, self.machine.numNodes))
                 return testobj
 
             # process filters
@@ -649,13 +649,13 @@ See manual for discussion of these arguments.
     def sortTests(self):
         """Sort the tests as to batch or interactive or other. Return two lists."""
 
-# tests that were invalid, filtered, skipped etc. have status not CREATED
-# This screens out things that recently got set SKIPPED, etc.
+    # tests that were invalid, filtered, skipped etc. have status not CREATED
+    # This screens out things that recently got set SKIPPED, etc.
 
         interactiveTests = [t for t in self.testlist if t.status is CREATED]
         batchTests = [t for t in self.testlist if t.status is BATCHED]
 
-# postcondition
+    # postcondition
         if (batchTests and (configuration.options.nobatch or \
                             configuration.options.allInteractive)):
             for t in batchTests:
@@ -667,20 +667,20 @@ See manual for discussion of these arguments.
 
     def main(self, clas = '', adder=None, examiner=None):
         """
-This is the main driver code.
-Returns true if all interactive tests found passed, false if interrupted or
-an error occurs.
+        This is the main driver code.
+        Returns true if all interactive tests found passed, false if interrupted or
+        an error occurs.
 
-``clas`` is a string containing command-line options, such as::
+        ``clas`` is a string containing command-line options, such as::
 
-    --debug --level 18
+            --debug --level 18
 
-If ``clas`` is blank, sys.argv[1:] is used as the arguments.
-See ``configuration.init``.
+        If ``clas`` is blank, sys.argv[1:] is used as the arguments.
+        See ``configuration.init``.
 
-Routines ``adder`` and ``examiner``, if given,  are called in ``configuration``
-to allow user a chance to add options and examine results of option parsing.
-"""
+        Routines ``adder`` and ``examiner``, if given,  are called in ``configuration``
+        to allow user a chance to add options and examine results of option parsing.
+        """
         self.init(clas, adder, examiner)
         self.firstBanner()
         core_result = self.core()
@@ -1004,8 +1004,8 @@ BATCHED = ats.BATCHED
             # Convert minutes to seconds
             continuationStep = int(configuration.options.continueFreq * 60)
         while unfinished:
-            timeNow= time.time()
-            timePassed= timeNow - timeStatusReport
+            timeNow = time.time()
+            timePassed = timeNow - timeStatusReport
             if timePassed >= configuration.options.reportFreq*60:
                 terminal("ATS REPORT AT ELAPSED TIME", wallTime())
                 # log("ATS REPORT AT ELAPSED TIME", wallTime(), echo=True)
@@ -1016,7 +1016,7 @@ BATCHED = ats.BATCHED
             unfinished = machine.scheduler.step()
 
             if configuration.options.continueFreq is not None:
-                timeNow= time.time()
+                timeNow = time.time()
                 if (timeNow-timeContinuation) >= continuationStep:
                     self.continuationFile(interactiveTests, True)
                     timeContinuation = timeNow
@@ -1063,13 +1063,13 @@ BATCHED = ats.BATCHED
     def onSave(self, hook):
         """Add a hook for the results function. Will be passed two arguments:
 
-1. The proposed state r, a dict
-2. This manager
+        1. The proposed state r, a dict
+        2. This manager
 
-The hook will sually will add items to r, but can make any desired
-modification to r. Note that at this stage the dependents and depends_on
-fields of a test are not present; instead depends_on_serial and
-dependents_serial contain the serial numbers of the relevant tests.
+        The hook will sually will add items to r, but can make any desired
+        modification to r. Note that at this stage the dependents and depends_on
+        fields of a test are not present; instead depends_on_serial and
+        dependents_serial contain the serial numbers of the relevant tests.
         """
         self.onResultsRoutines.append(hook)
 
