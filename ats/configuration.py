@@ -63,8 +63,6 @@ if (my_hostname.startswith('ruby')):
 else:
     MACHINE_TYPE = os.environ.get('MACHINE_TYPE', SYS_TYPE)
 
-# print("DEBUG MACHINE_TYPE ", MACHINE_TYPE)
-
 BATCH_TYPE   = os.environ.get('BATCH_TYPE', SYS_TYPE)
 
 # print("DEBUG BATCH_TYPE ", BATCH_TYPE)
@@ -107,12 +105,16 @@ def addOptions(parser):
     # Platform agnostic options
     add_starting_options(parser)
 
-    # Toss specific options
-    if SYS_TYPE.startswith('toss'):
+    # Flux options (toss 4 for now)
+    if MACHINE_TYPE.startswith('flux'):
+        add_flux_only_options(parser)
+
+    # Toss specific options (slurm)
+    elif SYS_TYPE.startswith('toss'):
         add_toss3_only_options(parser)
 
-    # Sierra Specific options
-    if SYS_TYPE.startswith('blueos_3_ppc64le_ib'):
+    # Sierra Specific options (lsf)
+    elif SYS_TYPE.startswith('blueos_3_ppc64le_ib'):
         add_blueos_only_options(parser)
 
     add_more_options(parser)
@@ -133,6 +135,27 @@ def add_starting_options(parser):
     parser.add_option('--share', action='store_false', dest='exclusive',
                       help='''Slurm option: Use --share rather than the
                       default --exclusive on srun commands''')
+
+def add_flux_only_options(parser):
+    parser.add_option('--flux_run_args', dest='flux_run_args', default='unset',
+                      help='''Flux option: Any specific string which will passed
+                      directly to flux on the flux run line. For example
+                      --flux_run_args="-o gpu-affinity=off --dry-run".
+                      Perform 'flux help run' for useful oprions for your project.
+                      String is not checked for validity.  Quotes in the string 
+                      may need to be escaped or otherwise specified''')
+    parser.add_option('--nn', dest='toss_nn', type='int', default=-1,
+                      help='''Flux option: -nn option. Over-rides test
+                      specific settings of nn (number of nodes). Setting this
+                      to 0 will allow multiple jobs to run per node
+                      concurrently, even when nn is specified for individual
+                      test cases.''')
+    parser.add_option('--gpus_per_task', dest='gpus_per_task', type='int',
+                       help='''Flux option: Sets or over-rides
+                       test specific settings of gpus_per_task, or ngpu,
+                       which is the number of GPU devices per MPI rank. ''')
+    parser.add_option('--flux_exclusive', action='store_true', dest='flux_exclusive', default=False,
+                      help='Flux option: Use --exclusive when submiting jobs')
 
 
 def add_blueos_only_options(parser):
@@ -218,13 +241,13 @@ def add_blueos_only_options(parser):
                       running with --mpibind this will be "none" and the
                       mpibind application will manage the binding''')
     parser.add_option('--jsrun_ngpu', dest='blueos_ngpu',
-                      type='int', help='''Blueos option: Sets of orver-rides
+                      type='int', help='''Blueos option: Sets or over-rides
                       test specific settings of ngpu (number of gpu devices
                       per resource/test case). Maps to jsrun --gpu_per_rs
                       option.  Default is 0. Number of GPU devices to use for
                       the test.''')
     parser.add_option('--lrun_ngpu', dest='blueos_ngpu',
-                      type='int', help='''Blueos option: Sets of orver-rides
+                      type='int', help='''Blueos option: Sets or over-rides
                       test specific settings of ngpu (number of gpu devices
                       per MPI process)) Maps to lrun -g option. Default is 0.
                       Number of GPU devices for each MPI rank in each test.
@@ -238,24 +261,23 @@ def add_toss3_only_options(parser):
     parser.add_option('--unbuffered', action='store_true',
                       help='Slurm option: Pass srun the --unbuffered option.')
     parser.add_option('--exclusive', action='store_true', dest='exclusive',
-                      help='Slurm or Flux  option: Use --exclusive when submiting jobs')
+                      help='Slurm option: Use --exclusive when submiting jobs')
     parser.add_option('--mpibind', default='off',
                       help='''Slurm option: Specify slurm --mpibind plugin
                       options to use. By default, ATS specifies --mpibind=off
                       on Toss 3 systems, but projects may want other options.
                       Common options are none, on, off.  srun --mpibind=help
                       will show further options.''')
-    parser.add_option('--kmpAffinity', default='granularity=core',
-                      help='''Slurm option: Specify KMP_AFFINITY env var on
-                      Toss3. By default ATS sets this to "granularity=core",
-                      but end users may provide an arbitrary string''')
     parser.add_option('--nn', dest='toss_nn', type='int', default=-1,
-                      help='''Slurm or Flux option: -nn option. Over-rides test
+                      help='''Slurm option: -nn option. Over-rides test
                       specific settings of nn (number of nodes). Setting this
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
                       test cases.''')
-
+    parser.add_option('--checkForAtsProc', action='store_true',
+                      help='''Slurm option:Attempt to determine if slurm thinks 1 processor
+                      should be reserved for ATS -- may reduce total number of
+                      MPI processes by 1.''')
 
 def add_more_options(parser):
     # TODO: Review options for better organization
@@ -331,21 +353,9 @@ def add_more_options(parser):
     parser.add_option('--sequential', action='store_true',
                        help='''Run each test consecutively. Do not run
                        concurrent test jobs.''')
-    parser.add_option('--nosrun', action='store_true',
-                      help='''Slurm option: Run the code without srun. This
-                      option can also be used on BlueOS to run ALL test on
-                      a login node as it circumvents the login node check.
-                      If the tests need to be run on a working node, then
-                      the tests themselves will need to get an allocation.''')
-    parser.add_option('--salloc', action='store_true',
-                      help='Slurm option: Run the code with salloc rather than srun.')
     parser.add_option('--showGroupStartOnly', action='store_true',
                       help='''Only show start of first test in group, not
                       subsequent steps.''')
-    parser.add_option('--checkForAtsProc', action='store_true',
-                      help='''Slurm option:Attempt to determine if slurm thinks 1 processor
-                      should be reserved for ATS -- may reduce total number of
-                      MPI processes by 1.''')
     parser.add_option('--skip', action='store_true',
                       help='''skip actual execution of the tests, but show
                       filtering results and missing test files.''')
@@ -375,6 +385,18 @@ def add_more_options(parser):
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                       help='''verbose mode; increased level of terminal output
                       ''')
+    parser.add_option('--salloc', action='store_true',
+                      help='Slurm option: Run the code with salloc rather than srun.')
+    parser.add_option('--nosrun', action='store_true',
+                      help='''Slurm option: Run the code without srun. This
+                      option can also be used on BlueOS to run ALL test on
+                      a login node as it circumvents the login node check.
+                      If the tests need to be run on a working node, then
+                      the tests themselves will need to get an allocation.''')
+    parser.add_option('--kmpAffinity', default='granularity=core',
+                      help='''Slurm option: Specify KMP_AFFINITY env var on
+                      Toss3. By default ATS sets this to "granularity=core",
+                      but end users may provide an arbitrary string''')
 
 
 def documentConfiguration():
