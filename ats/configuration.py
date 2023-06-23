@@ -207,7 +207,7 @@ def add_blueos_only_options(parser):
                       settings of np (number of processors).  Useful for GPU
                       tests where the 4 MPI and 4 GPU devices are a common
                       testing scenario''')
-    parser.add_option('--lrun_np_max', dest='blueos_np_max', type='int',
+    parser.add_option('--test_np_max', dest='blueos_np_max', type='int',
                       help='''Blueos option: Over-rides test specific settings
                       of np (number of processors) if the test is set greater
                       than the value provided.''')
@@ -229,10 +229,6 @@ def add_blueos_only_options(parser):
                       of np (number of processors). Useful for GPU tests where
                       the 4 MPI and 4 GPU devices are a common testing
                       scenario''')
-    parser.add_option('--jsrun_np_max', dest='blueos_np_max', type='int',
-                      help='''Blueos option: Over-rides test specific settings
-                      of np (number of processors) if the test is set greater
-                      than the value provided.''')
     parser.add_option('--jsrun_bind', dest='blueos_jsrun_bind',
                       default='unset',
                       help='''Blueos option: jsrun --bind option. "none",
