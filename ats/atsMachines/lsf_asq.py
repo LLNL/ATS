@@ -333,6 +333,7 @@ class lsfMachine (machines.Machine):
         # Command line --blueos_np_max option will over-ride the test specific np option if
         # the test specific option is greater than the command line option
         if test.blueos_np_max > 0 and  test.np > test.blueos_np_max:
+            print("Deprecation Warning: lrun_np_max and jsrun_np_max are deprecated and will be removed in the future. Use test_np_max instead.")
             test.np = test.blueos_np_max
             np = test.blueos_np_max
 
