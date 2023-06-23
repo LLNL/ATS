@@ -92,21 +92,19 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         :param options: The options available to a user in test.ats files.
         """
-        self.flux_exclusive = options.flux_exclusive
-        self.exclusive = options.exclusive
         self.timelimit = options.timelimit
         self.toss_nn   = options.toss_nn
         self.cuttime   = options.cuttime
         self.flux_run_args = options.flux_run_args
         self.gpus_per_task = options.gpus_per_task
+        self.test_np_max = options.test_np_max
 
         if FluxScheduled.debug:
-            print("DEBUG: FluxScheduled examineOptions : self.exclusive=%s" % (self.exclusive))
-            print("DEBUG: FluxScheduled examineOptions : self.flux_exclusive=%s" % (self.flux_exclusive))
             print("DEBUG: FluxScheduled examineOptions : self.timelimit=%s" % (self.timelimit))
             print("DEBUG: FluxScheduled examineOptions : self.cuttime=%s" % (self.cuttime))
             print("DEBUG: FluxScheduled examineOptions : self.flux_run_args=%s" % (self.flux_run_args))
             print("DEBUG: FluxScheduled examineOptions : self.gpus_per_task=%s" % (self.gpus_per_task))
+            print("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max))
 
     def set_nt_num_nodes(self, test):
         """
@@ -161,6 +159,12 @@ class FluxScheduled(lcMachines.LCMachineCore):
         else:
             test.num_nodes = self.toss_nn
 
+        # Command line option test_np_max over-rides limits the max np in the test deck
+        test.np = test.options.get("np", 1)
+        if self.test_np_max is not None:                              
+            if test.np > self.test_np_max:      # If test np is greater than the command line max 
+                test.np = self.test_np_max      # then set the test np to the maxd
+
     def calculateCommandList(self, test):
         """
         Generates a list of commands to run a test in ATS on a
@@ -170,9 +174,9 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         # ret = "flux run -o cpu-affinity=per-task -o mpibind=off".split()
         ret = "flux run ".split()
-        np = test.options.get("np", 1)
 
         FluxScheduled.set_nt_num_nodes(self, test)
+        np = max(test.np, 1)
 
         # set max_time based on time limit priorities
         # 1) cuttime is highest priority.  This will have been copied from options.cuttime into self.cuttime
@@ -190,15 +194,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
         #if np > self.coresPerNode:
         #    nn = ceil(np / self.coresPerNode)
 
-        if test.num_nodes > 0:
-            ret.append(f"-N{test.num_nodes}")
-            """Node-exclusive job scheduling: even if a job does not use the entire resources."""
-            """Requires use of -N. """
-            if test.options.get("exclusive", False) or self.flux_exclusive:
-                ret.append("--exclusive")
-
-        elif test.options.get("exclusive", False) or self.flux_exclusive:
-            log(f"ATS WARNING: --exclusive requires use of 'nn' option to specify the number of nodes needed.", echo=True)
+        # SAD 2023 June 21
+        #   Removing 'flux exclusive for now'  If users want it, they can specify it 
+        #   with the flux_run_args option.
+        # if test.num_nodes > 0:
+        #    ret.append(f"-N{test.num_nodes}")
+        #    """Node-exclusive job scheduling: even if a job does not use the entire resources."""
+        #    """Requires use of -N. """
+        #    if test.options.get("exclusive", False) or self.flux_exclusive:
+        #        ret.append("--exclusive")
+        #elif test.options.get("exclusive", False) or self.flux_exclusive:
+        #    log(f"ATS WARNING: --exclusive requires use of 'nn' option to specify the number of nodes needed.", echo=True)
 
         #"""Thread subscription - Flux does not oversubscribe cores by default."""
         #nt = test.options.get("nt", 1)
@@ -209,10 +215,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # ret.append(f"-n{np}")  # Need to comment these out if we are using per-resource options like tasks-per-node
         # ret.append(f"-c{test.cpus_per_task}")
 
-        # Moved into set_nt_num_nodes where nt was being processed
-        # """GPU scheduling interface"""
-        # gpus_per_task = test.options.get("gpus_per_task", 0)
-        
         # SAD comment out for now 2023 June 20
         # if gpus_per_task:
         #     ret.append(f"--gpus-per-task={gpus_per_task}")
@@ -290,8 +292,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         Is this machine able to run the test interactively when resources become available?
            If so return ''.  Otherwise return the reason it cannot be run here.
         """
-        np = max(test.np, 1)
         FluxScheduled.set_nt_num_nodes(self, test)
+        np = max(test.np, 1)
         if (np * test.cpus_per_task) > self.maxCores:
             return "Too many cores needed (%d > %d)" % (np * test.cpus_per_task, self.maxCores)
 
@@ -329,8 +331,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
     # ##############################################################################################################################
     def noteLaunch(self, test):
         """A test has been launched."""
-        np = max(test.np, 1)
         FluxScheduled.set_nt_num_nodes(self, test)
+        np = max(test.np, 1)
 
         if FluxScheduled.debug_noteLaunch:
             print("FluxScheduled DEBUG: Before Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
@@ -346,8 +348,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
     def noteEnd(self, test):
         """A test has finished running. """
-        np = max(test.np, 1)
         FluxScheduled.set_nt_num_nodes(self, test)
+        np = max(test.np, 1)
         self.numProcsAvailable += (np * test.cpus_per_task)
         if test.num_nodes > 0:
             self.numberNodesExclusivelyUsed -= test.num_nodes

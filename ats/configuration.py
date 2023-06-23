@@ -150,13 +150,14 @@ def add_flux_only_options(parser):
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
                       test cases.''')
+    parser.add_option('--test_np_max', dest='test_np_max', type='int',
+                      help='''Flux option: Over-rides test specific settings
+                      of np (number of processors) if the test is set greater
+                      than the value provided.''')
     parser.add_option('--gpus_per_task', dest='gpus_per_task', type='int',
                        help='''Flux option: Sets or over-rides
                        test specific settings of gpus_per_task, or ngpu,
                        which is the number of GPU devices per MPI rank. ''')
-    parser.add_option('--flux_exclusive', action='store_true', dest='flux_exclusive', default=False,
-                      help='Flux option: Use --exclusive when submiting jobs')
-
 
 def add_blueos_only_options(parser):
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um', default=True,
