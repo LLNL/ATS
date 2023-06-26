@@ -22,7 +22,7 @@
     Added test_np_max (see below) for flux as well as other schedulers.
 
     --------------------------------------------------------------
-    P E R   T E S T   O P T I O N S ------------------------------
+    P E R   T E S T   O P T I O N S
 
     At the individual test level, these are useful options
     when using Flux:
@@ -136,7 +136,13 @@
 
     Note that the -c8 setting ensures a separate GPU for each MPI rank.
 
-    
+
+    Additionally there was a small change to the ATS blueOS wrapper (lsf):
+        Options --lrun_np_max and --jsrun_np_max are being deprecated and
+        are repaced by a single option --test_np_max to be uniform
+        throughout ATS
+
+
 
 ## 7.0.111
     Inital Flux support on Toss 4 systems where flux is 
