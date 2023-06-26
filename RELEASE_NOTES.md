@@ -136,13 +136,10 @@
 
     Note that the -c8 setting ensures a separate GPU for each MPI rank.
 
-
     Additionally there was a small change to the ATS blueOS wrapper (lsf):
         Options --lrun_np_max and --jsrun_np_max are being deprecated and
         are repaced by a single option --test_np_max to be uniform
         throughout ATS
-
-
 
 ## 7.0.111
     Inital Flux support on Toss 4 systems where flux is 
