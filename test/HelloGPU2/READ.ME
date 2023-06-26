@@ -53,10 +53,10 @@ lrun --mpibind=off -N2 -n16 ./a.out <- same as above
     # the cpu and gpu affinity in the tes case, so look at them by hand for reasonableness
     # lrun will 'pack' the jobs.  jsrun will use a resource list
 
-/usr/apps/ats/7.0.113/bin/atslite1 
-/usr/apps/ats/7.0.113/bin/atslite1 --lrun -verbose
-/usr/apps/ats/7.0.113/bin/atslite1 --lrun --lrun_pack -verbose
-/usr/apps/ats/7.0.113/bin/atslite1 --jsrun_exclusive  -verbose
+/usr/apps/ats/7.0.113/bin/atslite1 --smpi_off 
+/usr/apps/ats/7.0.113/bin/atslite1 --smpi_off --lrun -verbose
+/usr/apps/ats/7.0.113/bin/atslite1 --smpi_off --lrun --lrun_pack -verbose
+/usr/apps/ats/7.0.113/bin/atslite1 --smpi_off --jsrun_exclusive  -verbose
 
 
 --------------------------------------------------------------------------------
