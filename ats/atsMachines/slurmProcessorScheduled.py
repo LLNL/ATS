@@ -75,8 +75,8 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
                 print("Setting npMax to 20 on alastor")
                 self.npMax = 20
                 self.npMaxH = 20
-            elif self.hostname.startswith('rzwhippet'):
-                print("Setting npMax to 112 on whippet")
+            elif self.hostname.startswith('rzwhippet') or self.hostname.startswith('poodle'):
+                print("Setting npMax to 112 on %s", (self.hostname))
                 self.npMax = 112
                 self.npMaxH = 112
             
