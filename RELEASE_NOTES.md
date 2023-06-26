@@ -141,7 +141,6 @@
         are repaced by a single option --test_np_max to be uniform
         throughout ATS
 
-
 ## 7.0.111
     Inital Flux support on Toss 4 systems where flux is 
     the native scheduler.   
