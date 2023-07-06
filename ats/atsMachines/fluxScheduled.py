@@ -56,8 +56,11 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.numberNodesExclusivelyUsed = 0
 
         # coresPerGPU is needed to get the -c option correct
-        # when running with GPUs.  
-        self.coresPerGPU = int(self.numCores / self.numGPUs)
+        # when running with GPUs.
+        if not self.numGPUs is 0:
+            self.coresPerGPU = int(self.numCores / self.numGPUs)
+        else:
+            self.coresPerGPU = 0
 
         if FluxScheduled.debug:
             print("DEBUG: FluxScheduled init : self.numNodes    =%i" % (self.numNodes))
