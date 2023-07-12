@@ -150,6 +150,12 @@ def add_flux_only_options(parser):
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
                       test cases.''')
+    parser.add_option('--num_concurrent_jobs', dest='num_concurrent_jobs', type='int', default=-1,
+                      help='''Flux option: Number of concurrently running jobs
+                      ATS will give to the Flux scheduler. ATS currently throttles
+                      the number of open flux jobs to avoid Flux issues.  This option can 
+                      be used to override this limitation, which is currently 1 per node.
+                      ''')
     parser.add_option('--test_np_max', dest='test_np_max', type='int',
                       help='''Flux option: Over-rides test specific settings
                       of np (number of processors) if the test is set greater

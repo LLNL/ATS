@@ -34,6 +34,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
     debug = False
     debug_canRunNow = False
     debug_noteLaunch = False
+    flux_outstanding_jobs = 0    #  Track the number of submitted jobs yet to finish
 
     def init(self):
         """
@@ -94,6 +95,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         self.timelimit = options.timelimit
         self.toss_nn   = options.toss_nn
+        self.num_concurrent_jobs  = options.num_concurrent_jobs
         self.cuttime   = options.cuttime
         self.flux_run_args = options.flux_run_args
         self.gpus_per_task = options.gpus_per_task
@@ -103,6 +105,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             print("DEBUG: FluxScheduled examineOptions : self.timelimit=%s" % (self.timelimit))
             print("DEBUG: FluxScheduled examineOptions : self.cuttime=%s" % (self.cuttime))
             print("DEBUG: FluxScheduled examineOptions : self.flux_run_args=%s" % (self.flux_run_args))
+            print("DEBUG: FluxScheduled examineOptions : self.num_concurrent_jobs=%i" % (self.num_concurrent_jobs))
             print("DEBUG: FluxScheduled examineOptions : self.gpus_per_task=%s" % (self.gpus_per_task))
             print("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max))
 
@@ -309,6 +312,18 @@ class FluxScheduled(lcMachines.LCMachineCore):
             if self.numProcsAvailable < self.maxCores:
                 return False
 
+        # Throttle number of oustanding flux jobs
+        # Default is 1 job per node.
+        # Allow user to limit number of currently submitted flux jobs with the
+        # --num_concurrent_jobs option.
+        # set max_outstanding_jobs as appropriate based on this logic
+        max_outstanding_jobs = self.numNodes
+        if self.num_concurrent_jobs > 0:
+            max_outstanding_jobs = self.num_concurrent_jobs
+
+        if FluxScheduled.flux_outstanding_jobs >= max_outstanding_jobs:
+            return False
+
         if self.remainingCapacity() >= test.np:
             if FluxScheduled.debug_canRunNow:
                 print("FluxScheduled DEBUG: canRunNow returning True. capacity=%i >= test.np=%i" % (self.remainingCapacity(), test.np))
@@ -338,24 +353,30 @@ class FluxScheduled(lcMachines.LCMachineCore):
             print("FluxScheduled DEBUG: Before Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
                   (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
+        FluxScheduled.flux_outstanding_jobs += 1
+
         self.numProcsAvailable -= (np * test.cpus_per_task)
         if test.num_nodes > 0:
             self.numberNodesExclusivelyUsed += test.num_nodes
 
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: After  Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+            print("FluxScheduled DEBUG: After  Job Launch flux_outstanding_jobs=%i remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
+                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
     def noteEnd(self, test):
         """A test has finished running. """
         FluxScheduled.set_nt_num_nodes(self, test)
         np = max(test.np, 1)
+
+        FluxScheduled.flux_outstanding_jobs -= 1
+
         self.numProcsAvailable += (np * test.cpus_per_task)
         if test.num_nodes > 0:
             self.numberNodesExclusivelyUsed -= test.num_nodes
+
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: After  Job Finished remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+            print("FluxScheduled DEBUG: After  Job Finished flux_outstanding_jobs=%i remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
+                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
 
     def periodicReport(self):
         """
