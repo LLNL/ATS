@@ -54,20 +54,20 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.numGPUs= int(
             flux.resource.list.resource_list(self.fluxHandle).get().up.ngpus
         )
-        self.numberNodesExclusivelyUsed = 0
 
         # coresPerGPU is needed to get the -c option correct
         # when running with GPUs.  
         self.coresPerGPU = int(self.numCores / self.numGPUs)
+        self.coresPerNode = int(self.numCores / self.numNodes)
 
         if FluxScheduled.debug:
-            print("DEBUG: FluxScheduled init : self.numNodes    =%i" % (self.numNodes))
-            print("DEBUG: FluxScheduled init : self.maxCores    =%i" % (self.maxCores))
-            print("DEBUG: FluxScheduled init : self.numCores    =%i" % (self.numCores))
-            print("DEBUG: FluxScheduled init : self.numGPUs     =%i" % (self.numGPUs))
-            print("DEBUG: FluxScheduled init : self.coresPerGPU =%i" % (self.coresPerGPU))
+            print("DEBUG: FluxScheduled init : self.numNodes     =%i" % (self.numNodes))
+            print("DEBUG: FluxScheduled init : self.maxCores     =%i" % (self.maxCores))
+            print("DEBUG: FluxScheduled init : self.numCores     =%i" % (self.numCores))
+            print("DEBUG: FluxScheduled init : self.numGPUs      =%i" % (self.numGPUs))
+            print("DEBUG: FluxScheduled init : self.coresPerGPU  =%i" % (self.coresPerGPU))
+            print("DEBUG: FluxScheduled init : self.coresPerNode =%i" % (self.coresPerNode))
 
-        # self.coresPerNode = self.maxCores // self.numNodes
         self.npMax  = multiprocessing.cpu_count()
 
         if "NP_MAX" in os.environ.keys():
@@ -258,6 +258,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
 
         # Cannot use these options if we are using per-resource options like tasks-per-node
+
+        # We want to limit the spread of MPI ranks across multiple nodes by flux.
+        # If the user has specified a 'nn' option, we will honor that.
+        # If not, determine the number of nodes needed for the job.
+        if test.num_nodes > 0:
+            ret.append(f"-N{test.num_nodes}")
+        else: 
+            total_cores_needed = test.cpus_per_task * np
+            num_nodes_needed = ceil(total_cores_needed / self.coresPerNode)
+            ret.append(f"-N{num_nodes_needed}")
+
         ret.append(f"-n{np}")               
         ret.append(f"-c{test.cpus_per_task}")   # Needs to be set properly for threaded or gpu runs
 
@@ -313,15 +324,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
                 return False
 
         # Throttle number of oustanding flux jobs
-        # Default is 1 job per node.
-        # Allow user to limit number of currently submitted flux jobs with the
+        # Default is 8 jobs per node.
+        # Allow user to increase or decrease this with the 
         # --num_concurrent_jobs option.
         # set max_outstanding_jobs as appropriate based on this logic
-        max_outstanding_jobs = self.numNodes
+        max_outstanding_jobs = self.numNodes * 8
         if self.num_concurrent_jobs > 0:
             max_outstanding_jobs = self.num_concurrent_jobs
 
         if FluxScheduled.flux_outstanding_jobs >= max_outstanding_jobs:
+            if FluxScheduled.debug_canRunNow:
+                print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= max_outstanding_jobs=%i" % (FluxScheduled.flux_outstanding_jobs, max_outstanding_jobs))
             return False
 
         if self.remainingCapacity() >= test.np:
@@ -350,18 +363,16 @@ class FluxScheduled(lcMachines.LCMachineCore):
         np = max(test.np, 1)
 
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: Before Job Launch remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                  (self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+            print("FluxScheduled DEBUG: Before Job Launch remainingCores=%i test.num_nodes=%i test.np=%i " % 
+                  (self.numProcsAvailable, test.num_nodes, np))
 
         FluxScheduled.flux_outstanding_jobs += 1
 
         self.numProcsAvailable -= (np * test.cpus_per_task)
-        if test.num_nodes > 0:
-            self.numberNodesExclusivelyUsed += test.num_nodes
 
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: After  Job Launch flux_outstanding_jobs=%i remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+            print("FluxScheduled DEBUG: After  Job Launch   flux_outstanding_jobs=%i remainingCores=%i test.num_nodes=%i test.np=%i " % 
+                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, test.num_nodes, np))
 
     def noteEnd(self, test):
         """A test has finished running. """
@@ -371,12 +382,10 @@ class FluxScheduled(lcMachines.LCMachineCore):
         FluxScheduled.flux_outstanding_jobs -= 1
 
         self.numProcsAvailable += (np * test.cpus_per_task)
-        if test.num_nodes > 0:
-            self.numberNodesExclusivelyUsed -= test.num_nodes
 
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: After  Job Finished flux_outstanding_jobs=%i remainingCores=%i remainingNodes=%i test.num_nodes=%i test.np=%i " % 
-                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, self.numNodes - self.numberNodesExclusivelyUsed, test.num_nodes, np))
+            print("FluxScheduled DEBUG: After  Job Finished flux_outstanding_jobs=%i remainingCores=%i test.num_nodes=%i test.np=%i " % 
+                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, test.num_nodes, np))
 
     def periodicReport(self):
         """
@@ -424,10 +433,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if self.numProcsAvailable < 1:
             return 0
         else:
-            if self.numberNodesExclusivelyUsed >= self.numNodes:
+            if (flux.resource.list.resource_list(self.fluxHandle).get().free.nnodes < 1):
                 return 0
             else:
-                if (flux.resource.list.resource_list(self.fluxHandle).get().free.nnodes < 1):
-                    return 0
-                else:
-                    return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
+                return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
