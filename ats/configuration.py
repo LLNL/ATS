@@ -171,6 +171,11 @@ def add_flux_only_options(parser):
                        help='''Flux option: Sets or over-rides
                        test specific settings of gpus_per_task, or ngpu,
                        which is the number of GPU devices per MPI rank. ''')
+    parser.add_option('--no_time_limit', action='store_true', dest='no_time_limit', default=False,
+                      help='''Do not specify per job time limits on the flux run line.  
+                      This option takes precedence over any other timelimit or cutoff time
+                      options. ''')
+
 
 def add_blueos_only_options(parser):
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um', default=True,

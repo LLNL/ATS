@@ -15,8 +15,6 @@ from math import ceil
 
 import flux
 import flux.job
-import multiprocessing
-
 
 from ats import terminal
 from ats.atsMachines import lcMachines
@@ -69,14 +67,14 @@ class FluxScheduled(lcMachines.LCMachineCore):
             print("DEBUG: FluxScheduled init : self.coresPerGPU  =%i" % (self.coresPerGPU))
             print("DEBUG: FluxScheduled init : self.coresPerNode =%i" % (self.coresPerNode))
 
-        self.npMax  = multiprocessing.cpu_count()
-
+        # Maintain for backwards compatability with projects
+        # Allow user to over-ride the coresPerNode
+        # Other schedulers call this npMax, but for flux we are calling this coresPerNode
+        # But honor the old NP_MAX env variable if it exists
         if "NP_MAX" in os.environ.keys():
-            self.npMax = int(os.getenv("NP_MAX"))
-            self.maxCores = self.npMax * self.numNodes
+            self.coresPerNode = int(os.getenv("NP_MAX"))  
+            self.maxCores = self.coresPerNode * self.numNodes
 
-        self.npMaxH = self.npMax
-        self.coresPerNode = self.npMax
         self.numberTestsRunningMax = self.maxCores
         self.numProcsAvailable = self.maxCores
 
@@ -102,6 +100,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.flux_run_args             = options.flux_run_args
         self.gpus_per_task             = options.gpus_per_task
         self.test_np_max               = options.test_np_max
+        self.no_time_limit             = options.no_time_limit
+        self.npMax                     = options.npMax
 
         if FluxScheduled.debug:
             print("DEBUG: FluxScheduled examineOptions : self.timelimit=%s" % (self.timelimit))
@@ -111,6 +111,18 @@ class FluxScheduled(lcMachines.LCMachineCore):
             print("DEBUG: FluxScheduled examineOptions : self.num_concurrent_mpi_tasks=%i" % (self.num_concurrent_mpi_tasks))
             print("DEBUG: FluxScheduled examineOptions : self.gpus_per_task=%s" % (self.gpus_per_task))
             print("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max))
+            print("DEBUG: FluxScheduled examineOptions : self.no_time_limit=%s" % (self.no_time_limit))
+            print("DEBUG: FluxScheduled examineOptions : self.npMax=%i" % (self.npMax))
+
+        # Command line option --npMax will over-ride flux detection of cores per node 
+        # and related vars.  Similar to setting based on NP_MAX above in the init() function, but
+        # this is from the command line
+        if self.npMax > 0:
+            self.coresPerNode = self.npMax
+            self.maxCores = self.coresPerNode * self.numNodes
+            self.numberTestsRunningMax = self.maxCores
+            self.numProcsAvailable = self.maxCores
+            
 
     def set_nt_num_nodes(self, test):
         """
@@ -184,62 +196,22 @@ class FluxScheduled(lcMachines.LCMachineCore):
         FluxScheduled.set_nt_num_nodes(self, test)
         np = max(test.np, 1)
 
-        # set max_time based on time limit priorities
-        # 1) cuttime is highest priority.  This will have been copied from options.cuttime into self.cuttime
+        # If the user has given ats the --no_time_limit option, then do not
+        # append the -t option at all on the flux run line.
+        #
+        # Otherwise set set time limit based on time limit priorities
+        # 1) cuttime is 1st priority.  This will have been copied from options.cuttime into self.cuttime
         # 2) deck timelmit is 2nd priority. Check if 'timelimit' is in the test options
-        # 3) --timelimit (or default timelmit) is last
-        if self.cuttime is not None:
-            max_time = self.cuttime
-        elif 'timelimit' in test.options:
-            max_time = test.options.get("timelimit")
-        else:
-            max_time = self.timelimit
+        # 3) --timelimit (or default timelmit) is 3rd and last
+        if self.no_time_limit == False:
+            if self.cuttime is not None:
+                max_time = self.cuttime
+            elif 'timelimit' in test.options:
+                max_time = test.options.get("timelimit")
+            else:
+                max_time = self.timelimit
 
-        ret.append(f"-t{max_time}")
-
-        #if np > self.coresPerNode:
-        #    nn = ceil(np / self.coresPerNode)
-
-        # SAD 2023 June 21
-        #   Removing 'flux exclusive for now'  If users want it, they can specify it 
-        #   with the flux_run_args option.
-        # if test.num_nodes > 0:
-        #    ret.append(f"-N{test.num_nodes}")
-        #    """Node-exclusive job scheduling: even if a job does not use the entire resources."""
-        #    """Requires use of -N. """
-        #    if test.options.get("exclusive", False) or self.flux_exclusive:
-        #        ret.append("--exclusive")
-        #elif test.options.get("exclusive", False) or self.flux_exclusive:
-        #    log(f"ATS WARNING: --exclusive requires use of 'nn' option to specify the number of nodes needed.", echo=True)
-
-        #"""Thread subscription - Flux does not oversubscribe cores by default."""
-        #nt = test.options.get("nt", 1)
-        #"""
-        #In order to marry ATS's description of threading with Flux's understanding, Flux will
-        #request 1 core per thread
-        #"""
-        # ret.append(f"-n{np}")  # Need to comment these out if we are using per-resource options like tasks-per-node
-        # ret.append(f"-c{test.cpus_per_task}")
-
-        # SAD comment out for now 2023 June 20
-        # if gpus_per_task:
-        #     ret.append(f"--gpus-per-task={gpus_per_task}")
-
-        # Let's punt on gpus_per_node or gpus_per_job or gpus_per_resource in LSF speak for now.
-        # Let's get gpus_per_task working correctly first.  This will also be synonymous with 
-        # the historical 'ngpu' option that was used on BlueOS.
-        # But commenting out gpus_per_node for now.
-        # gpus_per_node = test.options.get("gpus_per_node", 0)
-        # if gpus_per_node:
-        #     if gpus_per_node > (self.numGPUs / self.numNodes):
-        #         log(f"ATS WARNING: Number of gpus_per_node requested is higher than this machine can support. This machine allows for a max of: {self.numGPUs // self.numNodes}", echo=True)
-        #     ret.append(f"--gpus-per-node={gpus_per_node}")
-        #     if not test.num_nodes:
-        #         log("ATS WARNING: number of nodes not set when using gpus_per_node, defaulting to nodes=1", echo=True)
-        #         ret.append(f"--nodes=1")
-        # else:
-        #     ret.append(f"-n{np}")  # Cannot use these options if we are using per-resource options like tasks-per-node
-        #     ret.append(f"-c{test.cpus_per_task}")
+            ret.append(f"-t{max_time}")
 
         """
         Need to set -n{np} and -c{test.cpus_per_task}.  But we also need to account for accessing
@@ -260,8 +232,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
         The above is accounted for now in routine set_nt_num_nodes which was already called
         """
 
-        # Cannot use these options if we are using per-resource options like tasks-per-node
-
         # We want to limit the spread of MPI ranks across multiple nodes by flux.
         # If the user has specified a 'nn' option, we will honor that.
         # If not, determine the number of nodes needed for the job.
@@ -279,24 +249,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # preferences, or any other valid 'flux run' option
         if self.flux_run_args != "unset":
             ret.append(self.flux_run_args)
-
-        """
-        CPU affinity enabled settings will go here. These are applicable 
-        to an entire test run, not just to one test.
-        """
-        # ret.append('-o\"cpu-affinity=per-task\"')
-
-        """Verbose mode, set to output to stdlog. Really outputs to logfile."""
-        # ret.append("-vvv")
-
-        """output option. """
-        # ret.append("--output=flux-{{id}}.stdout")
-        # ret.append("--output=none")
-        # ret.append("--log=job{cc}.id")
-
-        """error option. """
-        # ret.append("--error=flux-{{id}}.stderr")
-        # ret.append("--error=none")
 
         """Set job name. Follows convention for ATS in Slurm and LSF schedulers."""
         test.jobname = f"{np}_{test.serialNumber}{test.namebase[0:50]}{time.strftime('%H%M%S',time.localtime())}"
@@ -326,22 +278,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
             if self.numProcsAvailable < self.maxCores:
                 return False
 
-        # Throttle number of oustanding flux jobs
-        # Default is 8 jobs per node.
-        # Allow user to increase or decrease this with the 
-        # --num_concurrent_jobs option.
+        # If --num_concurrent_jobs was specified
+        # Throttle number of oustanding flux jobs based on this user requested limit
         # set max_outstanding_jobs as appropriate based on this logic
-        max_outstanding_jobs = self.numNodes * 8
         if self.num_concurrent_jobs > 0:
-            max_outstanding_jobs = self.num_concurrent_jobs
+            if FluxScheduled.flux_outstanding_jobs >= self.num_concurrent_jobs:
+                if FluxScheduled.debug_canRunNow:
+                    print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= self.num_concurrent_jobs=%i"
+                        % (FluxScheduled.flux_outstanding_jobs, self.num_concurrent_jobs))
+                return False
 
-        if FluxScheduled.flux_outstanding_jobs >= max_outstanding_jobs:
-            if FluxScheduled.debug_canRunNow:
-                print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= max_outstanding_jobs=%i" 
-                    % (FluxScheduled.flux_outstanding_jobs, max_outstanding_jobs))
-            return False
-
-        # If num_concurrent_mpi_tasks was specified, 
+        # If --num_concurrent_mpi_tasks was specified, 
         # Throttle ATS based on this user set limit
         if self.num_concurrent_mpi_tasks > 0:
             if FluxScheduled.flux_outstanding_mpi_tasks >= self.num_concurrent_mpi_tasks:
