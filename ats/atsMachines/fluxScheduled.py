@@ -34,7 +34,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
     debug = False
     debug_canRunNow = False
     debug_noteLaunch = False
-    flux_outstanding_jobs = 0    #  Track the number of submitted jobs yet to finish
+    flux_outstanding_jobs = 0       # Track the number of submitted jobs yet to finish
+    flux_outstanding_mpi_tasks = 0  # Track the number of outstanding submitted mpi tasks across all jobs
 
     def init(self):
         """
@@ -93,19 +94,21 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         :param options: The options available to a user in test.ats files.
         """
-        self.timelimit = options.timelimit
-        self.toss_nn   = options.toss_nn
-        self.num_concurrent_jobs  = options.num_concurrent_jobs
-        self.cuttime   = options.cuttime
-        self.flux_run_args = options.flux_run_args
-        self.gpus_per_task = options.gpus_per_task
-        self.test_np_max = options.test_np_max
+        self.timelimit                 = options.timelimit
+        self.toss_nn                   = options.toss_nn
+        self.num_concurrent_jobs       = options.num_concurrent_jobs
+        self.num_concurrent_mpi_tasks  = options.num_concurrent_mpi_tasks
+        self.cuttime                   = options.cuttime
+        self.flux_run_args             = options.flux_run_args
+        self.gpus_per_task             = options.gpus_per_task
+        self.test_np_max               = options.test_np_max
 
         if FluxScheduled.debug:
             print("DEBUG: FluxScheduled examineOptions : self.timelimit=%s" % (self.timelimit))
             print("DEBUG: FluxScheduled examineOptions : self.cuttime=%s" % (self.cuttime))
             print("DEBUG: FluxScheduled examineOptions : self.flux_run_args=%s" % (self.flux_run_args))
             print("DEBUG: FluxScheduled examineOptions : self.num_concurrent_jobs=%i" % (self.num_concurrent_jobs))
+            print("DEBUG: FluxScheduled examineOptions : self.num_concurrent_mpi_tasks=%i" % (self.num_concurrent_mpi_tasks))
             print("DEBUG: FluxScheduled examineOptions : self.gpus_per_task=%s" % (self.gpus_per_task))
             print("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max))
 
@@ -334,8 +337,19 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if FluxScheduled.flux_outstanding_jobs >= max_outstanding_jobs:
             if FluxScheduled.debug_canRunNow:
-                print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= max_outstanding_jobs=%i" % (FluxScheduled.flux_outstanding_jobs, max_outstanding_jobs))
+                print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= max_outstanding_jobs=%i" 
+                    % (FluxScheduled.flux_outstanding_jobs, max_outstanding_jobs))
             return False
+
+        # If num_concurrent_mpi_tasks was specified, 
+        # Throttle ATS based on this user set limit
+        if self.num_concurrent_mpi_tasks > 0:
+            if FluxScheduled.flux_outstanding_mpi_tasks >= self.num_concurrent_mpi_tasks:
+                if FluxScheduled.debug_canRunNow:
+                    print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_mpi_tasks=%i >= self.num_concurrent_mpi_tasks=%i"
+                        % (FluxScheduled.flux_outstanding_mpi_tasks, self.num_concurrent_mpi_tasks))
+                return False
+            
 
         if self.remainingCapacity() >= test.np:
             if FluxScheduled.debug_canRunNow:
@@ -367,12 +381,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
                   (self.numProcsAvailable, test.num_nodes, np))
 
         FluxScheduled.flux_outstanding_jobs += 1
+        FluxScheduled.flux_outstanding_mpi_tasks += np
 
         self.numProcsAvailable -= (np * test.cpus_per_task)
 
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: After  Job Launch   flux_outstanding_jobs=%i remainingCores=%i test.num_nodes=%i test.np=%i " % 
-                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, test.num_nodes, np))
+            print("FluxScheduled DEBUG: After  Job Launch   flux_outstanding_jobs=%i flux_outstanding_mpi_tasks=%i remainingCores=%i test.num_nodes=%i test.np=%i " % 
+                  (FluxScheduled.flux_outstanding_jobs, FluxScheduled.flux_outstanding_mpi_tasks, self.numProcsAvailable, test.num_nodes, np))
 
     def noteEnd(self, test):
         """A test has finished running. """
@@ -380,12 +395,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
         np = max(test.np, 1)
 
         FluxScheduled.flux_outstanding_jobs -= 1
+        FluxScheduled.flux_outstanding_mpi_tasks -= np
 
         self.numProcsAvailable += (np * test.cpus_per_task)
 
         if FluxScheduled.debug_noteLaunch:
-            print("FluxScheduled DEBUG: After  Job Finished flux_outstanding_jobs=%i remainingCores=%i test.num_nodes=%i test.np=%i " % 
-                  (FluxScheduled.flux_outstanding_jobs, self.numProcsAvailable, test.num_nodes, np))
+            print("FluxScheduled DEBUG: After  Job Finished flux_outstanding_jobs=%i flux_outstanding_mpi_tasks=%i remainingCores=%i test.num_nodes=%i test.np=%i " % 
+                  (FluxScheduled.flux_outstanding_jobs, FluxScheduled.flux_outstanding_mpi_tasks, self.numProcsAvailable, test.num_nodes, np))
 
     def periodicReport(self):
         """

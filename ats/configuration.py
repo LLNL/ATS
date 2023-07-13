@@ -156,6 +156,13 @@ def add_flux_only_options(parser):
                       the number of open flux jobs to avoid Flux issues.  This option can 
                       be used to override this limitation, which is currently 1 per node.
                       ''')
+    parser.add_option('--num_concurrent_mpi_tasks', dest='num_concurrent_mpi_tasks', type='int', default=-1,
+                      help='''Flux option: Number of concurrently active mpi tasks across all running jobs.
+                      This option can be used to throttle job submission to Flux
+                      based on the number of MPI tasks in flight, once this limit
+                      is hit, ATS will not submit more jobs until other jobs
+                      have finished.
+                      ''') 
     parser.add_option('--test_np_max', dest='test_np_max', type='int',
                       help='''Flux option: Over-rides test specific settings
                       of np (number of processors) if the test is set greater
