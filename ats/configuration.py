@@ -106,8 +106,9 @@ def addOptions(parser):
     add_starting_options(parser)
 
     # Flux options (toss 4 for now)
-    if MACHINE_TYPE.startswith('flux'):
+    if 'flux' in MACHINE_TYPE.lower():
         add_flux_only_options(parser)
+    
 
     # Toss specific options (slurm)
     elif SYS_TYPE.startswith('toss'):
