@@ -103,6 +103,20 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.no_time_limit             = options.no_time_limit
         self.npMax                     = options.npMax
 
+        # Command line option --npMax will over-ride flux detection of cores per node 
+        # and related vars.  Similar to setting based on NP_MAX above in the init() function, but
+        # this is from the command line
+        if self.npMax > 0:
+            self.coresPerNode = self.npMax
+            self.maxCores = self.coresPerNode * self.numNodes
+            self.numberTestsRunningMax = self.maxCores
+            self.numProcsAvailable = self.maxCores
+
+        # If num_concurrent_mpi_tasks was not set, it will be -1.  In this case
+        # set this to be the numProcsAvailable in the allocation.
+        if self.num_concurrent_mpi_tasks < 0:
+            self.num_concurrent_mpi_tasks = self.numProcsAvailable
+
         if FluxScheduled.debug:
             print("DEBUG: FluxScheduled examineOptions : self.timelimit=%s" % (self.timelimit))
             print("DEBUG: FluxScheduled examineOptions : self.cuttime=%s" % (self.cuttime))
@@ -113,17 +127,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             print("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max))
             print("DEBUG: FluxScheduled examineOptions : self.no_time_limit=%s" % (self.no_time_limit))
             print("DEBUG: FluxScheduled examineOptions : self.npMax=%i" % (self.npMax))
-
-        # Command line option --npMax will over-ride flux detection of cores per node 
-        # and related vars.  Similar to setting based on NP_MAX above in the init() function, but
-        # this is from the command line
-        if self.npMax > 0:
-            self.coresPerNode = self.npMax
-            self.maxCores = self.coresPerNode * self.numNodes
-            self.numberTestsRunningMax = self.maxCores
-            self.numProcsAvailable = self.maxCores
             
-
     def set_nt_num_nodes(self, test):
         """
         Set the test options test.num_nodes (nn), test.nt (number of threads), and 
@@ -248,7 +252,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # Pass any arbitrary string provided by the user here.  This could be any of the -o options for affinity
         # preferences, or any other valid 'flux run' option
         if self.flux_run_args != "unset":
-            ret.append(self.flux_run_args)
+            ret.extend(self.flux_run_args.split())
+            # ret.append(self.flux_run_args)
 
         """Set job name. Follows convention for ATS in Slurm and LSF schedulers."""
         test.jobname = f"{np}_{test.serialNumber}{test.namebase[0:50]}{time.strftime('%H%M%S',time.localtime())}"
@@ -288,7 +293,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
                         % (FluxScheduled.flux_outstanding_jobs, self.num_concurrent_jobs))
                 return False
 
-        # If --num_concurrent_mpi_tasks was specified, 
+        # If --num_concurrent_mpi_tasks is > 0
         # Throttle ATS based on this user set limit
         if self.num_concurrent_mpi_tasks > 0:
             if FluxScheduled.flux_outstanding_mpi_tasks >= self.num_concurrent_mpi_tasks:
@@ -400,3 +405,5 @@ class FluxScheduled(lcMachines.LCMachineCore):
                 return 0
             else:
                 return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
+
+
