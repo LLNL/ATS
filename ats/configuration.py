@@ -152,17 +152,15 @@ def add_flux_only_options(parser):
                       concurrently, even when nn is specified for individual
                       test cases.''')
     parser.add_option('--num_concurrent_jobs', dest='num_concurrent_jobs', type='int', default=-1,
-                      help='''Flux option: Number of concurrently running jobs
-                      ATS will give to the Flux scheduler. ATS currently throttles
-                      the number of open flux jobs to avoid Flux issues.  This option can 
-                      be used to override this limitation, which is currently 1 per node.
+                      help='''Flux option: Limit number of concurrently running jobs.
+                      Default is unset, but projects may wish to set this in order to
+                      throttle ATS submission of jobs to the flux scheduler. 
                       ''')
     parser.add_option('--num_concurrent_mpi_tasks', dest='num_concurrent_mpi_tasks', type='int', default=-1,
-                      help='''Flux option: Number of concurrently active mpi tasks across all running jobs.
-                      This option can be used to throttle job submission to Flux
-                      based on the number of MPI tasks in flight, once this limit
-                      is hit, ATS will not submit more jobs until other jobs
-                      have finished.
+                      help='''Flux option: Limit number of concurrently active mpi tasks across all running jobs.
+                      Default value is the number of CPU cores in the allocation.
+                      Projects may wish to increase this or decrease this in order to
+                      throttle ATS submission of jobs to the flux scheduler.
                       ''') 
     parser.add_option('--test_np_max', dest='test_np_max', type='int',
                       help='''Flux option: Over-rides test specific settings
