@@ -299,6 +299,9 @@ class FluxScheduled(lcMachines.LCMachineCore):
         ret.append(f"-n{test.np}")
         ret.append(f"-c{test.cpus_per_task}")   # Needs to be set properly for threaded or gpu runs
 
+        if test.gpus_per_task > 0:
+            ret.append(f"-g{test.gpus_per_task}")   # -g option allows access to GPU with mpibind turned off
+
         # Pass any arbitrary string provided by the user here.  This could be any of the -o options for affinity
         # preferences, or any other valid 'flux run' option
         if self.flux_run_args != "unset":
