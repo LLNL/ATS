@@ -104,7 +104,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         :param options: The options available to a user in test.ats files.
         """
         self.timelimit                 = options.timelimit
-        self.toss_nn                   = options.toss_nn
+        self.flux_nn                   = options.flux_nn
         self.num_concurrent_jobs       = options.num_concurrent_jobs
         self.num_concurrent_mpi_tasks  = options.num_concurrent_mpi_tasks
         self.cuttime                   = options.cuttime
@@ -112,6 +112,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.gpus_per_task             = options.gpus_per_task
         self.test_np_max               = options.test_np_max
         self.no_time_limit             = options.no_time_limit
+        self.use_flux_rm               = options.use_flux_rm
+        self.flux_exclusive            = options.flux_exclusive
 
         # Command line option --npMax will over-ride flux detection of cores per node 
         # and related vars.  Similar to setting based on NP_MAX above in the init() function, but
@@ -138,12 +140,16 @@ class FluxScheduled(lcMachines.LCMachineCore):
             log(("DEBUG: FluxScheduled examineOptions : self.gpus_per_task=%s" % (self.gpus_per_task)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.no_time_limit=%s" % (self.no_time_limit)), echo=True)
+            log(("DEBUG: FluxScheduled examineOptions : self.use_flux_rm=%s" % (self.use_flux_rm)), echo=True)
+            log(("DEBUG: FluxScheduled examineOptions : self.flux_exclusive=%s" % (self.flux_exclusive)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.npMax=%i" % (self.npMax)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.npMaxH=%i" % (self.npMaxH)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.numberTestsRunningMax =%i" % (self.numberTestsRunningMax)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.numProcsAvailable =%i" % (self.numProcsAvailable)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.numNodesAvailable =%i" % (self.numNodesAvailable)), echo=True)
 
+        if self.use_flux_rm:
+            log("Info: Will use flux resource manager to verify free resources", echo=True)
             
     def set_nt_num_nodes(self, test):
         """
@@ -192,17 +198,38 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if (cpus_per_task_based_on_gpus > test.cpus_per_task):
             test.cpus_per_task = cpus_per_task_based_on_gpus
 
-        # Command line option toss_nn over-rides what is in the deck.
-        if (self.toss_nn < 0):
+        # Command line option flux_nn over-rides what is in the deck.
+        if (self.flux_nn < 0):
             test.num_nodes = test.options.get('nn', 0)
         else:
-            test.num_nodes = self.toss_nn
+            test.num_nodes = self.flux_nn
 
         # Command line option test_np_max over-rides limits the max np in the test deck
         test.np = test.options.get("np", 1)
         if self.test_np_max is not None:                              
             if test.np > self.test_np_max:      # If test np is greater than the command line max 
                 test.np = self.test_np_max      # then set the test np to the maxd
+
+        test.num_nodes_calculated = 0   # Will be calculated if not specified by the user
+        test.num_nodes_exclusive  = 0   # Default to 0, meaning the node is not exclusively used for each job
+
+        if test.num_nodes > 0:                              
+            # If either per test nn was specified or -nn was specified on the command line
+            # then that will be used when setting test.num_nodes, and that will
+            # then also be used for the num_nodes_exclusive value
+            test.num_nodes_exclusive= test.num_nodes
+
+        else:
+            # If per test nn was not specified, and -nn was not specified on the command
+            # then calculate the number of nodes to use based on the np (number of mpi task)
+            # and the number of cpus needed per task
+            total_cores_needed = test.cpus_per_task * test.np
+            test.num_nodes_calculated = ceil(total_cores_needed / self.coresPerNode)
+
+            # if --flux_exclusive option was given, then indicate exclusive node use 
+            # for the job
+            if self.flux_exclusive:
+                test.num_nodes_exclusive = test.num_nodes_calculated
 
     def calculateCommandList(self, test):
         """
@@ -215,7 +242,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
         ret = "flux run ".split()
 
         FluxScheduled.set_nt_num_nodes(self, test)
-        np = max(test.np, 1)
 
         # If the user has given ats the --no_time_limit option, then do not
         # append the -t option at all on the flux run line.
@@ -260,15 +286,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # have exclusive access to the node, so use --exclusive in that scenario.
         # If we calculate the -N ourselves, it does not mean exclusive access,
         # but the -N is just there to stop spreading the mpi tasks around nodes
+
         if test.num_nodes > 0:
             ret.append(f"-N{test.num_nodes}")
             ret.append("--exclusive")
         else: 
-            total_cores_needed = test.cpus_per_task * np
-            num_nodes_needed = ceil(total_cores_needed / self.coresPerNode)
-            ret.append(f"-N{num_nodes_needed}")
+            ret.append(f"-N{test.num_nodes_calculated}")
+            if self.flux_exclusive:
+                ret.append("--exclusive")
+            
 
-        ret.append(f"-n{np}")               
+        ret.append(f"-n{test.np}")
         ret.append(f"-c{test.cpus_per_task}")   # Needs to be set properly for threaded or gpu runs
 
         # Pass any arbitrary string provided by the user here.  This could be any of the -o options for affinity
@@ -278,7 +306,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             # ret.append(self.flux_run_args)
 
         """Set job name. Follows convention for ATS in Slurm and LSF schedulers."""
-        test.jobname = f"{np}_{test.serialNumber}{test.namebase[0:50]}{time.strftime('%H%M%S',time.localtime())}"
+        test.jobname = f"{test.np}_{test.serialNumber}{test.namebase[0:50]}{time.strftime('%H%M%S',time.localtime())}"
         ret.append("--job-name")
         ret.append(test.jobname)
         return ret + self.calculateBasicCommandList(test)
@@ -289,9 +317,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
            If so return ''.  Otherwise return the reason it cannot be run here.
         """
         FluxScheduled.set_nt_num_nodes(self, test)
-        np = max(test.np, 1)
-        if (np * test.cpus_per_task) > self.maxCores:
-            return "Too many cores needed (%d > %d)" % (np * test.cpus_per_task, self.maxCores)
+        if (test.np * test.cpus_per_task) > self.maxCores:
+            return "Too many cores needed (%d > %d)" % (test.np * test.cpus_per_task, self.maxCores)
 
         if test.num_nodes > self.numNodes:
             return "Too many nodes needed (%d)" % (test.num_nodes)
@@ -311,8 +338,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if self.num_concurrent_jobs > 0:
             if FluxScheduled.flux_outstanding_jobs >= self.num_concurrent_jobs:
                 if FluxScheduled.debug_canRunNow:
-                    print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= self.num_concurrent_jobs=%i"
-                        % (FluxScheduled.flux_outstanding_jobs, self.num_concurrent_jobs))
+                    log(("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_jobs=%i >= self.num_concurrent_jobs=%i"
+                        % (FluxScheduled.flux_outstanding_jobs, self.num_concurrent_jobs)), echo=True)
                 return False
 
         # If --num_concurrent_mpi_tasks is > 0
@@ -320,18 +347,17 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if self.num_concurrent_mpi_tasks > 0:
             if FluxScheduled.flux_outstanding_mpi_tasks >= self.num_concurrent_mpi_tasks:
                 if FluxScheduled.debug_canRunNow:
-                    print("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_mpi_tasks=%i >= self.num_concurrent_mpi_tasks=%i"
-                        % (FluxScheduled.flux_outstanding_mpi_tasks, self.num_concurrent_mpi_tasks))
+                    log(("FluxScheduled DEBUG: canRunNow returning False. FluxScheduled.flux_outstanding_mpi_tasks=%i >= self.num_concurrent_mpi_tasks=%i"
+                        % (FluxScheduled.flux_outstanding_mpi_tasks, self.num_concurrent_mpi_tasks)), echo=True)
                 return False
-            
 
         if self.remainingCapacity() >= test.np:
             if FluxScheduled.debug_canRunNow:
-                print("FluxScheduled DEBUG: canRunNow returning True. capacity=%i >= test.np=%i" % (self.remainingCapacity(), test.np))
+                log(("FluxScheduled DEBUG: canRunNow returning True. capacity=%i >= test.np=%i" % (self.remainingCapacity(), test.np)), echo=True)
             return True
         else:
             if FluxScheduled.debug_canRunNow:
-                print("FluxScheduled DEBUG: canRunNow returning False. capacity=%i < test.np=%i" % (self.remainingCapacity(), test.np))
+                log(("FluxScheduled DEBUG: canRunNow returning False. capacity=%i < test.np=%i" % (self.remainingCapacity(), test.np)), echo=True)
             return False
 
     # ##############################################################################################################################
@@ -348,13 +374,12 @@ class FluxScheduled(lcMachines.LCMachineCore):
     def noteLaunch(self, test):
         """A test has been launched."""
         FluxScheduled.set_nt_num_nodes(self, test)
-        np = max(test.np, 1)
 
         FluxScheduled.flux_outstanding_jobs += 1
-        FluxScheduled.flux_outstanding_mpi_tasks += np
-        self.numProcsAvailable -= (np * test.cpus_per_task)
-        self.numNodesAvailable -= test.num_nodes
-        self.numGPUsAvailable  -= (np * test.gpus_per_task)
+        FluxScheduled.flux_outstanding_mpi_tasks += test.np
+        self.numProcsAvailable -= (test.np * test.cpus_per_task)
+        self.numNodesAvailable -= test.num_nodes_exclusive
+        self.numGPUsAvailable  -= (test.np * test.gpus_per_task)
 
         if FluxScheduled.debug_noteLaunch:
             log (   ("FluxScheduled DEBUG: After  Job Launch   "
@@ -370,19 +395,18 @@ class FluxScheduled(lcMachines.LCMachineCore):
                      "test.num_nodes=%i "
                   % (FluxScheduled.flux_outstanding_jobs, FluxScheduled.flux_outstanding_mpi_tasks, 
                      self.numNodesAvailable, self.numProcsAvailable, self.numGPUsAvailable,
-                     test.num_nodes, np,
+                     test.num_nodes, test.np,
                      test.cpus_per_task, test.gpus_per_task, test.num_nodes)), echo=True)
 
     def noteEnd(self, test):
         """A test has finished running. """
         FluxScheduled.set_nt_num_nodes(self, test)
-        np = max(test.np, 1)
 
         FluxScheduled.flux_outstanding_jobs -= 1
-        FluxScheduled.flux_outstanding_mpi_tasks -= np
-        self.numProcsAvailable += (np * test.cpus_per_task)
-        self.numNodesAvailable += test.num_nodes
-        self.numGPUsAvailable  += (np * test.gpus_per_task)
+        FluxScheduled.flux_outstanding_mpi_tasks -= test.np
+        self.numProcsAvailable += (test.np * test.cpus_per_task)
+        self.numNodesAvailable += test.num_nodes_exclusive
+        self.numGPUsAvailable  += (test.np * test.gpus_per_task)
 
         if FluxScheduled.debug_noteLaunch:
             log (   ("FluxScheduled DEBUG: After  Job Finished "
@@ -398,7 +422,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
                      "test.num_nodes=%i "
                   % (FluxScheduled.flux_outstanding_jobs, FluxScheduled.flux_outstanding_mpi_tasks,
                      self.numNodesAvailable, self.numProcsAvailable, self.numGPUsAvailable,
-                     test.num_nodes, np,
+                     test.num_nodes, test.np,
                      test.cpus_per_task, test.gpus_per_task, test.num_nodes)), echo=True)
 
     def periodicReport(self):
@@ -406,57 +430,60 @@ class FluxScheduled(lcMachines.LCMachineCore):
         Report on current status of tasks and processor availability.
         Utilizes Flux accessors for resource_list and flux job monitoring capabilities.
         """
-        # TODO: reconcile ATS's notion of "running" with Flux
-        # ATS says anything that it has submitted to the queue is "running" but with Flux
+        # NOTE: ATS says anything that it has submitted to the queue is "running" but with Flux
         # jobs that have been submitted to the queue may not have necessarily been allocated resources yet
 
         if self.running:
             terminal(
-                "CURRENTLY RUNNING %d tests:" % len(self.running),
+                "CURRENTLY RUNNING (SUBMITTED) %d tests:" % len(self.running),
                 " ".join([t.name for t in self.running]),
             )
         terminal("-" * 80)
 
-        ## Flux specific accessors for number of nodes
-        # resource_list = flux.resource.list.resource_list(self.fluxHandle).get()
-        # procs = resource_list.allocated.ncores
-        # total = resource_list.up.ncores
-        # terminal(f"CURRENTLY UTILIZING {procs} of {total} processors.")
+        if self.use_flux_rm:
+            resource_list = flux.resource.list.resource_list(self.fluxHandle).get()
+            procs = resource_list.allocated.ncores
+            total = resource_list.up.ncores
+            terminal(f"CURRENTLY UTILIZING {procs} of {total} processors (Flux reported).")
 
-        numProcsUsed = min(self.maxCores, self.maxCores - self.numProcsAvailable)
-        terminal(f"CURRENTLY UTILIZING {numProcsUsed} of {self.maxCores} processors.")
-        terminal("-" * 80)
+        else:
+            numProcsUsed = min(self.maxCores, self.maxCores - self.numProcsAvailable)
+            terminal(f"CURRENTLY UTILIZING {numProcsUsed} of {self.maxCores} processors.")
+            terminal("-" * 80)
 
 
     # ##############################################################################################################################
     #
-    # SAD : 2022 Nov 1 Comment
-    #
     # Let's go ahead and add some throttling to Flux.  Primarily to keep down the number of open pipes used
     # to monitor jobs.
-    #
-    # First look at the ATS tallies for number of nodes and cores. 
-    # If those indicate none letft, return 0.
-    # If ATS thinks there are some left, then check and return the FLUX values for number of nodes or cores
     #
     # ##############################################################################################################################
 
     def remainingCapacity(self):
         """Returns the number of free cores in the flux instance."""
+        
+        if self.use_flux_rm:
 
-        # Check all our resource tracking first, avoid more expensive flux resource calls.
-        if self.numNodesAvailable < 1:
+            resource_list = flux.resource.list.resource_list(self.fluxHandle).get()
+
+            if resource_list.free.nnodes < 1:
+                return 0
+            elif resource_list.free.ncores < 1:
+                return 0
+            elif resource_list.free.ngpus < 1:
+                return 0
+            else:
+                return resource_list.free.ncores
+
+        # Else use ATS internal resource tracking
+        elif self.numNodesAvailable < 1:
             return 0
         elif self.numProcsAvailable < 1:
             return 0
         elif self.numGPUsAvailable < 1:
             return 0
-        # OK, we think there are resources, but check with flux as well
-        # This is a candidate for deletion.
         else:
-            if (flux.resource.list.resource_list(self.fluxHandle).get().free.nnodes < 1):
-                return 0
-            else:
-                return flux.resource.list.resource_list(self.fluxHandle).get().free.ncores
+            return self.numProcsAvailable;
 
 
+# end of file
