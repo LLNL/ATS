@@ -31,7 +31,9 @@ class StandardScheduler (object):
                                name='atss.log',
                                logging=configuration.options.logUsage,
                                echo=False)
+        self.calculatePriority(interactiveTests)
 
+    def calculatePriority(self, interactiveTests):
         for t in interactiveTests:
             waitOnMe = [x for x in interactiveTests if t in x.waitUntil]
             t.totalPriority += sum([w.priority for w in waitOnMe])
