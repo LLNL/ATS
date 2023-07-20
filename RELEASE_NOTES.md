@@ -1,8 +1,127 @@
 # ATS Release Notes
 
-##  7.0.114 (yet to be officially released)
+    --------------------------------------------------------------------------- 
+##  7.0.114
+    --------------------------------------------------------------------------- 
 
-    Added command line flux option: --num_concurrent_mpi_tasks.
+Commentatary on the flux run line:
+
+    Different projects required different flux options.  In particular, should
+    mpibind be on or off, should tests require excusive node access, should
+    the cpu-affinity or gpu-affinity be set?   As project needs vary,
+    ATS generates a basic flux line which looks like so: but then allows
+    projects to supplement these to provide for the best throughput or 
+    memory access or run reproducibility.
+
+    The basic flux run line which ATS generates will look like so
+
+    flux run -t<time_limit) -N<nodes> -n<mpi_tasks> -c<cores_per_mpi_task> -g<gpus_per_mpi_task)
+
+    ATS uses these standard, historical ATS testing options to generate the flux run line:
+        nn = number of nodes
+        np = number of mpi tasks
+        nt = number of thread per mpi task
+        ngpu / gpus_per_task = number of gpus per mpi rank
+        
+    And of course, there are command line options used as well, which can over-ride 
+    the test specific options.
+
+    However there are additional options, are changes to even those basic options
+    which some projects will require to achieve their testing goals.
+    
+Advice on running a Host compiled code using Flux
+
+    Host Example 1: ats --flux_run_args="-o mpibind=off"
+
+    Host Example 1 comments.  The use of "-o mpibind=off" was necessary
+    in order to allow flux to pack multiple jobs onto each node, and to 
+    ensure each MPI task, across all running jobs, do not share physical CPU
+    cores (ie to prevent over-subscription of physical CPU cores)
+
+Advice on running a GPU  compiled code using Flux
+
+    GPU  Example 1: ats --test_np_max=4 --gpus_per_task=1 --flux_run_args="-o mpibind=on" 
+
+    GPU  Example 1 comments. This code uses these options to run a minimum of
+    two GPU codes per node.  For tests which use less then 4 mpi tasks, this will run 
+    up to 8 separate GPU jobs per node, concurrently.  The command line options explained:
+
+    --test_np_max=4 <- sets the maximum number for the per test 'np' option. 
+        if a test has np set to 1, 2, 3, or 4, then there is no change.
+        if a test has np set to > 4, this --test_np_max will set it to 4.
+
+    --gpus_per_task=1 <- Specifies that each MPI task will use 1 GPU device.   
+        This is an easy way to run an existing test suite for which ngpu / gpus_per_task
+        is not specified on a per test basis.  This option is equivalent to a 
+        per test setting of ngpu=1, and will apply it to every test job.
+
+    --flux_run_args="-o mpibind=on" <- This project needs to have mpibind on in 
+        order to access the GPU memory using hipMalloc or Umpire.  This is an example
+        of a project specific setting. 
+
+    GPU  Example 2:
+
+        (Want Ben Liu's options here)
+
+Added and updated Flux options:
+
+  --flux_run_args="some string"
+
+    This can be used to add any string that is meaningful to
+    the basic 'flux run' command to each test submittal.
+    For instance:
+
+    --flux_run_args="-o gpu-affinity=per-task -o mpibind=off"
+
+        Would add that string literal to the basic flux run line that ATS
+        generates.
+
+  --nn  
+    Over-rides or appends test specific nn  option.
+
+  --test_np_max   
+    Potentially overrides the np test setting.
+    That is, it limits the maximum value of np to this value.
+    If the test np is less than this value, then no change
+    If the test np is greater than this value, then the test np
+    is reduced to this value.
+
+    For instance if the command line option --test_np_max=4
+    is used, then a per test setting of np=10 will be reduced
+    to np=4.  If a per test setting of np=1 is in the test deck,
+    then it will not be changed.
+
+  --gpus_per_task  Overrides or appends the test specific gpus_per_task
+        option.
+
+  --no_time_limit
+
+    Do not specify per job time limits on the flux run line. 
+    This option takes precedence over any other timelimit or cutoff time options
+
+  --use_flux_rm
+
+    Use flux resource manager to detect free hardware resources.
+    Default is for ATS to track available nodes, cores, and gpus.
+    But there may be scenarios where calling the flux resource list
+    could be useful.  
+
+    Both should provide good throughput. 
+
+    This information is used to know when to submit new jobs to flux.
+    If a project starts seeing jobs in the flux queue (ie waiting for
+    resources), one could try this alternative.
+
+  --flux_exclusive
+
+    Mark each job as needing exlusive access to the node.  Do not
+    run multiple jobs concurrently on a node.  This option will
+    pass the --exclusive option to flux on the run line, as well
+    as inform ATS that each jobs needs excusive access to the node(s)
+    on which it run.
+        
+  --num_concurrent_mpi_tasks
+
     This is another method which may be used to throttle Flux 
     jobs.  This sets the maximum number of outstanding MPI tasks 
     across all currently submitted Flux jobs.  When this limit
@@ -10,13 +129,13 @@
     currently submitted jobs have completed.
     There is no default limit.
 
-    Added command line flux option: --num_concurrent_jobs.
+  --num_concurrent_jobs
+
     This may be used to throttle flux jobs submitted
     by ATS. This is the maximum number of outstanding 
     flux jobs that have been submitted to flux, but 
     not yet completed.  The default value is 8 per node, but 
     this command line ats flag can set this number higher or lower.
-
 
     Adjusted basic flux run line to include
     the -N option.  Used to keep flux from
@@ -31,8 +150,9 @@
     to tell FLUX to use ASCII characters.
 
 
-
+    --------------------------------------------------------------------------- 
 ##  7.0.113
+    --------------------------------------------------------------------------- 
 
     Better Flux support for Native Flux machines with GPUs, 
     such as rzvernal.
@@ -176,7 +296,9 @@
     Note that the -c8 setting ensures a separate GPU for each MPI rank.
 
 
+    --------------------------------------------------------------------------- 
 ## 7.0.111
+    --------------------------------------------------------------------------- 
     Inital Flux support on Toss 4 systems where flux is 
     the native scheduler.   
 
@@ -189,7 +311,9 @@
     * remove outdated bin dir files
     * rename back to atsflux
 
+    --------------------------------------------------------------------------- 
 ## 7.0.105
+    --------------------------------------------------------------------------- 
 
     Update sleepBeforeRun option.
     Renamed from sleepBeforeSrun.
@@ -230,11 +354,15 @@
     --smpi_show
 
 
+    --------------------------------------------------------------------------- 
 ## 7.0.100
+    --------------------------------------------------------------------------- 
 
 * Port to Python 3.8
 
+    --------------------------------------------------------------------------- 
 ## 7.0 
+    --------------------------------------------------------------------------- 
 
 * 2021-April-19
 * Migrated from Bitbucket to GitHub
