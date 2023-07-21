@@ -133,33 +133,20 @@ Added and updated Flux options:
     pass the --exclusive option to flux on the run line, as well
     as inform ATS that each jobs needs excusive access to the node(s)
     on which it run.
+
+  --num_concurrent_jobs NUM_CONCURRENT_JOBS
+    Flux option: Limit number of concurrently running jobs. 
+    Default is unset, but projects may wish to set this in 
+    order to throttle ATS submission of jobs to the flux
+                        scheduler.
+  --num_concurrent_mpi_tasks NUM_CONCURRENT_MPI_TASKS
+    Flux option: Limit number of concurrently active mpi tasks 
+    across all running jobs. Default value is the number of 
+    CPU cores in the allocation. Projects may wish to
+    increase this or decrease this in order to throttle 
+    ATS submission of jobs to the flux scheduler.
+
         
-  --num_concurrent_mpi_tasks
-
-    This is another method which may be used to throttle Flux 
-    jobs.  This sets the maximum number of outstanding MPI tasks 
-    across all currently submitted Flux jobs.  When this limit
-    is hit, ATS will not submit more jobs to Flux until
-    currently submitted jobs have completed.
-    There is no default limit.
-
-  --num_concurrent_jobs
-
-    This may be used to throttle flux jobs submitted
-    by ATS. This is the maximum number of outstanding 
-    flux jobs that have been submitted to flux, but 
-    not yet completed.  The default value is 8 per node, but 
-    this command line ats flag can set this number higher or lower.
-
-    Adjusted basic flux run line to include
-    the -N option.  Used to keep flux from
-    spreading MPI tasks across multiple
-    nodes un-necessarily  Will use the test
-    specific -nn option if specified.  If
-    not specified, ATS will calculate the
-    minimum number of nodes needed for the
-    job and use that.
-    
     Export env variable FLUX_F58_FORCE_ASCII=1,
     to tell FLUX to use ASCII characters.
 
