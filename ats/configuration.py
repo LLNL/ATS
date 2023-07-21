@@ -106,7 +106,7 @@ def addOptions(parser):
     add_starting_options(parser)
 
     # Flux options (toss 4 for now)
-    if MACHINE_TYPE.startswith('flux'):
+    if 'flux' in MACHINE_TYPE.lower():
         add_flux_only_options(parser)
 
     # Toss specific options (slurm)
@@ -118,7 +118,6 @@ def addOptions(parser):
         add_blueos_only_options(parser)
 
     add_more_options(parser)
-
 
 def add_starting_options(parser):
     # TODO: group SYS_TYPE specific options
@@ -144,20 +143,38 @@ def add_flux_only_options(parser):
                       Perform 'flux help run' for useful oprions for your project.
                       String is not checked for validity.  Quotes in the string 
                       may need to be escaped or otherwise specified''')
-    parser.add_option('--nn', dest='toss_nn', type='int', default=-1,
+    parser.add_option('--nn', dest='flux_nn', type='int', default=-1,
                       help='''Flux option: -nn option. Over-rides test
                       specific settings of nn (number of nodes). Setting this
                       to 0 will allow multiple jobs to run per node
                       concurrently, even when nn is specified for individual
                       test cases.''')
+    parser.add_option('--num_concurrent_jobs', dest='num_concurrent_jobs', type='int', default=-1,
+                      help='''Flux option: Limit number of concurrently running jobs.
+                      Default is unset, but projects may wish to set this in order to
+                      throttle ATS submission of jobs to the flux scheduler. 
+                      ''')
+    parser.add_option('--num_concurrent_mpi_tasks', dest='num_concurrent_mpi_tasks', type='int', default=-1,
+                      help='''Flux option: Limit number of concurrently active mpi tasks across all running jobs.
+                      Default value is the number of CPU cores in the allocation.
+                      Projects may wish to increase this or decrease this in order to
+                      throttle ATS submission of jobs to the flux scheduler.
+                      ''') 
     parser.add_option('--test_np_max', dest='test_np_max', type='int',
                       help='''Flux option: Over-rides test specific settings
-                      of np (number of processors) if the test is set greater
-                      than the value provided.''')
+                      of np (number of processors).  If the test np is greater than test_np_max
+                      reduce the test np to test_np_max.''')
     parser.add_option('--gpus_per_task', dest='gpus_per_task', type='int',
                        help='''Flux option: Sets or over-rides
                        test specific settings of gpus_per_task, or ngpu,
                        which is the number of GPU devices per MPI rank. ''')
+    parser.add_option('--no_time_limit', action='store_true', dest='no_time_limit', default=False,
+                      help='''Flux option: Do not specify per job time limits on the flux run line.
+                      This option takes precedence over any other timelimit or cutoff time
+                      options.''')
+    parser.add_option('--flux_exclusive', action='store_true', dest='flux_exclusive', default=False,
+                      help='''Flux option:  Run each job on an exclusive set of nodes.''')
+    parser.add_option('--use_flux_rm', action='store_true', default=False, help="Flux option: Use flux resource manager to detect free hardware resources")
 
 def add_blueos_only_options(parser):
     parser.add_option('--m_gpu', action='store_true', dest='mpi_um', default=True,

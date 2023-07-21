@@ -400,11 +400,17 @@ class MachineCore(object):
         if configuration.SYS_TYPE.startswith('toss'):
             os.environ['VIADEV_USE_SHMEM_COLL'] = "0"
 
-        if configuration.SYS_TYPE.startswith('chaos'):
-            os.environ['VIADEV_USE_SHMEM_COLL'] = "0"
-
         # LS_COLORS can mess up somesystem and is not needed for any platform by ATS
         os.environ['LS_COLORS'] = ""
+
+        # Tell Flux to use ASCII character set, otherwise Python can't handle the output and dies with error like so:
+        # UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 3942: invalid start byte
+        # 
+        # File ".../ats/tests.py", line 643, in recordOutput
+        # for line in f:
+        # File "/collab/usr/gapps/python/.../lib/python3.9/codecs.py", line 322, in decode
+        #   (result, consumed) = self._buffer_decode(data, self.errors, final)
+        os.environ['FLUX_F58_FORCE_ASCII'] = "1"
 
         # Bamboo env vars can also mess up somesystem runs by exceeding char limit for env vars
         # remove them
