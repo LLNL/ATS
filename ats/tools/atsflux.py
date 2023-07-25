@@ -24,6 +24,10 @@ my_hostname = os.environ.get("HOSTNAME", "unset")
 if (my_hostname.startswith('rzvernal')):
     flux_native = True
     time_limit = 240
+elif (my_hostname.startswith('rzansel')):
+    flux_under_lsf = True
+    flux_native = False
+    time_limit = 240
 else:
     flux_native = False
     time_limit = 240
@@ -148,6 +152,38 @@ def main():
                 "--output=atsflux.log"
             ]
 
+    elif flux_under_lsf is True:
+        print("Running flux under lsf")
+
+        lsf_job_id = os.getenv("LSB_JOBID")
+        cmd = []
+
+        if lsf_job_id is None: # if this is a login node
+            print("We are not under an allocation...")
+            cmd = [
+                "lalloc",
+                f"{args.numNodes}", # number of nodes, but lalloc doesn't have a arg name for this, this would be the -nnodes option if on bsub
+                # f"--account={args.account}", # -G option might be used here instead not sure if it will work with lalloc as it is a bsub option
+                f"-W {args.job_time}", # this is the option used for timeout on lsf
+
+                # "--smpi_off", # This might not be needed here but in the lrun instead
+                # "--exclusive", # this might be baked into the lalloc command (-core_isolation might be the arg used for bsub)
+            ]
+
+        cmd.extend(
+            [
+                "jsrun",
+                "--tasks_per_rs=1",
+                "--cpu_per_rs=ALL_CPUS",
+                "--gpu_per_rs=ALL_GPUS",
+                f"--nrs={args.numNodes}",
+                "--bind=none",
+                "--smpiargs=-disable_gpu_hooks",
+                "flux",
+                "start",
+                # "-o,-S,log-filename=out",
+            ]
+        )
 
     else:
         print("running flux under slurm")
@@ -170,7 +206,7 @@ def main():
             [
                 "srun",
                 f"-N{args.numNodes}",
-                f"-n{args.numNodes}",
+                f"-n{args.numNodes}", # should this be numNodes, or does this need to be changed to total_cores???
                 "--pty",
                 shutil.which("flux"),
                 "start",
