@@ -169,6 +169,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("%s options.salloc              = %s " % (DEBUG_SLURM, options.salloc))
             print("%s options.checkForAtsProc     = %s " % (DEBUG_SLURM, options.checkForAtsProc))
             print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
+            print("%s options.removeEndNote       = %s " % (DEBUG_SLURM, options.removeEndNote))
             print("%s options.skip                = %s " % (DEBUG_SLURM, options.skip))
             print("%s options.exclusive           = %s " % (DEBUG_SLURM, options.exclusive))
             print("%s options.mpibind             = %s " % (DEBUG_SLURM, options.mpibind))

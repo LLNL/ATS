@@ -380,6 +380,9 @@ def add_more_options(parser):
     parser.add_option('--showGroupStartOnly', action='store_true',
                       help='''Only show start of first test in group, not
                       subsequent steps.''')
+    parser.add_option('--removeEndNote', action='store_true',
+                      help='''Remove message printed after test has finished
+                      running.''')
     parser.add_option('--skip', action='store_true',
                       help='''skip actual execution of the tests, but show
                       filtering results and missing test files.''')

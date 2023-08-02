@@ -212,6 +212,7 @@ class lsfMachine (machines.Machine):
             print("%s options.nosrun              = %s " % (DEBUG_LSF, options.nosrun))
             print("%s options.checkForAtsProc     = %s " % (DEBUG_LSF, options.checkForAtsProc))
             print("%s options.showGroupStartOnly  = %s " % (DEBUG_LSF, options.showGroupStartOnly))
+            print("%s options.removeEndNote       = %s " % (DEBUG_LSF, options.removeEndNote))
             print("%s options.skip                = %s " % (DEBUG_LSF, options.skip))
             print("%s options.blueos_exclusive    = %s " % (DEBUG_LSF, options.blueos_exclusive))
             print("%s options.mpibind             = %s " % (DEBUG_LSF, options.mpibind))

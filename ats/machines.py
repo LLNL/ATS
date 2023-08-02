@@ -317,7 +317,8 @@ class MachineCore(object):
            #note test.status is not necessarily status after this!
            #see test.expectedResult
 
-        self.noteEnd(test)  #to be defined in children
+        if not configuration.options.removeEndNote:
+            self.noteEnd(test)  #to be defined in children
 
         # now close the outputs
         if test.stdOutLocGet() != 'terminal':
