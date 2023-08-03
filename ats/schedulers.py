@@ -81,7 +81,8 @@ class StandardScheduler (object):
                 self.schedule("Chose #%d to start." % nextTest.serialNumber)
             self.addBlock(nextTest)
             result = machine.startRun(nextTest)
-            self.logStart(nextTest, result)
+            if not configuration.options.removeStartNote:
+                self.logStart(nextTest, result)
             if not result:
                 self.removeBlock(nextTest)
                 break   # failure to launch, let it come back if tests left.
