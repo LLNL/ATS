@@ -304,16 +304,15 @@ class AtsManager(object):
         successful_run = True
 
         if self.testlist:
-            log("""=========================================================
-                ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
+            log("=================================================\n"
+                "ATS RESULTS %s""" % datestamp(long_format=True), echo=True)
             log('-------------------------------------------------',
                 echo = True)
             self.report()
             log('-------------------------------------------------',
                 echo = True)
         if not configuration.options.skip:
-            log("""
-ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
+            log("""ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
             successful_run = self.summary(log)
             self._summary2(log)
         return successful_run
@@ -638,7 +637,7 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
                 dependent.waitUntil = dependent.waitUntil + [t]
 
         log.leading = ''
-        log("------------------ Input complete --------", echo=True)
+        log("------------------ Input complete ------------------", echo=True)
         echo =  configuration.options.verbose or \
                 debug() or \
                 configuration.options.skip
@@ -948,13 +947,11 @@ ATS SUMMARY %s""" % datestamp(long_format=True), echo=True)
         # In this scheme, the job is rerun but previously passed jobs are
         # marked passed and batched jobs are marked SKIPPED.
         fc = open(self.continuationFileName, 'w')
-        print("""
-import ats
-testlist = ats.manager.testlist
-PASSED = ats.PASSED
-EXPECTED = ats.EXPECTED
-BATCHED = ats.BATCHED
-""", file=fc)
+        print("import ats\n"
+              "testlist = ats.manager.testlist\n"
+              "PASSED = ats.PASSED\n"
+              "EXPECTED = ats.EXPECTED\n"
+              "BATCHED = ats.BATCHED", file=fc)
 
         # The goal here is to mark passed things that need not be rerun.
         # Sometimes something passed but a child did not, which could be a
