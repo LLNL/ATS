@@ -319,8 +319,9 @@ class MachineCore(object):
 
         endNote = self.noteEnd(test)  #to be defined in children
 
-        if not configuration.options.removeEndNote:
-            print(endNote)
+        if endNote: # Check that there is something to be printed
+            if not configuration.options.removeEndNote: # Does the user want it to be printed
+                print(endNote)
 
         # now close the outputs
         if test.stdOutLocGet() != 'terminal':

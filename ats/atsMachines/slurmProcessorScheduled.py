@@ -650,7 +650,6 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         msg = '%s #%4d %s,  nn=%d, np=%d, nt=%d, ngpu=0 %s' % \
             ("Stop ", test.serialNumber, test.name, my_nn, my_np, my_nt, time.asctime())
 
-        # print(msg)
         return msg
 
     def periodicReport(self):

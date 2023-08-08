@@ -849,8 +849,6 @@ class lsfMachine (machines.Machine):
         if my_environment == "INTERACTIVE":
             os.system("stty sane")  # Keep the interactive terminal sane on blueos
 
-        # print(msg)
-
         if my_environment == "INTERACTIVE":
             os.system("stty sane")  # Keep the interactive terminal sane on blueos
 
