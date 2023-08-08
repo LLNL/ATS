@@ -486,7 +486,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         elif self.numGPUsAvailable < 1:
             return 0
         else:
-            return self.numProcsAvailable;
+            return self.numProcsAvailable
 
 
 # end of file
