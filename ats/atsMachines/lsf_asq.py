@@ -849,7 +849,7 @@ class lsfMachine (machines.Machine):
         if my_environment == "INTERACTIVE":
             os.system("stty sane")  # Keep the interactive terminal sane on blueos
 
-        print(msg)
+        # print(msg)
 
         if my_environment == "INTERACTIVE":
             os.system("stty sane")  # Keep the interactive terminal sane on blueos
@@ -883,6 +883,7 @@ class lsfMachine (machines.Machine):
                 print("ATS Error: Can not find file '%s'\n" % test.rs_filename)
 
         #print self.nodesInUse
+        return msg
 
     def periodicReport(self):
         "Report on current status of tasks"
