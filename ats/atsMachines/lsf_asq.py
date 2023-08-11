@@ -212,6 +212,8 @@ class lsfMachine (machines.Machine):
             print("%s options.nosrun              = %s " % (DEBUG_LSF, options.nosrun))
             print("%s options.checkForAtsProc     = %s " % (DEBUG_LSF, options.checkForAtsProc))
             print("%s options.showGroupStartOnly  = %s " % (DEBUG_LSF, options.showGroupStartOnly))
+            print("%s options.removeStartNote     = %s " % (DEBUG_LSF, options.removeStartNote))
+            print("%s options.removeEndNote       = %s " % (DEBUG_LSF, options.removeEndNote))
             print("%s options.skip                = %s " % (DEBUG_LSF, options.skip))
             print("%s options.blueos_exclusive    = %s " % (DEBUG_LSF, options.blueos_exclusive))
             print("%s options.mpibind             = %s " % (DEBUG_LSF, options.mpibind))
@@ -847,8 +849,6 @@ class lsfMachine (machines.Machine):
         if my_environment == "INTERACTIVE":
             os.system("stty sane")  # Keep the interactive terminal sane on blueos
 
-        print(msg)
-
         if my_environment == "INTERACTIVE":
             os.system("stty sane")  # Keep the interactive terminal sane on blueos
 
@@ -881,6 +881,7 @@ class lsfMachine (machines.Machine):
                 print("ATS Error: Can not find file '%s'\n" % test.rs_filename)
 
         #print self.nodesInUse
+        return msg
 
     def periodicReport(self):
         "Report on current status of tasks"

@@ -428,6 +428,11 @@ class FluxScheduled(lcMachines.LCMachineCore):
                      test.num_nodes, test.np,
                      test.cpus_per_task, test.gpus_per_task, test.num_nodes)), echo=True)
 
+        msg = '%s #%4d %s,  nn=%d, np=%d, ngpu=%d %s' % \
+            ("Stop ", test.serialNumber, test.name, test.num_nodes, test.np, test.gpus_per_task, time.asctime())
+
+        return msg
+
     def periodicReport(self):
         """
         Report on current status of tasks and processor availability.
