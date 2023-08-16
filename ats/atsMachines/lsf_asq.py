@@ -18,7 +18,7 @@ from subprocess import check_output
 #
 tempstr = sys.executable
 tempstr = tempstr.replace('bin/python','')
-atsdir  = os.path.join(tempstr, 'lib/python2.7/site-packages/ats');
+atsdir  = os.path.join(tempstr, 'lib/python2.7/site-packages/ats')
 hwname = os.uname()[1]
 #print "DEBUG 1000 atsdir=%s" % atsdir
 #print "DEBUG 2000 hwname=%s" % hwname
@@ -509,11 +509,11 @@ class lsfMachine (machines.Machine):
                                 self.nodesInUse[slotNum]  = 1
 
                     # create the file with the nodes to use
-                    test.rs_filename = os.getcwd() + "/%i_ats_test_%04d_rs" % (os.getpid(), test.serialNumber);
+                    test.rs_filename = os.getcwd() + "/%i_ats_test_%04d_rs" % (os.getpid(), test.serialNumber)
 
                     # print "SAD DEBUG self.LLNL_CORE_ISOLATION = %d\n" % self.LLNL_CORE_ISOLATION
 
-                    file = open(test.rs_filename,"w");
+                    file = open(test.rs_filename,"w")
                     rs_cntr = -1
                     for node in test.rs_nodesToUse:
                         rs_cntr += 1
@@ -718,7 +718,7 @@ class lsfMachine (machines.Machine):
         # pending job
         if self.runningWithinBsub == False:
             my_output = check_output("lsfjobs | grep `whoami` | wc -l",
-                                     shell=True, text=True);
+                                     shell=True, text=True)
             my_num_lsf_jobs_running = int(my_output)
 
             if nosrun == False:
@@ -791,7 +791,7 @@ class lsfMachine (machines.Machine):
         if hasattr(test, 'nt'):
             my_nt = max(test.nt, 1)
 
-        test.num_procs_used = my_np * my_nt;
+        test.num_procs_used = my_np * my_nt
         if hasattr(test, 'rs_nodesToUse') and len(test.rs_nodesToUse) > 0 and test.num_nodes > 0:
             test.num_procs_used = test.num_nodes * physical_cores_per_node
 
@@ -863,7 +863,7 @@ class lsfMachine (machines.Machine):
                     print("ATS Error: noteEnd, slotNum=%i self.npMax=%i\n" %
                           (slotNum, self.numNodes))
                     sys.exit(-1)
-                self.nodesInUse[slotNum] = 0;
+                self.nodesInUse[slotNum] = 0
 
             if cntNumNodes != test.num_nodes:
                 print("ATS Error: noteEnd, cntNumNodes=%i test.num_nodes=%i\n" %
