@@ -55,8 +55,11 @@ class FluxScheduled(lcMachines.LCMachineCore):
         )
 
         # coresPerGPU is needed to get the -c option correct
-        # when running with GPUs.  
-        self.coresPerGPU = int(self.numCores / self.numGPUs)
+        # when running with GPUs.
+        if not self.numGPUs is 0:
+            self.coresPerGPU = int(self.numCores / self.numGPUs)
+        else:
+            self.coresPerGPU = 0
         self.coresPerNode = int(self.numCores / self.numNodes)
 
         # Maintain for backwards compatability with projects
@@ -488,10 +491,10 @@ class FluxScheduled(lcMachines.LCMachineCore):
             return 0
         elif self.numProcsAvailable < 1:
             return 0
-        elif self.numGPUsAvailable < 1:
+        elif self.numGPUsAvailable < 1 and self.numGPUs is not 0:
             return 0
         else:
-            return self.numProcsAvailable;
+            return self.numProcsAvailable
 
 
 # end of file
