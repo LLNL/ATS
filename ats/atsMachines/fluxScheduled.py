@@ -62,6 +62,10 @@ class FluxScheduled(lcMachines.LCMachineCore):
             self.coresPerGPU = 0
         self.coresPerNode = int(self.numCores / self.numNodes)
 
+        # Strings used to determine which node a user wants the test to run
+        # Used with same_node var
+        self.node_list = []
+
         # Maintain for backwards compatability with projects
         # Allow user to over-ride the coresPerNode
         # Other schedulers call this npMax, but for flux we are calling this coresPerNode
@@ -262,6 +266,19 @@ class FluxScheduled(lcMachines.LCMachineCore):
                 max_time = self.timelimit
 
             ret.append(f"-t{max_time}")
+
+
+
+        import pprint
+
+        same_node = test.options.get('same_node', None)
+        if same_node is not None:
+            if same_node not in self.node_list:
+                self.node_list.append(same_node)
+                pprint.pprint(self.node_list)
+            print(f"This is the node that we are trying to run on:{self.node_list.index(same_node) % self.numNodes}")
+            ret.append(f"--requires=rank:{self.node_list.index(same_node) % self.numNodes}")
+
 
         """
         Need to set -n{np} and -c{test.cpus_per_task}.  But we also need to account for accessing
