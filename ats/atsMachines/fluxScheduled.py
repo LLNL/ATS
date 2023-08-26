@@ -277,7 +277,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
                 self.node_list.append(same_node)
                 pprint.pprint(self.node_list)
             print(f"This is the node that we are trying to run on:{self.node_list.index(same_node) % self.numNodes}")
-            ret.append(f"--requires=rank:{self.node_list.index(same_node) % self.numNodes}")
+            ret.append(f"--requires=-rank:{self.node_list.index(same_node) % self.numNodes}")
 
 
         """
