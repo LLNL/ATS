@@ -33,7 +33,7 @@ def main():
     level_found = False
 
     for index, arg in enumerate(sys.argv):
-        print("SAD DEBUG index=%i arg=%s" % (index, arg))
+        # print("SAD DEBUG index=%i arg=%s" % (index, arg))
         if (arg.startswith('level=') >= 0):
             level_found = True
         elif (arg.find('=') >= 0):
