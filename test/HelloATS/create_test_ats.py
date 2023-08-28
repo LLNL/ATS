@@ -27,30 +27,46 @@ def get_test_lines_generator():
     # Duplicate items in nprocs: [1, 2, ..., 64] --> [1, 1, 2, 2, ..., 64, 64]
     nprocs = sorted(2 * [1, 2, 3, 4, 5, 6, 7, 8, 16 ])
 
-    test_line = "t%d=test  (executable='./a.out', clas='%s', " \
+    test_line = "t%d=test  (executable='./a.out', level=20, clas='%s', " \
                 "label='a.out_%d', np=%d, sandbox=False)\n"
     return (test_line % (test_num, arg_, test_num, num_proc)
             for test_num, arg_, num_proc in zip(range(1, 44, 2), clas, nprocs))
 
-
 def get_testif_lines_generator():
     """Returns a generator containing testifs (conditional tests)."""
     testif_line = "t%d=testif(t%d, executable = my_checker, " \
-                  "clas = t%d.outname, nosrun=True)\n"
+                  "level=20, clas = t%d.outname, nosrun=True)\n"
     return (testif_line % (testif_num, testif_num - 1, testif_num - 1)
             for testif_num in range(2, 45, 2))
+
+def get_test_lines_generator_level_10():
+    """Returns a generator containing independent tests."""
+    clas = itertools.cycle(['', 'arg1 arg2 arg3'])
+    nprocs = sorted(2 * [1, 2, 3, 4 ])
+    labels = ('the', 'cat', 'in', 'hat', 'chased', 'big', 'red', 'fox')
+
+    test_line = "test(executable='./a.out', level=10, clas='%s', " \
+                "label='%s', np=%d, nt=1)\n"
+    return (test_line % (arg_, label, num_proc)
+            for arg_, label, num_proc in zip(clas, labels, nprocs) )
+
 
 
 if __name__ == "__main__":
     TEST_ATS = "test.ats"
-    FILE_HEADER = get_file_header()
-    TEST_LINES = get_test_lines_generator()
+    FILE_HEADER  = get_file_header()
+    TEST_LINES   = get_test_lines_generator()
     TESTIF_LINES = get_testif_lines_generator()
+    TEST10_LINES = get_test_lines_generator_level_10()
 
     with open(TEST_ATS, 'w') as ofp:
         ofp.write(FILE_HEADER)
+
         for test, testif in zip(TEST_LINES, TESTIF_LINES):
             ofp.write(test)
             ofp.write(testif)
+
+        for test in TEST10_LINES:
+            ofp.write(test)
 
     print(f"Most Excellent! Created ats test file {TEST_ATS}\n")
