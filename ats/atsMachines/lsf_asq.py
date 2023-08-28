@@ -445,7 +445,7 @@ class lsfMachine (machines.Machine):
                                     "--env", str_omp_proc_bind,
                                     "-N", str(int(test.num_nodes)),
                                     "-n", str(np)
-                                    ] + str_lrun_jsrun_args.split() + str_mpibind + commandList
+                                    ] + str_lrun_jsrun_args.split() + [ str_mpibind ] + commandList
                         else :
                             return ["lrun",
                                     str_smpi,
@@ -453,7 +453,7 @@ class lsfMachine (machines.Machine):
                                     "--env", str_omp_num_threads,
                                     "--env", str_omp_proc_bind,
                                     "-n", str(np)
-                                    ] + str_lrun_jsrun_args.split() + str_mpibind + commandList
+                                    ] + str_lrun_jsrun_args.split() + [ str_mpibind ] + commandList
                     else:
                         if ( test.num_nodes > 0) :
                             return ["lrun",
@@ -546,7 +546,7 @@ class lsfMachine (machines.Machine):
 
                     if test.jsrun_bind == "unset":
                         if self.mpibind:
-                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b none " + str_mpibind
+                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b none " + [ str_mpibind ]
                         else:
                             if self.old_defaults:
                                 str_lrun_jsrun_args = str_lrun_jsrun_args + " -b rs "
@@ -554,7 +554,7 @@ class lsfMachine (machines.Machine):
                                 str_lrun_jsrun_args = str_lrun_jsrun_args + " -b rs "
                     else:
                         if self.mpibind:
-                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind + " " + str_mpibind
+                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind + " " + [ str_mpibind ]
                         else:
                             str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind
 
@@ -594,7 +594,7 @@ class lsfMachine (machines.Machine):
                         if str_lrun_jsrun_args == "unset":
                             str_lrun_jsrun_args = str_mpibind
                         else:
-                            str_lrun_jsrun_args = str_lrun_jsrun_args + " " + str_mpibind
+                            str_lrun_jsrun_args = str_lrun_jsrun_args + " " + [ str_mpibind ]
 
                     cpu_per_rs = np * test.cpus_per_task
 
