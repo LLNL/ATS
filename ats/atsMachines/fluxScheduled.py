@@ -316,9 +316,9 @@ class FluxScheduled(lcMachines.LCMachineCore):
             if self.flux_exclusive:
                 ret.append("--exclusive")
 
-        if test.np > self.coresPerNode and same_node:   # Need to limit cores to be the max on the node if we
+        if test.np > self.coresPerNode and same_node:   # Need to limit cores to be the max on the node if we want to run on the same node
             log(f"ATS WARNING: Limiting cores, because of same_node option, to match max: {self.coresPerNode}")
-            ret.append(f"-n{self.coresPerNode}")        # want to run on the same node
+            ret.append(f"-n{self.coresPerNode}")
         else:
             ret.append(f"-n{test.np}")
         ret.append(f"-c{test.cpus_per_task}")   # Needs to be set properly for threaded or gpu runs
