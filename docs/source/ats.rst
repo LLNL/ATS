@@ -163,6 +163,13 @@ ATS installation.
 --oneFailure
    Stop if a test fails.
 
+--removeStartNote
+   Removes the messages printed at the start of a test running.
+
+--removeEndNote
+   Removes the message printed at the end of a test running. Will still get results
+   printed with pass/fail, just no "stop".
+
 --serial
    Run only one job at a time.
 
@@ -1039,7 +1046,7 @@ same_node
    to be run on the same node. Useful for tests that depend on some data output
    by another test that might not be accessable from other nodes. NOTE: Using this
    option will limit -N 1 and -n to max on one node, if more than that were
-   requested. Ex: --same_node='abc'
+   requested. Ex: same_node='abc'
 
 Extra Arguments On The Executable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
