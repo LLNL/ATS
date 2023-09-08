@@ -1037,7 +1037,9 @@ hideOutput
 same_node
    ONLY WORKS ON FLUX. Specify a string identifier for the tests that you want
    to be run on the same node. Useful for tests that depend on some data output
-   by another test that might not be accessable from other nodes. Ex: --same_node='abc'
+   by another test that might not be accessable from other nodes. NOTE: Using this
+   option will limit -N 1 and -n to max on one node, if more than that were
+   requested. Ex: --same_node='abc'
 
 Extra Arguments On The Executable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
