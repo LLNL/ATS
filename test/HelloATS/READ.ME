@@ -30,19 +30,24 @@ It may also present some which are HALTED if errors are detected in slurm
 or mpi init by ATS.
 
 --------------------------------------------------------------------------------
-Toss 3 (rzgenie, etc.).  Only use Slurm
+Toss 4   Testing on slurm based toss4 machines such as rzwhippet
 --------------------------------------------------------------------------------
     export PATH=${PATH}:/usr/gapps/ats/scripts
-    module load python/3.8.2
-        // Modify this line to be the ats install you are testing
+    module load python/3.9.12
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
-    mpicc hello_ats.c        <- build the code
-    ./create_test_ats.py     <- create the ats test file
-    atslite1 test.ats        <- test using slurm
+    mpicc hello_ats.c            <- build the code
+    ./create_test_ats.py         <- create the ats test file
+    atslite1 test.ats           <- test using slurm
+    export -n MACHINE_TYPE
 
-    The end of the run should include:
+    # POODLE TEST LINE (or any other system without cross node MPI)
+    salloc -N1 -p pdebug --exclusive
+    atslite1 test.ats 
+    exit
 
+
+    ATS SUMMARY May 16, 2023 14:20:16
     FAILED:  10 a(a.out_1), a(a.out_3), a(a.out_9), a(a.out_11), ats_check_log#7, ats_check_log#8, a(a.out_17), a(a.out_19), a(a.out_25), a(a.out_27)
     PASSED:   18
     SKIPPED:  8
@@ -71,28 +76,6 @@ Toss 4  Cray rzvernal with rocm 5.5
     PASSED:   18
     SKIPPED:  8
 
---------------------------------------------------------------------------------
-Toss 4   Testing on slurm based toss4 machines such as rzwhippet
---------------------------------------------------------------------------------
-    export PATH=${PATH}:/usr/gapps/ats/scripts
-    module load python/3.9.12
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
-
-    mpicc hello_ats.c            <- build the code
-    ./create_test_ats.py         <- create the ats test file
-    atslite1 test.ats           <- test using slurm
-    export -n MACHINE_TYPE
-
-    # POODLE TEST LINE (or any other system without cross node MPI)
-    salloc -N1 -p pdebug --exclusive
-    atslite1 test.ats 
-    exit
-
-
-    ATS SUMMARY May 16, 2023 14:20:16
-    FAILED:  10 a(a.out_1), a(a.out_3), a(a.out_9), a(a.out_11), ats_check_log#7, ats_check_log#8, a(a.out_17), a(a.out_19), a(a.out_25), a(a.out_27)
-    PASSED:   18
-    SKIPPED:  8
 
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF

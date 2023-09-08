@@ -1,6 +1,24 @@
 # ATS Release Notes
 
     --------------------------------------------------------------------------- 
+##  7.0.115
+    --------------------------------------------------------------------------- 
+
+    Issue 151: Fixed bug in LSF module where --lrun --old_defaults and mpi bind
+    were not being processed correctly resulting in python error within ATS.
+
+    Issue 149: Fixed bug in atslite1 and atslite3 where --level=10 
+    (or some other number) was not processed correctly.   
+
+    New Feature: --removeStartNote and --removeEndNote
+    Implemented requested ATS command line options to reduce prints
+    related to jobs starting and/or stopping.
+    Requested by a project to reduce amount of messages sent to stdout.
+    ATS options are:
+        --removeStartNote <- will remove message notifying user of start of job
+        --removeEndNote   <- will remove message notifying user of end of job
+
+    --------------------------------------------------------------------------- 
 ##  7.0.114
     --------------------------------------------------------------------------- 
 

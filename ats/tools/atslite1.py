@@ -30,10 +30,13 @@ def main():
     clean_found = False
     exclusive_found = False
     nosub_found = False
+    level_found = False
 
     for index, arg in enumerate(sys.argv):
-        #print arg
-        if (arg.find('=') >= 0):
+        # print("SAD DEBUG index=%i arg=%s" % (index, arg))
+        if (arg.startswith('level=') >= 0):
+            level_found = True
+        elif (arg.find('=') >= 0):
             (key, val) = arg.split('=',1)
             sys.argv[index] = key + '="' + val + '"'
         elif (arg.find('exclusive') >= 0):

@@ -267,14 +267,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
             ret.append(f"-t{max_time}")
 
-        import pprint
-
+        # If the user requests that a test be run on the same node then we store the identifying string
+        # and then spread the node identifiers across the nodes we have access to. This way users dont need
+        # to think about how many nodes there are or which one they want to run on.
         same_node = test.options.get('same_node', None)
         if same_node is not None:
             if same_node not in self.node_list:
                 self.node_list.append(same_node)
-                pprint.pprint(self.node_list)
-            print(f"This is the node that we are trying to run on:{self.node_list.index(same_node) % self.numNodes}")
             ret.append(f"--requires=-rank:{self.node_list.index(same_node) % self.numNodes}")
 
         """
