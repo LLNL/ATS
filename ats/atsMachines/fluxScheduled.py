@@ -214,7 +214,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # Command line option test_np_max over-rides limits the max np in the test deck
         test.np = test.options.get("np", 1)
         if self.test_np_max is not None:                              
-            if test.np > self.test_np_max:      # If test np is greater than the command line max 
+            if test.np > self.test_np_max:      # If test np is greater than the command line max
                 test.np = self.test_np_max      # then set the test np to the maxd
 
         test.num_nodes_calculated = 0   # Will be calculated if not specified by the user
@@ -267,8 +267,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
             ret.append(f"-t{max_time}")
 
-
-
         import pprint
 
         same_node = test.options.get('same_node', None)
@@ -278,7 +276,6 @@ class FluxScheduled(lcMachines.LCMachineCore):
                 pprint.pprint(self.node_list)
             print(f"This is the node that we are trying to run on:{self.node_list.index(same_node) % self.numNodes}")
             ret.append(f"--requires=-rank:{self.node_list.index(same_node) % self.numNodes}")
-
 
         """
         Need to set -n{np} and -c{test.cpus_per_task}.  But we also need to account for accessing
@@ -307,16 +304,24 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # If we calculate the -N ourselves, it does not mean exclusive access,
         # but the -N is just there to stop spreading the mpi tasks around nodes
 
-        if test.num_nodes > 0:
+        if same_node:   # Need to limit -N if we want to run on the same node
+            if test.num_nodes > 0:   # Check that -N was set by user before giving warning
+                log("ATS WARNING: Limiting nodes to 1 be able to run on same node.")
+            ret.append("-N1")
+            ret.append("--exclusive")
+        elif test.num_nodes > 0:
             ret.append(f"-N{test.num_nodes}")
             ret.append("--exclusive")
-        else: 
+        else:
             ret.append(f"-N{test.num_nodes_calculated}")
             if self.flux_exclusive:
                 ret.append("--exclusive")
-            
 
-        ret.append(f"-n{test.np}")
+        if test.np > self.coresPerNode and same_node:   # Need to limit cores to be the max on the node if we
+            log(f"ATS WARNING: Limiting cores, because of same_node option, to match max: {self.coresPerNode}")
+            ret.append(f"-n{self.coresPerNode}")        # want to run on the same node
+        else:
+            ret.append(f"-n{test.np}")
         ret.append(f"-c{test.cpus_per_task}")   # Needs to be set properly for threaded or gpu runs
 
         if test.gpus_per_task > 0:
