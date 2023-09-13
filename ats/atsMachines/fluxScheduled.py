@@ -305,7 +305,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if same_node:   # Need to limit -N if we want to run on the same node
             if test.num_nodes > 0:   # Check that -N was set by user before giving warning
-                log("ATS WARNING: Limiting nodes to 1 be able to run on same node.")
+                log("ATS WARNING: Limiting nodes to 1 be able to run on same node.", echo=True)
             ret.append("-N1")
             ret.append("--exclusive")
         elif test.num_nodes > 0:
@@ -317,7 +317,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
                 ret.append("--exclusive")
 
         if test.np > self.coresPerNode and same_node:   # Need to limit cores to be the max on the node if we want to run on the same node
-            log(f"ATS WARNING: Limiting cores, because of same_node option, to match max: {self.coresPerNode}")
+            log(f"ATS WARNING: Limiting cores, because of same_node option, to match max: {self.coresPerNode}", echo=True)
             ret.append(f"-n{self.coresPerNode}")
         else:
             ret.append(f"-n{test.np}")
