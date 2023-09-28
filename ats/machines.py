@@ -200,7 +200,8 @@ class MachineCore(object):
                 test.statusCode = 0
             if test.statusCode == 0:                               # process is done
                 status = PASSED
-            elif "flux" in configuration.MACHINE_TYPE and test.statusCode == 142:
+            # This checks for flux timeouts since ATS' method for determining timeouts doesnt work with flux
+            elif "flux" in configuration.MACHINE_TYPE and test.statusCode == 142: # 142 is the return code for a timeout from flux
                 status = TIMEDOUT
             else:
                 # Coding to detect LSF deficiencies
