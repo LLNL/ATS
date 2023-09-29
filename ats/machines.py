@@ -55,12 +55,12 @@ class MachineCore(object):
         end time is set if time elapsed exceeds time limit """
         from ats import configuration
 
-        timeNow= time.time()
+        timeNow = time.time()
         # Add small increment to flags jobs that 
         # are close to timing out as timing out. Without this
         # they were occasionally mis categorized as FAILED in
         # later processing.
-        timePassed= (timeNow - test.startTime) + 0.2
+        timePassed = (timeNow - test.startTime) + 0.2
         #cut = configuration.cuttime
         fraction = timePassed / test.timelimit.value
 
@@ -117,7 +117,7 @@ class MachineCore(object):
         """
         from ats import configuration
         test.child.poll()
-        #print test.child.returncode
+        # print(f"This is the return code for the test:{test.child.returncode}")
         if test.child.returncode is None:
             overtime, fraction = self.checkForTimeOut(test)
             #print "DEBUG getStatus 100"
@@ -200,6 +200,9 @@ class MachineCore(object):
                 test.statusCode = 0
             if test.statusCode == 0:                               # process is done
                 status = PASSED
+            # This checks for flux timeouts since ATS' method for determining timeouts doesnt work with flux
+            elif "flux" in configuration.MACHINE_TYPE and test.statusCode == 142: # 142 is the return code for a timeout from flux
+                status = TIMEDOUT
             else:
                 # Coding to detect LSF deficiencies
                 # Implemented 2018-12-12
