@@ -573,7 +573,22 @@ class AtsManager(object):
     def testif(self, parent, *clas, **options):
         "Create test, to be run only if othertest passed."
         testobj = self.test(*clas, **options)
-        parent.addDependent(testobj)
+
+        #
+        # 2023 November 13 Suggestion by Bob Anderson, support multiple dependencies in a list like so
+        # 
+        # t1 = test(...)
+        # t2 = test(...)
+        # testif(parent=[t1, t2], ...)
+         
+        # parent.addDependent(testobj)
+        
+        if isinstance(parent, list):
+            for p in parent:
+                p.addDependent(testobj)
+        else:   
+            parent.addDependent(testobj)
+
         return testobj
 
     def collectTests(self):
