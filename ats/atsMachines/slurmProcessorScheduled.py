@@ -476,6 +476,8 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
             if test.cpus_per_task > 0:
                 srun_cpus_per_task="--cpus-per-task=%i" % test.cpus_per_task
+            elif test.cpus_per_task == 0:
+                srun_cpus_per_task="--comment=nocpuspertask"
 
             if SlurmProcessorScheduled.debugClass:
                 print("SAD DEBUG SRUN100")
@@ -517,6 +519,8 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         if test.cpus_per_task > 0:
             srun_cpus_per_task="--cpus-per-task=%i" % test.cpus_per_task
+        elif test.cpus_per_task == 0:
+            srun_cpus_per_task="--comment=nocpuspertask"
 
         if SlurmProcessorScheduled.debugClass:
             print("SAD DEBUG SRUN800 ")
