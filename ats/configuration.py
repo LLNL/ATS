@@ -412,6 +412,7 @@ def add_more_options(parser):
                       followed by an s, m, or h to give the time in seconds,
                       minutes (the default), or hours. Note: Jobs that TIMEOUT
                       are marked as FAIL when using Flux.''')
+    parser.add_option('--quiet', action='store_true', help='Quiet certain ATS warnings and messages.')
     parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                       help='''verbose mode; increased level of terminal output
                       ''')

@@ -67,40 +67,6 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
             self.runningWithinSalloc = False
             self.npMax= self.numberTestsRunningMax
 
-        # Set cores on alastor to 20
-        # Set cores to 112 on whippet
-        if "HOSTNAME" in os.environ.keys():
-            self.hostname= os.getenv("HOSTNAME")
-            if self.hostname.startswith('rzalastor'):
-                print("Setting npMax to 20 on alastor")
-                self.npMax = 20
-                self.npMaxH = 20
-            elif self.hostname.startswith('rzwhippet') or self.hostname.startswith('poodle'):
-                print("Setting npMax to 112 on %s", (self.hostname))
-                self.npMax = 112
-                self.npMaxH = 112
-            
-
-
-        # Does slurm see the ATS process itself as utilizing a core?
-        self.slurmSeesATSProcessAsUsingACore = False
-        if "SLURM_PTY_PORT" in os.environ.keys() or "SLURM_STEP_ID" in os.environ.keys():
-            self.slurmSeesATSProcessAsUsingACore = True
-            print("""
-ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
-            ATS Will ignore 'nn' (number of nodes) test options and allow processes
-            to span multiple nodes for better throughput and to help prevent srun hangs.
-
-            NOTE: This feature may not fix possible hangs resulting from a single test
-                  case which utilizes all allocated cores. Slurm may not see all 
-                  the cores as usable and accept the job but not schedule it, resulting in a hang
-
-            The node spanning behavior may be overridden with the --strict_nn ATS option.
-
-            CAUTION: Use of --strict_nn may result in slurm/srun hangs which are 
-                     beyond the control of ATS, depending on how the nodes were allocated
-""")
-
         super(SlurmProcessorScheduled, self).init()
 
     #
@@ -140,6 +106,27 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         self.distribution        = options.distribution
         self.checkForAtsProcFlag = options.checkForAtsProc
 
+        # Does slurm see the ATS process itself as utilizing a core?
+        self.slurmSeesATSProcessAsUsingACore = False
+        if "SLURM_PTY_PORT" in os.environ.keys() or "SLURM_STEP_ID" in os.environ.keys():
+            self.slurmSeesATSProcessAsUsingACore = True
+            if not configuration.options.quiet:
+                print("""
+ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
+            ATS Will ignore 'nn' (number of nodes) test options and allow processes
+            to span multiple nodes for better throughput and to help prevent srun hangs.
+
+            NOTE: This feature may not fix possible hangs resulting from a single test
+                  case which utilizes all allocated cores. Slurm may not see all 
+                  the cores as usable and accept the job but not schedule it, resulting in a hang
+
+            The node spanning behavior may be overridden with the --strict_nn ATS option.
+
+            CAUTION: Use of --strict_nn may result in slurm/srun hangs which are 
+                     beyond the control of ATS, depending on how the nodes were allocated
+""")
+
+
         if SlurmProcessorScheduled.debugClass:
             DEBUG_SLURM = "DEBUG SlurmProcessorScheduled Class"
             print("%s options.cuttime             = %s " % (DEBUG_SLURM, options.cuttime))
@@ -156,6 +143,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("%s options.cpusPerTask         = %s " % (DEBUG_SLURM, options.cpusPerTask))
             print("%s options.sleepBeforeSrun     = %s " % (DEBUG_SLURM, options.sleepBeforeSrun))
             print("%s options.continueFreq        = %s " % (DEBUG_SLURM, options.continueFreq))
+            print("%s options.quiet               = %s " % (DEBUG_SLURM, options.quiet))
             print("%s options.verbose             = %s " % (DEBUG_SLURM, options.verbose))
             print("%s options.debug               = %s " % (DEBUG_SLURM, options.debug))
             print("%s options.info                = %s " % (DEBUG_SLURM, options.info))
