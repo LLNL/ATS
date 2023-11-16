@@ -67,6 +67,9 @@ class SlurmProcessorScheduled(lcMachines.LCMachineCore):
             self.runningWithinSalloc = False
             self.npMax= self.numberTestsRunningMax
 
+        # log('SAD DEBUG SlurmProcessorScheduled init self.numNodes = ', self.numNodes)
+        # log('SAD DEBUG SlurmProcessorScheduled init self.npMax = ', self.npMax)
+
         super(SlurmProcessorScheduled, self).init()
 
     #
@@ -141,7 +144,6 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("%s options.reportFreq          = %s " % (DEBUG_SLURM, options.reportFreq))
             print("%s options.ompNumThreads       = %s " % (DEBUG_SLURM, options.ompNumThreads))
             print("%s options.cpusPerTask         = %s " % (DEBUG_SLURM, options.cpusPerTask))
-            print("%s options.sleepBeforeSrun     = %s " % (DEBUG_SLURM, options.sleepBeforeSrun))
             print("%s options.continueFreq        = %s " % (DEBUG_SLURM, options.continueFreq))
             print("%s options.quiet               = %s " % (DEBUG_SLURM, options.quiet))
             print("%s options.verbose             = %s " % (DEBUG_SLURM, options.verbose))
@@ -171,7 +173,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             self.npMax = options.npMax
         else:
             if self.runningWithinSalloc:
-                self.npMax = min(self.npMaxH, self.npMax)
+                self.npMax = max(self.npMaxH, self.npMax)
             else:
                 self.npMax = self.npMaxH
 
