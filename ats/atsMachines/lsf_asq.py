@@ -544,9 +544,15 @@ class lsfMachine (machines.Machine):
                     if str_lrun_jsrun_args == "unset":
                         str_lrun_jsrun_args = ""
 
+                    if lsfMachine.debugJsrun:
+                        JSRUN_DEBUG = "JSRUN 220 DEBUG lsf_asq"
+                        print("%s test.jsrun_bind =  '%s'" % (JSRUN_DEBUG, test.jsrun_bind))
+                        print("%s self.mpibind =  '%s'" % (JSRUN_DEBUG, self.mpibind))
+                        print("%s str_mpibind =  '%s'" % (JSRUN_DEBUG, str_mpibind))
+
                     if test.jsrun_bind == "unset":
                         if self.mpibind:
-                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b none " + [ str_mpibind ]
+                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b none " + str_mpibind
                         else:
                             if self.old_defaults:
                                 str_lrun_jsrun_args = str_lrun_jsrun_args + " -b rs "
@@ -554,7 +560,7 @@ class lsfMachine (machines.Machine):
                                 str_lrun_jsrun_args = str_lrun_jsrun_args + " -b rs "
                     else:
                         if self.mpibind:
-                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind + " " + [ str_mpibind ]
+                            str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind + " " + str_mpibind
                         else:
                             str_lrun_jsrun_args = str_lrun_jsrun_args + " -b " + test.jsrun_bind
 
@@ -594,7 +600,7 @@ class lsfMachine (machines.Machine):
                         if str_lrun_jsrun_args == "unset":
                             str_lrun_jsrun_args = str_mpibind
                         else:
-                            str_lrun_jsrun_args = str_lrun_jsrun_args + " " + [ str_mpibind ]
+                            str_lrun_jsrun_args = str_lrun_jsrun_args + " " + str_mpibind
 
                     cpu_per_rs = np * test.cpus_per_task
 
