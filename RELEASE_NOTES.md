@@ -1,4 +1,61 @@
 # ATS Release Notes
+    ---------------------------------------------------------------------------
+##  7.0.116
+    ---------------------------------------------------------------------------
+
+New Features:
+    Support multiple dependencies for a job.
+        Suggestion and code provided by Bob Anderson.
+        Dependencies may look like the traditional still
+    
+        tt=testif(parent=t1, ...)
+
+        But may also look like this using [] to specify multiple dependencies for ajo
+
+        t1 = test(...)
+        t2 = test(...)
+        testif(parent=[t1, t2], ...)
+
+    Add --quiet option to ATS.
+        Will be used to suppress warnings.
+        First warning to be suppressed is
+        "Slurm sees ATS or Shell as itself using a CPU"
+
+Slurm Bug Fixes:
+    Fix default setting of npMax with slurmProcessorScheduled
+        Use the number of CPUs reported by slurm when possible.  
+
+    Update Slurm module to bypass setting cpus-per-task if cpus_per_task is set to 0.
+        Prior to this, cpus per task was set to 1 as the minimum.  But there are use cases where
+        it should actually be 0.
+        
+
+LSF Bug Fixes:
+    Fix string catenation python errors in lsf_asq.py
+
+Flux Bug Fixes:
+    Fix python warning in fluxScheduled.py
+        Change if not self.numGPUs is 0:
+        to     if self.numGPUs != 0:
+
+    Better support for flux timeouts
+
+
+c7b94c7 (HEAD -> main, origin/main, origin/HEAD) Fix default setting of npMax with slurmProcessorScheduled
+839828d Fix string catenation python errors in lsf_asq.py
+97f4855 Support multiple dependencies for a job.
+7240f61 Add --quiet option to ATS.
+260d0ee Fix python warning in fluxScheduled.py
+caafd0a Merge branch 'main' of github.com:LLNL/ATS into main
+c234386 ats version 7.0.116 (beta)
+36a862d Flux timeouts (#154)
+d5bfb31 Update test/HelloSameNode/READ.ME
+e0906ec Same_node warnings now print to console as well as log (#153)
+b0a2451 New testing directory HelloSameNode
+1046121 new testing
+24e9d3c Same node option (#152)
+
+
 
     --------------------------------------------------------------------------- 
 ##  7.0.115
