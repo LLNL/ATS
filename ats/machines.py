@@ -500,7 +500,7 @@ class MachineCore(object):
 
         if hasattr(test, 'rs_filename'):
             if os.path.isfile(test.rs_filename):
-                myfile = open(test.rs_filename, mode='r', errors='replace')
+                myfile = open(test.rs_filename, mode='r')
                 all_of_it = myfile.read()
                 myfile.close()
                 print("%sjsrun_rs =\n%s" % (magic, all_of_it), file=test.outhandle)
