@@ -158,7 +158,7 @@ class MachineCore(object):
                 # Coding to detect SLURM deficiencies, and abort job.
                 # Implemented 2016-Aug-30
                 slurm_error = False
-                f = open(test.errname, 'r')
+                f = open(test.errname, 'r', errors='replace')
                 lines = f.readlines()
                 f.close
                 for line in lines:
@@ -207,7 +207,7 @@ class MachineCore(object):
                 # Coding to detect LSF deficiencies
                 # Implemented 2018-12-12
                 lsf_error = False
-                f = open(test.errname, 'r')
+                f = open(test.errname, 'r', errors='replace')
                 lines = f.readlines()
                 f.close
                 for line in lines:
@@ -228,7 +228,7 @@ class MachineCore(object):
                             lsf_error = True
 
                 if not lsf_error:
-                    f = open(test.outname, 'r')
+                    f = open(test.outname, 'r', errors='replace')
                     lines = f.readlines()
                     f.close
                     for line in lines:
@@ -597,7 +597,7 @@ The subprocess part of launch. Also the part that might fail.
                 testStdin = None
             else:
                 #print "DEBUG MachineCore._launch 020 "
-                testStdin = open(test.directory + '/' + stdin_file)
+                testStdin = open(test.directory + '/' + stdin_file, errors='replace')
 
             # 2016-09-01
             # Starting jobs too fast confuses slurm and MPI.  Short wait between each job submittal
