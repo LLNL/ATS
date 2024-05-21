@@ -16,17 +16,15 @@ make hip
 flux alloc -N2 -n112 --exclusive --time-limit=30m
 
     // per task syntax
-flux run -N 1 -n 1 -c 64  --gpus-per-task=8 ./a.out
-flux run -N 1 --exclusive -n 1 -c 1 ./a.out 5 &
-flux run -N 1 --exclusive -n 1 -c 1 ./a.out 5 &
-flux run -n 1 -c 8 ./a.out 5 2>&1 | tee c.log &
-flux run -n 1 -c 8 ./a.out 5 2>&1 | tee d.log &
+flux run -N1 -n1 -c 24 -g 1 ./a.out 5
+flux run -N1 -n1 -c 24 ./a.out 5
+flux run -N1 -n1 -c 96 ./a.out 5
 
     // per resource syntax
 flux run -N 2 --tasks-per-node 2 ./a.out
 
     # ats tests
-/usr/apps/ats/7.0.116/bin/atslite1 test.ats
+/usr/apps/ats/7.0.116/bin/atsflux --flux test.ats
 
 --------------------------------------------------------------------------------
 Test a GPU code built with cuda/nvcc

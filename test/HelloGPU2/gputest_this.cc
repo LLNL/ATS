@@ -313,9 +313,6 @@ int main(int argc, char *argv[])
         SADGPU_GET_DEVICE_PROPERTIES(&props, 0);
             
         printf("\n");
-#if defined(HAVE_HIP)
-        printf("    GCN Architecture:     %i \n", props.gcnArch);
-#endif
         printf("    Global Memory:        %lu mb\n",props.totalGlobalMem / mb);
         printf("    Shared memory:        %lu kb\n",props.sharedMemPerBlock / kb);
         printf("    Constant memory:      %lu kb\n",props.totalConstMem / kb);
