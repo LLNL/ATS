@@ -34,7 +34,11 @@ def curDateTime():
 def wallTimeSecs():
     "Return the wall time used so far in seconds"
     times_at_end = os.times()
-    return times_at_end[4] - _times_at_start[4]
+    # Elapsed time (4) is not available on Windows.
+    if times_at_end[4]!= 0:
+        return times_at_end[4] - _times_at_start[4]
+    else:
+        return times_at_end[0] - _times_at_start[0]
 
 def wallTime():
     "Return the wall time used so far in h:mm:ss"
