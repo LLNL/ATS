@@ -121,6 +121,9 @@ class WinMachine (machines.Machine):
 
     def periodicReport(self):
         "Report on current status of tasks"
+        if len(self.running):
+            terminal("CURRENTLY RUNNING %d tests:" % len(self.running),
+                     " ".join([t.name for t in self.running]) )
         terminal("-"*80)
         terminal("CURRENTLY UTILIZING %d of %d processors." % (
             self.numberMaxProcessors - self.numProcsAvailable, self.numberMaxProcessors))
