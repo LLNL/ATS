@@ -5,7 +5,7 @@ from ats import machines, terminal
 from ats.atsut import RUNNING, TIMEDOUT
 
 class Docker (machines.Machine):
-    "Typical Linux machine."
+    "Typical Linux machine. To use, set MACHINE_TYPE environment variable to docker"
     def init (self) :
         self.npMax = 1
 
@@ -48,12 +48,11 @@ class Docker (machines.Machine):
         # machines.py sets this
         self.npMax = self.numberTestsRunningMax
         self.mpiexe = options.mpiexe
-        self.mpiexe = options.mpiexe
         self.nompi = options.nompi
         if (self.npMax < 2 and self.mpiexe):
             terminal("WARNING: npMax should be > 1 to use mpiexe")
         if (self.mpiexe and self.nompi):
-            terminal("WARNING: Setting --nompi and --mpiexe contradicts")
+            terminal("WARNING: --mpiexe will be ignored when --nompi")
 
     def calculateCommandList(self, test):
         """Prepare for run of executable using a suitable command. First we get the plain command
