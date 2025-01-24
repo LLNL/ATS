@@ -38,7 +38,7 @@ class Docker (machines.Machine):
                           --launchCmds '--affinity' --mpiexe mpirun
                           would launch each test as
                           mpirun --affinity ...
-                          """
+                          """)
 
 
     def examineOptions(self, options):
