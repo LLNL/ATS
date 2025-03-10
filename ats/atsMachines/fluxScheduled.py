@@ -17,7 +17,7 @@ from math import ceil
 from ats import terminal
 from ats.atsMachines import lcMachines
 from ats.tests import AtsTest
-from ats.utils.generic_utils import runCommand
+from ats.util.generic_utils import runCommand
 from ats import configuration
 from ats import log
 
