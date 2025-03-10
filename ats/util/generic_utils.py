@@ -358,7 +358,7 @@ def set_machine_type_based_on_sys_type():
         elif host.startswith('herd'):
             os.environ['MACHINE_TYPE'] = 'slurm32'
 
-        elif host.startswith('rzgenie') or host.startswith('rztopaz') or host.startswith('rztrona') or \
+        elif host.startswith('rzgenie') or host.startswith('rztrona') or \
              host.startswith('borax') or host.startswith('quartz') or host.startswith('agate') or \
              host.startswith('pascal') or host.startswith('jade') or host.startswith('mica'):
             os.environ['MACHINE_TYPE'] = 'slurm36'
@@ -371,6 +371,10 @@ def set_machine_type_based_on_sys_type():
 
         elif host.startswith('mammoth'):
             os.environ['MACHINE_TYPE'] = 'slurm128'
+
+        elif host.startswith('tioga') or host.startswith('rzadams') or \
+             host.startswith('rzvernal') or host.startswith('tuolumne'):
+            os.environ['MACHINE_TYPE'] = 'flux00'
 
         elif os.environ['SYS_TYPE'] in ['bgqos_0']:
             os.environ['MACHINE_TYPE'] = 'bgqos_0_ASQ'

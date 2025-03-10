@@ -454,7 +454,7 @@ def get_machine_factory(module_name, machine_class,
     module_name. "machine_package" tells Python where module_name can be found if
     not in the project's root directory.
     """
-    log("Machine Factory: importing {} from {}".format(module_name, machine_package),
+    log(f"Machine Factory: importing {module_name} from {machine_package}",
         echo=False)
     try:
         machine_module = importlib.import_module(f'.{module_name}',
@@ -462,10 +462,14 @@ def get_machine_factory(module_name, machine_class,
         machine_factory = getattr(machine_module, machine_class)
         return machine_factory
     
-    except ModuleNotFoundError:
-        log(f"Module '{module_name}' not found in package '{machine_package}'. Continuing search.",
-            echo=False)
-        return None
+    except ModuleNotFoundError as e:
+        if (e == ModuleNotFoundError(module_name)):
+            log(f"Module {module_name} not found in package {machine_package}. Continuing search.",
+                echo=False)
+            return None
+        else:
+            # If a module error occurs for a module other than module_name, raise an error
+            raise e
 
 def get_machine(file_text, file_name, is_batch=False):
     header = '#BATS:' if is_batch else '#ATS:'
@@ -524,12 +528,7 @@ def get_machine_entry_points(machine_class):
         echo=False)
     for name, machine_factory in ats_machines.items():
         if machine_class in machine_factory.value:
-            log("Machine Factory: Found machine {} of class {}: {}".format(
-                name,
-                machine_class,
-                machine_factory
-            ))
-
+            log(f"Machine Factory: Found machine {name} of class {machine_class}: {machine_factory}")
             return machine_factory.load()(machine_class, -1)
 
     # Downstream needs to be able to detect if machine isn't found

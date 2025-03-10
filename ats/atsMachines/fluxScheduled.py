@@ -10,15 +10,14 @@ Author: William Hobbs
 """
 
 import os
+import sys
 import time
 from math import ceil
-
-import flux
-import flux.job
 
 from ats import terminal
 from ats.atsMachines import lcMachines
 from ats.tests import AtsTest
+from ats.utils.generic_utils import runCommand
 from ats import configuration
 from ats import log
 
@@ -40,6 +39,11 @@ class FluxScheduled(lcMachines.LCMachineCore):
         Sets ceiling on number of nodes and cores in the allocation.
         Defines a persistent handle to use to connect to the broker.
         """
+        # Add the flux python library to the system path
+        flux_python_path = runCommand("flux config builtin python_path")
+        sys.path.append(flux_python_path)
+        import flux
+        import flux.job
         self.fluxHandle = flux.Flux()
         self.numNodes = int(
             flux.resource.list.resource_list(self.fluxHandle).get().up.nnodes
