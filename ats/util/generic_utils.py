@@ -373,7 +373,8 @@ def set_machine_type_based_on_sys_type():
             os.environ['MACHINE_TYPE'] = 'slurm128'
 
         elif host.startswith('tioga') or host.startswith('rzadams') or \
-             host.startswith('rzvernal') or host.startswith('tuolumne'):
+             host.startswith('rzvernal') or host.startswith('tuolumne') or \
+             host.startswith('corona'):
             os.environ['MACHINE_TYPE'] = 'flux00'
 
         elif os.environ['SYS_TYPE'] in ['bgqos_0']:
