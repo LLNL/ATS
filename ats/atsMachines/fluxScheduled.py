@@ -41,7 +41,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         """
         # Add the flux python library to the system path
         flux_python_path = runCommand("flux config builtin python_path")
-        sys.path.append(flux_python_path)
+        sys.path.append(flux_python_path[0].strip())
         import flux
         import flux.job
         self.fluxHandle = flux.Flux()
@@ -516,7 +516,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             return 0
         elif self.numProcsAvailable < 1:
             return 0
-        elif self.numGPUsAvailable < 1 and self.numGPUs is not 0:
+        elif self.numGPUsAvailable < 1 and self.numGPUs ~= 0:
             return 0
         else:
             return self.numProcsAvailable
