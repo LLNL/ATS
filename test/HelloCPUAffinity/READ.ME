@@ -6,7 +6,7 @@ Sample use of lightweight ATS wrapper script
 
 How to use:
 
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -26,7 +26,7 @@ an a.out executable in this directory like so:
 --------------------------------------------------------------------------------
 Toss 3 (rzgenie, etc.).  Only use Slurm
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -40,20 +40,18 @@ Toss 3 (rzgenie, etc.).  Only use Slurm
     atslite1 test.ats
 
 --------------------------------------------------------------------------------
-Toss 4  Cray rzvernal with rocm 5.4.3
+Toss 4  Cray rzvernal/rzadams ATS-4
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
     module load python/3.9.12
-    module load rocm/5.4.3
-    module load cce/15.0.0c-magic
-    module load rocmcc/5.4.3-magic
+    module load rocmcc/6.2.0-cce-18.0.0b-magic
     export ROCR_VISIBLE_DEVICES=0,1,2,3
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-5.4.3-magic/llvm/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-6.2.0-cce-18.0.0b-magic/llvm/lib
 
-    mpihipcc hello_affinity.cc
+    mpiamdclang++ hello_affinity.cc
     ./create_test_ats.py
     atsflux  test.ats
     export -n MACHINE_TYPE
@@ -61,7 +59,7 @@ Toss 4  Cray rzvernal with rocm 5.4.3
 --------------------------------------------------------------------------------
 Toss 4   Testing on slurm based toss4 machines such as rzwhippet
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -82,7 +80,7 @@ Toss 4   Testing on slurm based toss4 machines such as rzwhippet
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 

@@ -6,7 +6,7 @@ Sample use of lightweight ATS wrapper script
 
 How to use:
 
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -53,18 +53,18 @@ Toss 4   Testing on slurm based toss4 machines such as rzwhippet
     SKIPPED:  8
 
 --------------------------------------------------------------------------------
-Toss 4  Cray rzvernal with rocm 5.5
+Toss 4  ATS-4 (rzvernal, rzadams, tioga, etc.)
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
     module load python/3.9.12
-    module load rocmcc/5.5.0-cce-15.0.1g-magic
+    module load rocmcc/6.2.0-cce-18.0.0b-magic
     export ROCR_VISIBLE_DEVICES=0,1,2,3
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-5.5.0-cce-15.0.1g-magic/llvm/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-6.2.0-cce-18.0.0b-magic/llvm/lib
 
-    mpihipcc hello_ats.c        <- build the code
+    mpiamdclang++ hello_ats.c        <- build the code
     ./create_test_ats.py        <- create the ats test file
     atsflux  test.ats           <- test using flux
     export -n MACHINE_TYPE
@@ -75,7 +75,6 @@ Toss 4  Cray rzvernal with rocm 5.5
     FAILED:  10 a(a.out_1), a(a.out_3), a(a.out_9), a(a.out_11), ats_check_log#7, ats_check_log#8, a(a.out_17), a(a.out_19), a(a.out_25), a(a.out_27)
     PASSED:   18
     SKIPPED:  8
-
 
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF

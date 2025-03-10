@@ -6,7 +6,7 @@ Sample use of lightweight ATS wrapper script
 
 How to use:
 
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -48,7 +48,7 @@ Toss 3 (rzgenie, etc.).
 --------------------------------------------------------------------------------
     export PATH=${PATH}:/usr/gapps/ats/scripts
     module load python/3.8.2
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -61,18 +61,24 @@ Toss 3 (rzgenie, etc.).
     # useful for performance testing OpenMP
     ats test.ats --verbose --exclusive  --numNodes=3 
 
+
 --------------------------------------------------------------------------------
-Toss 4  Cray rzvernal with rocm 5.4.3
+Toss 4  ATS-4 (rzvernal, rzadams, tioga, etc.)
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
+
+    module load python/3.9.12
+    module load rocmcc/6.2.0-cce-18.0.0b-magic
+    export ROCR_VISIBLE_DEVICES=0,1,2,3
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-6.2.0-cce-18.0.0b-magic/llvm/lib
 
     module load python/3.9.12
     module load rocmcc/5.5.0-cce-15.0.1g-magic
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-5.5.0-cce-15.0.1g-magic/llvm/lib
 
-    mpihipcc -g -fopenmp -O2 -o omp_test omp_test.cc
+    mpiamdclang++ -g -fopenmp -O2 -o omp_test omp_test.cc
     ./create_test_ats.py
     atsflux test.ats
 
@@ -83,7 +89,7 @@ Toss 4 (rzwhippet, etc.).
     module load python/3.9.12
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
     or 
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
 
 
     mpicxx -g -qopenmp -pthread -O2 -o omp_test omp_test.cc
@@ -102,7 +108,7 @@ Toss 4 (rzwhippet, etc.).
 --------------------------------------------------------------------------------
 Blueos (rzansel)  Uses LSF
 --------------------------------------------------------------------------------
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.117/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
     or
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 

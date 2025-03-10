@@ -3,9 +3,9 @@ Test a GPU code built with hip/rocm
 --------------------------------------------------------------------------------
 
 module load python/3.9.12
-module load rocmcc/5.5.0-cce-15.0.1g-magic
+module load rocmcc/6.2.0-cce-18.0.0b-magic
 export ROCR_VISIBLE_DEVICES=0,1,2,3
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-5.5.0-cce-15.0.1g-magic/llvm/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-6.2.0-cce-18.0.0b-magic/llvm/lib
 export MPICH_SMP_SINGLE_COPY_MODE=NONE
 
 make clean
@@ -24,7 +24,7 @@ flux run -N1 -n1 -c 96 ./a.out 5
 flux run -N 2 --tasks-per-node 2 ./a.out
 
     # ats tests
-/usr/apps/ats/7.0.117/bin/atsflux --flux test.ats
+/usr/apps/ats/7.0.118/bin/atsflux --flux test.ats
 
 --------------------------------------------------------------------------------
 Test a GPU code built with cuda/nvcc
@@ -51,10 +51,10 @@ lrun --mpibind=off -N2 -n16 ./a.out <- same as above
     # the cpu and gpu affinity in the tes case, so look at them by hand for reasonableness
     # lrun will 'pack' the jobs.  jsrun will use a resource list
 
-/usr/apps/ats/7.0.117/bin/atslite1 --smpi_off 
-/usr/apps/ats/7.0.117/bin/atslite1 --smpi_off --lrun -verbose
-/usr/apps/ats/7.0.117/bin/atslite1 --smpi_off --lrun --lrun_pack -verbose
-/usr/apps/ats/7.0.117/bin/atslite1 --smpi_off --jsrun_exclusive  -verbose
+/usr/apps/ats/7.0.118/bin/atslite1 --smpi_off 
+/usr/apps/ats/7.0.118/bin/atslite1 --smpi_off --lrun -verbose
+/usr/apps/ats/7.0.118/bin/atslite1 --smpi_off --lrun --lrun_pack -verbose
+/usr/apps/ats/7.0.118/bin/atslite1 --smpi_off --jsrun_exclusive  -verbose
 
 
 --------------------------------------------------------------------------------

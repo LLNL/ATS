@@ -15,6 +15,6 @@ Triple = test(executable='/usr/bin/echo',
     clas='',
     directory='/g/g16/dawson/wci/Dump',
     np=1,
-    ngpu=0,
-    nn=0
+    ngpu=1,
+    nn=1
 )
