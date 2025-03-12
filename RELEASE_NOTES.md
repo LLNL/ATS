@@ -1,5 +1,47 @@
 # ATS Release Notes
     ---------------------------------------------------------------------------
+##  7.0.118 
+    ---------------------------------------------------------------------------
+March 12, 2025
+
+Updates to work with updated Cray systems including tioga, rzvernal, rzadams, tenaya
+Landon Owen contribution.
+
+    Find flux python correctly.
+    Added LC flux machine names, added call to include the flux python library 
+    to the system path for fluxScheduled, removed rztopaz machine name
+    
+    Added corona to the flux machines
+    Fix typo for ats util
+    Fix bug with flux python path string
+    Change ~= to !=
+
+Add a general ATS machine called docker
+Landon Owen contribution.
+    
+    Added a docker ats machine for launching tests in a more general manner
+
+Fix wallTimeSecs() for Windows 
+Ben Liu contribution
+    
+    Fix wallTimeSecs() for Windows
+    
+    Improved windows reporting
+
+Add robustness to parsing of non-ASCII out/err files 
+Ben Liu contribution
+    
+    Add robustness to non-ASCII output
+
+Fix python warning in fluxScheduled.py
+    
+    Change
+      if not self.numGPUs is 0:
+    to
+      if self.numGPUs != 0:
+    
+
+    ---------------------------------------------------------------------------
 ##  7.0.116
     ---------------------------------------------------------------------------
 
