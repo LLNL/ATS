@@ -4,7 +4,7 @@
 
 How to use:
 
-    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.118/bin:$PATH
+    export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.119/bin:$PATH
     or 
     export PATH=/usr/gapps/ats/${SYS_TYPE}/7.0.${USER}/bin:$PATH
 
@@ -15,10 +15,9 @@ Toss 4 EAS : flux native scheduler
 atsflux can be used for either, the difference is how the job starts, but
 both can use flux with same 'atsflux' command.
 --------------------------------------------------------------------------------
-    export MACHINE_TYPE=flux00
+    export -n MPICH_GPU_SUPPORT_ENABLED
     ./create_test_ats.py        <- create the ats test file
-    atsflux  test.ats           <- test using flux
-    export -n MACHINE_TYPE
+    atsflux -N3  test.ats           <- test using flux
 
     The end of the run should include:
 

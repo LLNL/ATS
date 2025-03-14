@@ -21,12 +21,15 @@ num_cpus = multiprocessing.cpu_count()
 
 # Get hostname to set defaults for if Flux is the native scheduler
 my_hostname = os.environ.get("HOSTNAME", "unset")
-if (my_hostname.startswith('rzvernal')):
+if my_hostname.startswith('tioga')    or my_hostname.startswith('rzadams')  or \
+   my_hostname.startswith('rzvernal') or my_hostname.startswith('tuolumne') or \
+   my_hostname.startswith('tenaya')   or my_hostname.startswith('corona')   or \
+   my_hostname.startswith('elcap') :
     flux_native = True
-    time_limit = 240
+    time_limit = 60
 else:
     flux_native = False
-    time_limit = 240
+    time_limit = 60
 
 def _parse_args() -> argparse.Namespace:
     """Parse arguments for formatting ATS python files."""
