@@ -463,13 +463,13 @@ def get_machine_factory(module_name, machine_class,
         return machine_factory
     
     except ModuleNotFoundError as e:
-        if (e == ModuleNotFoundError(module_name)):
+        if (module_name in e.name):
             log(f"Module {module_name} not found in package {machine_package}. Continuing search.",
                 echo=False)
             return None
         else:
-            # If a module error occurs for a module other than module_name, raise an error
-            raise e
+            log(f"Importing {module_name} from {machine_package} caused the following error:\n{e}", echo=True)
+            return None
 
 def get_machine(file_text, file_name, is_batch=False):
     header = '#BATS:' if is_batch else '#ATS:'
