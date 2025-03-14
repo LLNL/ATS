@@ -1,5 +1,4 @@
 #ATS:winParallel SELF WinMachine 8
-#ATS:darwin machines Machine -2
 #ATS:win32 SELF WinMachine 1
 #BATS:batchsimulator machines BatchSimulator 1200
 
