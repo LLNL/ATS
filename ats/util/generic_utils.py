@@ -366,7 +366,7 @@ def set_machine_type_based_on_sys_type():
         elif host.startswith('corona'):
             os.environ['MACHINE_TYPE'] = 'slurm48'
 
-        elif host.startswith('poodle') or host.startswith('rzwhippet'):
+        elif host.startswith('poodle') or host.startswith('rzwhippet') or host.startswith('dane'):
             os.environ['MACHINE_TYPE'] = 'slurm112'
 
         elif host.startswith('mammoth'):
