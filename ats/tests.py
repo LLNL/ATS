@@ -631,7 +631,7 @@ class AtsTest (object):
 
         if self.testStdout != 'terminal':
             try:
-                f = open(self.outname, 'r')
+                f = open(self.outname, 'r', errors='ignore')
             except IOError as e:
                 self.notes = ['Missing output file.']
                 log('Missing output file', self.outname, e)

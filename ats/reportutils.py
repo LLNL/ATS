@@ -127,7 +127,7 @@ def writeFailedCodeTestCase(f, test, err_path):
     msg = ""
     err_files = glob.glob(os.path.join(err_path, '*' + str(test.serialNumber) + '*.log.err'))
     if len(err_files) > 0:
-        with open(err_files[0], 'r') as logferr:
+        with open(err_files[0], 'r', errors='ignore') as logferr:
             # not readlines() - there are standard xml escapes to fix, we don't want to iterate over
             # the whole message.
             rawmsg = logferr.read()
@@ -137,7 +137,7 @@ def writeFailedCodeTestCase(f, test, err_path):
 
     log_files = glob.glob(os.path.join(err_path, '*' + str(test.serialNumber) + '*.log'))
     if len(log_files) > 0:
-        with open(log_files[0], 'r') as logf:
+        with open(log_files[0], 'r', errors='ignore') as logf:
             rawmsg = logf.read()
             msg += "***** ats log file: *****\n running from clone code \n"
             msg += cleanErrorMessage(rawmsg)
