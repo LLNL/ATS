@@ -2,39 +2,39 @@ import os
 glue(independent=True)
 glue(keep=True)
 
-#test(executable='./a.out', np=1, ngpu=1, clas="1")
+#test(executable='./a.out', np=4, ngpu=1, clas="1")
 
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
 
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
 
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
 
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
 
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 test(executable='./a.out', np=2, gpus_per_task=1, clas="5")
-test(executable='./a.out', np=1, gpus_per_task=1, clas="5")
+test(executable='./a.out', np=4, gpus_per_task=1, clas="5")
 
 
 #test(executable='./a.out', nn=1, np=2)

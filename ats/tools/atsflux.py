@@ -49,6 +49,11 @@ def _parse_args() -> argparse.Namespace:
         help="Max number of cores per node. Overrides default ATS detection of cores per node",
     )
     parser.add_argument(
+        "--CPX",
+        action="store_true",
+        help="Allocate nodes in CPX mode on ATS-4",
+    )
+    parser.add_argument(
         "--job_time",
         default=time_limit,
         type=int,
@@ -142,15 +147,26 @@ def main():
 
         # else start flux from the login node
         else:
-            cmd = [
-                "flux", "alloc",
-                "-N", f"{args.numNodes}",
-                "-n", f"{total_cores}",
-                "-t", f"{args.job_time}m",
-                "--exclusive",
-                "--output=atsflux.log"
-            ]
-
+            if args.CPX:
+                cmd = [
+                    "flux", "alloc",
+                    "-N", f"{args.numNodes}",
+                    "-n", f"{total_cores}",
+                    "-t", f"{args.job_time}m",
+                    "--exclusive",
+                    "--conf=resource.rediscover=true",
+                    "--setattr=gpumode=CPX",
+                    "--output=atsflux.log"
+                ]
+            else:
+                cmd = [
+                    "flux", "alloc",
+                    "-N", f"{args.numNodes}",
+                    "-n", f"{total_cores}",
+                    "-t", f"{args.job_time}m",
+                    "--exclusive",
+                    "--output=atsflux.log"
+                ]
 
     else:
         print("running flux under slurm")
