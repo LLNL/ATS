@@ -267,29 +267,15 @@ int main(int argc, char *argv[])
         SADGPU_DEVICE_PROP props;
         SADGPU_GET_DEVICE_PROPERTIES(&props, device_ndx);
 
-        char small_buf[16];
-        memset(small_buf, 0, 16);
-
-#if defined(HAVE_NVCC)
-        // For NVCC Create an numerical id for the device from the uuid data structure.
-        unsigned long my_uuid = 0;
-        for (int uuid_ndx=0; uuid_ndx<16; ++uuid_ndx)
-        {
-            my_uuid += (unsigned long)props.uuid.bytes[uuid_ndx];
-        }
-
-        snprintf(small_buf, 15, "%i-%lu ", node_num, my_uuid);
-
-#elif defined(HAVE_HIP)
-        // For HIP, use the unique pciBusID for the GPU identifier.
-        snprintf(small_buf, 15, "%i-%i ", node_num, props.pciBusID);
-#endif
+        // The PCI Bus ID string is typically in the format "domain:bus:device.function" (e.g., "0000:03:00.0").
+        char pcibus_id[32], small_buf[32];
+        memset(pcibus_id, 0, 32);
+        memset(small_buf, 0, 32);
+        SADGPU_GET_DEVICE_PCI_BUS_ID(pcibus_id, sizeof(pcibus_id), device_ndx)
+        snprintf(small_buf, 31, "%i-%s ", node_num, pcibus_id);
         strcat(print_buf, small_buf);
     }
     strcat(print_buf, "\n");
-
-        // All GPUs will have the same characteristics, so we can just have
-        // MPI rank 0 print out the attributes for the first device it sees.
 
     if (my_rank == 0)
     {

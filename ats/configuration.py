@@ -143,6 +143,9 @@ def add_flux_only_options(parser):
                       Perform 'flux help run' for useful oprions for your project.
                       String is not checked for validity.  Quotes in the string 
                       may need to be escaped or otherwise specified''')
+    parser.add_option('--cpx', action='store_true', default=False, 
+                      help='''Flux option: Assume CPX allocation of nodes on ATS-4, 
+                      utilizing 24 GPUS per node''')
     parser.add_option('--nn', dest='flux_nn', type='int', default=-1,
                       help='''Flux option: -nn option. Over-rides test
                       specific settings of nn (number of nodes). Setting this

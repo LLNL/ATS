@@ -124,6 +124,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
         self.test_np_max               = options.test_np_max
         self.no_time_limit             = options.no_time_limit
         self.use_flux_rm               = options.use_flux_rm
+        self.cpx                       = options.cpx
         self.flux_exclusive            = options.flux_exclusive
 
         # Command line option --npMax will over-ride flux detection of cores per node 
@@ -152,6 +153,7 @@ class FluxScheduled(lcMachines.LCMachineCore):
             log(("DEBUG: FluxScheduled examineOptions : self.test_np_max=%s" % (self.test_np_max)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.no_time_limit=%s" % (self.no_time_limit)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.use_flux_rm=%s" % (self.use_flux_rm)), echo=True)
+            log(("DEBUG: FluxScheduled examineOptions : self.cpx=%s" % (self.cpx)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.flux_exclusive=%s" % (self.flux_exclusive)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.npMax=%i" % (self.npMax)), echo=True)
             log(("DEBUG: FluxScheduled examineOptions : self.npMaxH=%i" % (self.npMaxH)), echo=True)
@@ -161,6 +163,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         if self.use_flux_rm:
             log("Info: Will use flux resource manager to verify free resources", echo=True)
+
+        if self.cpx:
+            log("Info: Running in CPX mode", echo=True)
+            os.environ['FLUX_MPIBIND_USE_TOPOFILE'] = "1"
+            log("Info: CPX mode Setting FLUX_MPIBIND_USE_TOPOFILE to 1", echo=True)
+            os.environ['MPIBIND_TOPOFILE'] = "/collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml"
+            log("Info: CPX mode Setting MPIBIND_TOPOFILE to /collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml", echo=True)
             
     def set_nt_num_nodes(self, test):
         """
