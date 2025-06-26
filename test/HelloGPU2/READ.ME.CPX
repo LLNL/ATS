@@ -10,7 +10,11 @@ make hip
 /usr/apps/ats/7.0.120/bin/atsflux --flux test.ats
 
 /usr/apps/ats/7.0.120/bin/atsflux --CPX --cpx  --flux test.ats \
---test_np_max=4 --gpus_per_task=1 --num_concurrent_jobs=48 \
+--test_np_max=4 --gpus_per_task=1 --num_concurrent_jobs=48
+
+
+
+OPTIONAL
 --flux_run_args="-o mpibind=on -o fastload"
 
 grep "physical gpu identifiers" toss_4_x86_64_ib_cray.*.logs/0*log | awk -F " " '{print $14 " "}' | sort | uniq -c

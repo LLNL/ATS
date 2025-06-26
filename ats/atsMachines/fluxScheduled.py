@@ -12,6 +12,7 @@ Author: William Hobbs
 import os
 import sys
 import time
+import subprocess
 from math import ceil
 
 from ats import terminal
@@ -164,12 +165,12 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if self.use_flux_rm:
             log("Info: Will use flux resource manager to verify free resources", echo=True)
 
-        if self.cpx:
-            log("Info: Running in CPX mode", echo=True)
+        if self.cpx or self.within_cpx_allocation():
+            log("NOTICE: Running in CPX mode", echo=True)
             os.environ['FLUX_MPIBIND_USE_TOPOFILE'] = "1"
-            log("Info: CPX mode Setting FLUX_MPIBIND_USE_TOPOFILE to 1", echo=True)
+            log("NOTICE: CPX mode Setting FLUX_MPIBIND_USE_TOPOFILE to 1", echo=True)
             os.environ['MPIBIND_TOPOFILE'] = "/collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml"
-            log("Info: CPX mode Setting MPIBIND_TOPOFILE to /collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml", echo=True)
+            log("NOTICE: CPX mode Setting MPIBIND_TOPOFILE to /collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml", echo=True)
             
     def set_nt_num_nodes(self, test):
         """
@@ -530,5 +531,27 @@ class FluxScheduled(lcMachines.LCMachineCore):
         else:
             return self.numProcsAvailable
 
+    # ##############################################################################################################################
+    # function returns TRUE if we are within a CPX allocation
+    # ##############################################################################################################################
+    def within_cpx_allocation(self):
+        command = ["/opt/rocm-6.4.1/bin/rocm-smi", "--showcomputepartition"]
+
+        try:
+            # Run the command and capture output
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            output = result.stdout
+
+            # Check for the presence of "CPX" in the output
+            found_cpx = "CPX" in output
+            if found_cpx:
+                print(f"NOTICE: rocm-smi detected CPX mode")
+
+        except subprocess.CalledProcessError as e:
+            # Handle the case where the command fails
+            print(f"INFO: rocm-smi failed with error: {e}")
+            found_cpx = False
+
+        return found_cpx
 
 # end of file
