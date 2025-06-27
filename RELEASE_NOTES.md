@@ -1,5 +1,67 @@
 # ATS Release Notes
     ---------------------------------------------------------------------------
+##  7.0.120
+    ---------------------------------------------------------------------------
+Support CPX partitioning mode on El Capitan platforms
+
+    Purpose: Increases testing throughput by using up to 24 GPUs per node. 
+
+    Usage: Allocate a testing partition in CPX mode (see below)
+           Allow ATS to auto-detect and use 24 GPUs per node or if that fails
+           allow user to specify --cpx option to force CPX mode in the allocation.
+
+    Caveat: This feature relies on mpibind to work properly.  Do not
+            pass ATS options which disable mpibind.  For instance an ATS option 
+            such as --flux_run_args="-o mpibind=off" will break CPX mode. 
+           
+    If ats is running within CPX allocation on El Capitan machines, attempt
+    to use a topological map file to properly use the 24 GPUs seen in this 
+    allocation mode.   This will deliver better testing throughput.
+
+    To allocate in CPX mode, these additional flux options may be passed
+    to the flux alloc command:
+    
+    --conf=resource.rediscover=true --setattr=gpumode=CPX
+
+    For projects using  Git  CI or custom ats wrappers which
+    handle the allocation, the above options will need to be specified
+    at the allocation time as appropriate.
+
+    For the light weight atsflux wrapper included with ATS, the option
+    --CPX may be used to allocate nodes in CPX mode.
+
+    ATS will then, at run time attempt to detect this mode by using 
+    the 'rocm-smi' executable and inspecting for CPX mode.  If detected,
+    ATS will automatially set environment variables to properly use
+    CPX mode as ATS submits the testing jobs. This will be reported 
+    in near the beginning of ATS stdout like so:
+
+    NOTICE: rocm-smi detected CPX mode
+    NOTICE: Running in CPX mode
+    NOTICE: CPX mode Setting FLUX_MPIBIND_USE_TOPOFILE to 1
+    NOTICE: CPX mode Setting MPIBIND_TOPOFILE to /collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml
+
+    If auto-detection of CPX mode fails, the user may force the use of CPX
+    mode by ATS by using this new ats option:
+
+    --cpx
+
+    In this case, look for these lines at the beginning of the ats run
+    to verify CPX usage. 
+
+    NOTICE: Running in CPX mode
+    NOTICE: CPX mode Setting FLUX_MPIBIND_USE_TOPOFILE to 1
+    NOTICE: CPX mode Setting MPIBIND_TOPOFILE to /collab/usr/global/tools/mpi/mpibind/topo/tuo-cpx-lgpus.xml
+
+    This is a new feature, which likely could be extended or improved.  But for
+    the purpose of better husbanding of El Capitan resources, we want to get 
+    this in users hands now.
+
+    Thoughts for future improvment currently include supporting TPX mode
+    (in addtion to CPX mode), and allowing projects to specify alternative
+    topo map files. 
+    
+    ---------------------------------------------------------------------------
 ##  7.0.119
     ---------------------------------------------------------------------------
 Date:   Thu Jun 19 10:11:39 2025 -0700
@@ -514,7 +576,6 @@ Added and updated Flux options:
     
     --smpi_off
     --smpi_show
-
 
     --------------------------------------------------------------------------- 
 ## 7.0.100
