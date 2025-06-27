@@ -3,10 +3,11 @@ Test a GPU code built with hip/rocm
 --------------------------------------------------------------------------------
 
 module load python/3.9.12
-module load rocmcc/6.2.0-cce-18.0.0b-magic
+module load rocmcc/6.4.1-cce-19.0.0f-magic
+module load cray-mpich/8.1.32
+export LD_LIBRARY_PATH=/usr/tce/packages/rocmcc/rocmcc-6.4.1-cce-19.0.0f-magic/llvm/llvm/lib:$LD_LIBRARY_PATH
+export PATH=$PATH:/opt/rocm-6.4.1/bin
 export ROCR_VISIBLE_DEVICES=0,1,2,3
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/tce/packages/rocmcc/rocmcc-6.2.0-cce-18.0.0b-magic/llvm/lib
-export MPICH_SMP_SINGLE_COPY_MODE=NONE
 
 make clean
 make hip
