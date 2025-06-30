@@ -1,8 +1,11 @@
 # ATS Release Notes
+
     ---------------------------------------------------------------------------
 ##  7.0.120
     ---------------------------------------------------------------------------
-Support CPX partitioning mode on El Capitan platforms
+Date: Fri Jun 27 14:24:22 2025 -0700
+
+    Support CPX partitioning mode on El Capitan platforms
 
     Purpose: Increases testing throughput by using up to 24 GPUs per node. 
 
