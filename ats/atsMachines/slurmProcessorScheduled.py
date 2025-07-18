@@ -157,6 +157,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("%s options.sequential          = %s " % (DEBUG_SLURM, options.sequential))
             print("%s options.nosrun              = %s " % (DEBUG_SLURM, options.nosrun))
             print("%s options.salloc              = %s " % (DEBUG_SLURM, options.salloc))
+            print("%s options.sargs               = %s " % (DEBUG_SLURM, options.sargs))
             print("%s options.checkForAtsProc     = %s " % (DEBUG_SLURM, options.checkForAtsProc))
             print("%s options.showGroupStartOnly  = %s " % (DEBUG_SLURM, options.showGroupStartOnly))
             print("%s options.removeStartNote     = %s " % (DEBUG_SLURM, options.removeStartNote))
@@ -203,6 +204,7 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         self.exclusive = options.exclusive
         self.mpibind   = options.mpibind
         self.salloc    = options.salloc
+        self.sargs     = options.sargs
         self.toss_nn   = options.toss_nn
         self.strict_nn = options.strict_nn
         self.useMinNodes = options.useMinNodes
@@ -228,6 +230,10 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
         parser.add_option("--partition", action="store", type="string", dest='partition',
             default = add_partition,
             help = "Partition in which to run jobs with np > 0")
+
+        parser.add_option("--sargs", action="store", type="string", dest='sargs',
+            default = "",
+            help = "extra srun/salloc args")
 
         parser.add_option("--numNodes", action="store", type="int", dest='numNodes',
            default = 2,
@@ -357,8 +363,14 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
 
         # Set the --partition option here
         # If not within an salloc, then set the partition to be used for the srun line
-        if self.runningWithinSalloc == False:
+        if self.runningWithinSalloc == False and self.partition:
             srun_partition="--partition=%s" % self.partition
+
+        if self.sargs:
+            extra_sargs = self.sargs
+        else:
+            extra_sargs = "--comment=nosargs"
+
 
         # Set the --nodes srun option  here
         #
@@ -479,11 +491,11 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             # End of Coding suggested by Chris Scroeder
 
             if self.salloc :
-                return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+                return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes, extra_sargs] + commandList
             else:
                 return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
                     srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
-                    "--ntasks=%i" % np \
+                    "--ntasks=%i" % np, extra_sargs \
                    ] + commandList
 
         # ----------------------------------------------------------------------------------------------------------------------------
@@ -516,11 +528,11 @@ ATS NOTICE: Slurm sees ATS or Shell as itself using a CPU.
             print("SAD DEBUG SRUN800 ")
 
         if self.salloc :
-            return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes] + commandList
+            return ["salloc", srun_partition, srun_ex_or_sh, srun_nodes, extra_sargs] + commandList
         else:
             return ["srun", srun_mpi_type, "--label", "-J", test.jobname,
                srun_partition, srun_ex_or_sh, srun_unbuffered, srun_mpibind, srun_distribution, srun_nodes, srun_cpus_per_task,
-               "--ntasks=%i" % np \
+               "--ntasks=%i" % np, extra_sargs, \
                ] + commandList
 
     def canRun(self, test):
