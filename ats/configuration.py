@@ -524,15 +524,23 @@ def get_machine_entry_points(machine_class):
     """
     log("Machine Factory: looping over available machine plugins:",
         echo=False)
-    ats_machines = {machine.name: machine
-                    for group, machines in entry_points().items()
-                    if group == 'ats.machines' for machine in machines}
-    log(f"Machine Factory: found machine plugins: {ats_machines}",
-        echo=False)
-    for name, machine_factory in ats_machines.items():
-        if machine_class in machine_factory.value:
-            log(f"Machine Factory: Found machine {name} of class {machine_class}: {machine_factory}")
+    if sys.version_info >= (3, 12):
+        ats_machines = entry_points().select(group='ats.machines', value=machine_class)
+        log(f"Machine Factory: found machine plugins: {ats_machines}",
+            echo=False)
+        for machine_factory in ats_machines:
+            log(f"Machine Factory: Found machine {machine_factory.name} of class {machine_factory.value}: {machine_factory}")
             return machine_factory.load()(machine_class, -1)
+    else:
+        ats_machines = {machine.name: machine
+                        for group, machines in entry_points().items()
+                        if group == 'ats.machines' for machine in machines}
+        log(f"Machine Factory: found machine plugins: {ats_machines}",
+            echo=False)
+        for name, machine_factory in ats_machines.items():
+            if machine_class in machine_factory.value:
+                log(f"Machine Factory: Found machine {name} of class {machine_class}: {machine_factory}")
+                return machine_factory.load()(machine_class, -1)
 
     # Downstream needs to be able to detect if machine isn't found
     return None
