@@ -281,7 +281,8 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # So default it to 'nt' which was set above, but
         # allow it to be set separately as well. 
         test.cpus_per_task = test.nt
-        if configuration.options.cpusPerTask > -1:
+        has_explicit_cpus_per_task = configuration.options.cpusPerTask > -1
+        if has_explicit_cpus_per_task:
             test.cpus_per_task = configuration.options.cpusPerTask
         else:
             if 'cpus_per_task' in test.options:
@@ -293,7 +294,13 @@ class FluxScheduled(lcMachines.LCMachineCore):
         # calculation and the cpus_per_task that was just set above.
         cpus_per_task_based_on_gpus = test.gpus_per_task * self.coresPerGPU
 
-        if (cpus_per_task_based_on_gpus > test.cpus_per_task):
+        # An explicit --cpusPerTask request is a launch-policy override.  In
+        # particular, CUDA runs can retain their per-rank GPU request while
+        # using fewer CPUs than the hardware CPUs-per-GPU ratio.
+        if (
+            not has_explicit_cpus_per_task
+            and cpus_per_task_based_on_gpus > test.cpus_per_task
+        ):
             test.cpus_per_task = cpus_per_task_based_on_gpus
 
         # Command line option flux_nn over-rides what is in the deck.
@@ -319,10 +326,18 @@ class FluxScheduled(lcMachines.LCMachineCore):
 
         else:
             # If per test nn was not specified, and -nn was not specified on the command
-            # then calculate the number of nodes to use based on the np (number of mpi task)
-            # and the number of cpus needed per task
+            # then calculate the number of nodes to use from both the CPU and GPU
+            # resources requested by the MPI ranks.  CUDA runs may explicitly use
+            # fewer CPUs per rank than the CPUs associated with a GPU, so a CPU-only
+            # calculation can otherwise place more GPU ranks on a node than it has
+            # visible GPU (or MIG) instances.
             total_cores_needed = test.cpus_per_task * test.np
-            test.num_nodes_calculated = ceil(total_cores_needed / self.coresPerNode)
+            cpu_nodes_needed = ceil(total_cores_needed / self.coresPerNode)
+            gpu_nodes_needed = 0
+            if test.gpus_per_task > 0 and self.numGPUs > 0:
+                total_gpus_needed = test.gpus_per_task * test.np
+                gpu_nodes_needed = ceil(total_gpus_needed * self.numNodes / self.numGPUs)
+            test.num_nodes_calculated = max(cpu_nodes_needed, gpu_nodes_needed)
 
             # if --flux_exclusive option was given, then indicate exclusive node use 
             # for the job
