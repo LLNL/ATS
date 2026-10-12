@@ -460,6 +460,9 @@ class FluxScheduled(lcMachines.LCMachineCore):
         if test.num_nodes > self.numNodes:
             return "Too many nodes needed (%d)" % (test.num_nodes)
 
+        if test.num_nodes_calculated > self.numNodes:
+            return "Too many calculated nodes needed (%d)" % (test.num_nodes_calculated)
+
         return ""
 
     def canRunNow(self, test):
